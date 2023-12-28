@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "68248536741",
+    "project_id": "tarefas-app-66907",
+    "storage_bucket": "tarefas-app-66907.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:68248536741:android:feab21c748de6d39dfaf4c",
+        "android_client_info": {
+          "package_name": "com.github.hendrilmendes.tarefas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "68248536741-g65qn8i99vlotlg0lgjqpkf09kveplhv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.hendrilmendes.tarefas",
+            "certificate_hash": "f908ff68223b34e5917a340a4da01895217becdf"
+          }
+        },
+        {
+          "client_id": "68248536741-vdtbil27ks0b1jgjeup7lmhutfoge5np.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.hendrilmendes.tarefas",
+            "certificate_hash": "e5d538c6d522582b6121cddf449fb620cb4399c4"
+          }
+        },
+        {
+          "client_id": "68248536741-5saaq9b33qes0rgkp03skpjic3b89h2s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSWF-Il2JrCLJwdWL6oSdJVvaOAzupvz8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "68248536741-5saaq9b33qes0rgkp03skpjic3b89h2s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "68248536741-2jof2i0131srcbg2jk6d0fkptasp9l5v.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.github.hendrilmendes.tarefas"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
