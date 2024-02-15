@@ -48,7 +48,7 @@ android {
 
     defaultConfig {
         applicationId "com.github.hendrilmendes.tarefas"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdk 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
