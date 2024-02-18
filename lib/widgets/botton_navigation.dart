@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tarefas/telas/mais/mais.dart';
 import 'package:tarefas/telas/home/home.dart';
+import 'package:tarefas/telas/notas/notas.dart';
 
 class BottomNavigationContainer extends StatefulWidget {
   const BottomNavigationContainer({super.key});
@@ -16,6 +17,7 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
 
   final List<Widget> screens = const [
     HomeScreen(),
+    NotasScreen(),
     MaisScreen(),
   ];
 
@@ -46,9 +48,14 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: const [
             NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: 'Início',
+              icon: Icon(Icons.task_outlined),
+              selectedIcon: Icon(Icons.task),
+              label: 'Tarefas',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.notes_outlined),
+              selectedIcon: Icon(Icons.notes),
+              label: 'Anotações',
             ),
             NavigationDestination(
               icon: Icon(Icons.more_horiz_outlined),

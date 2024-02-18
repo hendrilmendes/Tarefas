@@ -40,8 +40,8 @@ class LoginScreen extends StatelessWidget {
               onPressed: () async {
                 final user = await authService.signInWithGoogle();
                 if (user != null) {
-                  // ignore: use_build_context_synchronously
                   Navigator.pushReplacement(
+                    // ignore: use_build_context_synchronously
                     context,
                     MaterialPageRoute(
                       builder: (context) => const HomeScreen(),
@@ -61,7 +61,7 @@ class LoginScreen extends StatelessWidget {
                 foregroundColor: Colors.blue,
                 backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(100),
                 ),
               ),
               child: Padding(
