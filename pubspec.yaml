@@ -1,5 +1,5 @@
 name: tarefas
-description: "Um app de lista de tarefas simples"
+description: "Um app simples para você salvar suas tarefas e anotações do dia a dia"
 publish_to: 'none'
 
 version: 1.1.4+14
@@ -14,6 +14,9 @@ dependencies:
 # Dynamic Colors
   dynamic_color: ^1.6.9
 
+# Email
+  flutter_email_sender: ^6.0.2
+
 # Firebase
   firebase_core: ^2.24.2
   firebase_crashlytics: ^3.4.9
@@ -21,20 +24,30 @@ dependencies:
   cloud_firestore: ^4.14.0
   firebase_auth: ^4.16.0
 
+# Feedback
+  feedback:
+      git:
+        url: https://github.com/hendrilmendes/feedback.git
+        path: feedback
+        ref: master
+
 # Google
   google_sign_in: ^6.2.1 
 
 # HTTP
   http: ^1.2.0
-
-# MDI
-  material_design_icons_flutter: 5.0.5955-rc.1
   
 # Package Info
   package_info_plus: ^5.0.1
 
+# Path Provider
+  path_provider: ^2.1.2
+
 # Provider
   provider: ^6.1.1
+
+# Review  
+  in_app_review: ^2.0.8
 
 # Shared Preferences
   shared_preferences: ^2.2.2
@@ -42,6 +55,9 @@ dependencies:
 # Url Launcher
   url_launcher: ^6.2.4
 
+  flutter_localizations:
+    sdk: flutter
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter

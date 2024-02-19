@@ -1,5 +1,5 @@
 ## Tarefas
-Um app simples para você salvar suas tarefas do dia a dia
+Um app simples para você salvar suas tarefas e anotações do dia a dia
 
 ### Screenshots
 
@@ -31,7 +31,7 @@ Um app simples para você salvar suas tarefas do dia a dia
 
 ### O que há de novo?
 
-Veja as novidades em [Changelog](CHANGELOG.md)
+Veja as novidades em [Changelog](Changelog.md)
 ##
 
 ## Licença

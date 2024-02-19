@@ -5,12 +5,14 @@ Changelog Tarefas
 
 Novo:
 - Faça sua anotações mais importantes
+- Sistema de Feedback
 - Suporte ao Dynamic Colors do Android 12
-- Suporte minimo Android 8
-- Suporte minimo iOS 16
+- Desative o Dynamic Colors caso não gostar
 
 Correções/Melhorias
 - Correções de bugs e melhorias de desempenho
+- Ajustes e melhorias de design
+- Melhorias no Updater
 
 ======================================================
 #### 1.0.0 28/12/2023

@@ -39,8 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
         String newTaskTitle = '';
 
         return AlertDialog(
-          title: const Text('Adicionar Tarefa'),
-          content: TextField(
+          title: const Text("Adicionar Tarefa"),
+          content: TextFormField(
+            decoration: const InputDecoration(labelText: "Digite sua tarefa"),
+            maxLines: null,
             onChanged: (value) {
               newTaskTitle = value;
             },
@@ -50,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Cancelar'),
+              child: const Text("Cancelar"),
             ),
             TextButton(
               onPressed: () async {
@@ -61,7 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   'userId': _user!.uid,
                 });
 
-                // Rebuild the widget to reflect the changes
                 setState(() {
                   tasks.add(Task(
                     title: newTaskTitle,
@@ -72,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ignore: use_build_context_synchronously
                 Navigator.pop(context);
               },
-              child: const Text('Adicionar'),
+              child: const Text("Adicionar"),
             ),
           ],
         );
@@ -186,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Tarefas'),
+        title: const Text("Tarefas"),
         actions: [
           IconButton(
             color: Colors.blue,
@@ -199,9 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           IconButton(
             color: Colors.blue,
-            icon: Icon(themeModel.isDarkMode
-                ? Icons.light_mode
-                : Icons.dark_mode),
+            icon: Icon(
+                themeModel.isDarkMode ? Icons.light_mode : Icons.dark_mode),
             onPressed: themeModel.toggleDarkMode,
           ),
         ],
@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           } else if (snapshot.hasError) {
             return const Center(
-              child: Text('Erro ao carregar tarefas'),
+              child: Text("Erro ao carregar tarefas"),
             );
           } else {
             return tasks.isEmpty
@@ -224,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Nenhuma tarefa encontrada',
+                          "Nenhuma tarefa encontrada 😅",
                           style: TextStyle(fontSize: 18),
                         ),
                       ],

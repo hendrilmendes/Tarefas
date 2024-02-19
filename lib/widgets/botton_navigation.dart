@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tarefas/telas/mais/mais.dart';
+import 'package:tarefas/telas/config/config.dart';
 import 'package:tarefas/telas/home/home.dart';
 import 'package:tarefas/telas/notas/notas.dart';
 
@@ -50,17 +50,17 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
             NavigationDestination(
               icon: Icon(Icons.task_outlined),
               selectedIcon: Icon(Icons.task),
-              label: 'Tarefas',
+              label: "Tarefas",
             ),
             NavigationDestination(
               icon: Icon(Icons.notes_outlined),
               selectedIcon: Icon(Icons.notes),
-              label: 'Anotações',
+              label: "Anotações",
             ),
             NavigationDestination(
-              icon: Icon(Icons.more_horiz_outlined),
-              selectedIcon: Icon(Icons.more_horiz),
-              label: 'Mais',
+              icon: Icon(Icons.settings_outlined),
+              selectedIcon: Icon(Icons.settings),
+              label: "Ajustes",
             ),
           ],
         ),

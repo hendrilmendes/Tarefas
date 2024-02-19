@@ -36,30 +36,57 @@ class _NotasScreenState extends State<NotasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Anotações'),
+        title: const Text("Anotações"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: const Padding(
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            TextField(
-              controller: _noteController,
-              decoration: const InputDecoration(labelText: 'Nova Anotação'),
-              maxLines: null,
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _saveNote,
-              child: const Text('Salvar'),
-            ),
-            const SizedBox(height: 16.0),
-            const Expanded(
+            SizedBox(height: 16.0),
+            Expanded(
               child: NotesList(),
             ),
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showAddNoteDialog();
+        },
+        child: const Icon(Icons.add_outlined),
+      ),
+    );
+  }
+
+  Future<void> _showAddNoteDialog() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Nova Anotação"),
+          content: TextFormField(
+            controller: _noteController,
+            decoration: const InputDecoration(labelText: "Digite sua anotação"),
+            maxLines: null,
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancelar"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _saveNote();
+                Navigator.of(context).pop();
+              },
+              child: const Text("Salvar"),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -98,6 +125,7 @@ class NoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      clipBehavior: Clip.hardEdge,
       child: ListTile(
         title: Text(note['note']),
         onTap: () {
@@ -123,7 +151,7 @@ class NoteDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalhes da Anotação'),
+        title: const Text("Detalhes da Anotação"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -143,7 +171,7 @@ class NoteDetailPage extends StatelessWidget {
                     .delete();
                 Navigator.pop(context);
               },
-              child: const Text('Excluir'),
+              child: const Text("Excluir"),
             ),
           ],
         ),

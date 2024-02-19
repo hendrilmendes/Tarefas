@@ -29,7 +29,7 @@ class LoginScreen extends StatelessWidget {
             const SizedBox(height: 50),
             const Center(
               child: Text(
-                'Faça login para salvar suas tarefas em nuvem',
+                "Faça login para salvar suas tarefas e anotações em nuvem",
                 style: TextStyle(fontSize: 18),
               ),
             ),
@@ -77,7 +77,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     const Text(
-                      'Login com o Google',
+                      "Login com o Google",
                       style: TextStyle(fontSize: 16),
                     ),
                   ],
