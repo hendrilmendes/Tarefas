@@ -90,7 +90,7 @@ class _AboutPageState extends State<AboutPage> {
                         Navigator.pop(context);
                         launchUrl(
                           Uri.parse(
-                            'https://raw.githubusercontent.com/hendrilmendes/Tarefas/main/Changelog.md',
+                            'https://raw.githubusercontent.com/hendrilmendes/Tarefas/main/CHANGELOG.md',
                           ),
                           mode: LaunchMode.inAppBrowserView,
                         );

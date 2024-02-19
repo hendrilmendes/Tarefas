@@ -31,7 +31,7 @@ Um app simples para você salvar suas tarefas e anotações do dia a dia
 
 ### O que há de novo?
 
-Veja as novidades em [Changelog](Changelog.md)
+Veja as novidades em [Changelog](CHANGELOG.md)
 ##
 
 ## Licença
