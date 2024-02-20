@@ -211,7 +211,7 @@ class _MaisScreenState extends State<MaisScreen> {
 
             final Email email = Email(
               body: feedback.text,
-              subject: 'News-Droid',
+              subject: 'Tarefas',
               recipients: ['hendrilmendes2015@gmail.com'],
               attachmentPaths: [screenshotFilePath],
               isHTML: false,
