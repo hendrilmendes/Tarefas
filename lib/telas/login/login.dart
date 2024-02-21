@@ -31,6 +31,7 @@ class LoginScreen extends StatelessWidget {
               child: Text(
                 "Faça login para salvar suas tarefas e anotações em nuvem",
                 style: TextStyle(fontSize: 18),
+                textAlign: TextAlign.center,
               ),
             ),
             const SizedBox(
