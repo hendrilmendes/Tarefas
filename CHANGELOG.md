@@ -1,10 +1,10 @@
 Changelog Tarefas
 
 ======================================================
-#### 1.1.2 **/**/2024
+#### 1.1.5 **/**/2024
 
 Novo:
-- Faça sua anotações mais importantes
+- Faça suas anotações mais importantes
 - Sistema de Feedback
 - Suporte ao Dynamic Colors do Android 12
 - Desative o Dynamic Colors caso não gostar
