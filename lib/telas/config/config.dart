@@ -8,16 +8,17 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/telas/sobre/sobre.dart';
 import 'package:tarefas/tema/tema.dart';
 import 'package:tarefas/updater/updater.dart';
 
-class MaisScreen extends StatefulWidget {
-  const MaisScreen({super.key});
+class ConfigScreen extends StatefulWidget {
+  const ConfigScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _MaisScreenState createState() => _MaisScreenState();
+  _ConfigScreenState createState() => _ConfigScreenState();
 }
 
 class AccountUser extends StatelessWidget {
@@ -69,8 +70,9 @@ class AccountUser extends StatelessWidget {
   }
 }
 
-class _MaisScreenState extends State<MaisScreen> {
+class _ConfigScreenState extends State<ConfigScreen> {
   final User? _user = FirebaseAuth.instance.currentUser;
+  final AuthService _authService = AuthService();
   String appVersion = '';
   String appBuild = '';
 
@@ -101,6 +103,18 @@ class _MaisScreenState extends State<MaisScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Ajustes"),
+        actions: [
+          IconButton(
+            color: Colors.blue,
+            icon: const Icon(Icons.exit_to_app_outlined),
+            onPressed: () async {
+              await _authService.signOut();
+              // ignore: use_build_context_synchronously
+              Navigator.pushReplacementNamed(context, '/login');
+            },
+            tooltip: "Desconectar",
+          ),
+        ],
       ),
       body: ListView(
         children: [

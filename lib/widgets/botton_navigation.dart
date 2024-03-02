@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tarefas/telas/config/config.dart';
 import 'package:tarefas/telas/home/home.dart';
 import 'package:tarefas/telas/notas/notas.dart';
+import 'package:tarefas/telas/config/config.dart';
 
 class BottomNavigationContainer extends StatefulWidget {
   const BottomNavigationContainer({super.key});
@@ -18,7 +18,7 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
   final List<Widget> screens = const [
     HomeScreen(),
     NotasScreen(),
-    MaisScreen(),
+    ConfigScreen(),
   ];
 
   // Metodo da button nav
@@ -48,18 +48,18 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: const [
             NavigationDestination(
-              icon: Icon(Icons.task_outlined),
-              selectedIcon: Icon(Icons.task),
+              icon: Icon(Icons.task),
+              selectedIcon: Icon(Icons.task_outlined),
               label: "Tarefas",
             ),
             NavigationDestination(
-              icon: Icon(Icons.notes_outlined),
-              selectedIcon: Icon(Icons.notes),
+              icon: Icon(Icons.notes),
+              selectedIcon: Icon(Icons.notes_outlined),
               label: "Anotações",
             ),
             NavigationDestination(
-              icon: Icon(Icons.settings_outlined),
-              selectedIcon: Icon(Icons.settings),
+              icon: Icon(Icons.settings),
+              selectedIcon: Icon(Icons.settings_outlined),
               label: "Ajustes",
             ),
           ],

@@ -1,10 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/tarefas/tarefas.dart';
-import 'package:tarefas/tema/tema.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -183,28 +181,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeModel = Provider.of<ThemeModel>(context);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Tarefas"),
-        actions: [
-          IconButton(
-            color: Colors.blue,
-            icon: const Icon(Icons.exit_to_app_outlined),
-            onPressed: () async {
-              await _authService.signOut();
-              // ignore: use_build_context_synchronously
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-          IconButton(
-            color: Colors.blue,
-            icon: Icon(
-                themeModel.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-            onPressed: themeModel.toggleDarkMode,
-          ),
-        ],
       ),
       body: FutureBuilder<void>(
         future: _loadTasks(),

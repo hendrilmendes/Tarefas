@@ -38,17 +38,13 @@ class _NotasScreenState extends State<NotasScreen> {
       appBar: AppBar(
         title: const Text("Anotações"),
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            SizedBox(height: 16.0),
-            Expanded(
-              child: NotesList(),
-            ),
-          ],
-        ),
+      body: const Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Expanded(
+            child: NotesList(),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -100,18 +96,33 @@ class NotesList extends StatelessWidget {
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection('notes').snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator.adaptive());
+        } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Nenhuma anotação encontrada 😅",
+                  style: TextStyle(fontSize: 18),
+                ),
+              ],
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return const Center(child: Text("Erro ao carregar notas"));
+        } else {
+          final notes = snapshot.data!.docs;
+          return ListView.builder(
+            itemCount: notes.length,
+            itemBuilder: (context, index) {
+              final note =
+                  notes[index] as QueryDocumentSnapshot<Map<String, dynamic>>;
+              return NoteCard(note: note);
+            },
+          );
         }
-        final notes = snapshot.data!.docs;
-        return ListView.builder(
-          itemCount: notes.length,
-          itemBuilder: (context, index) {
-            final note =
-                notes[index] as QueryDocumentSnapshot<Map<String, dynamic>>;
-            return NoteCard(note: note);
-          },
-        );
       },
     );
   }
@@ -143,9 +154,11 @@ class NoteCard extends StatelessWidget {
 
 class NoteDetailPage extends StatelessWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> note;
+  final TextEditingController _noteController = TextEditingController();
 
-  // ignore: use_key_in_widget_constructors
-  const NoteDetailPage({Key? key, required this.note});
+  NoteDetailPage({super.key, required this.note}) {
+    _noteController.text = note['note'];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -158,9 +171,21 @@ class NoteDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(
-              note['note'],
-              style: const TextStyle(fontSize: 18.0),
+            TextFormField(
+              controller: _noteController,
+              decoration: const InputDecoration(labelText: "Anotação"),
+              maxLines: null,
+            ),
+            const SizedBox(height: 16.0),
+            ElevatedButton(
+              onPressed: () {
+                FirebaseFirestore.instance
+                    .collection('notes')
+                    .doc(note.id)
+                    .update({'note': _noteController.text});
+                Navigator.pop(context);
+              },
+              child: const Text("Salvar"),
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(

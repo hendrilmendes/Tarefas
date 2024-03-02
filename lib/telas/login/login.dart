@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tarefas/auth/auth.dart';
-import 'package:tarefas/telas/home/home.dart';
+import 'package:tarefas/widgets/botton_navigation.dart';
 
 class LoginScreen extends StatelessWidget {
   final AuthService authService;
@@ -45,7 +45,7 @@ class LoginScreen extends StatelessWidget {
                     // ignore: use_build_context_synchronously
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const HomeScreen(),
+                      builder: (context) => const BottomNavigationContainer(),
                     ),
                   );
                   if (kDebugMode) {
