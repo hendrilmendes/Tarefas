@@ -120,7 +120,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
         children: [
           AccountUser(user: _user),
           const Divider(),
-          _buildCategoryHeader("Personalização", Icons.palette_outlined),
+          _buildCategoryHeader("Interface", Icons.palette_outlined),
           _buildThemeSettings(themeModel),
           _buildDynamicColors(themeModel),
           _buildCategoryHeader("Outros", Icons.more_horiz_outlined),
