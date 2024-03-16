@@ -94,7 +94,7 @@ packages:
     description:
       path: feedback
       ref: master
-      resolved-ref: "0f13e8d23229fce8be6f1b7f5a3082ab6a15b731"
+      resolved-ref: "5c819c9c5fa93f4acf7d9e16b86ed26cd72173ab"
       url: "https://github.com/hendrilmendes/feedback.git"
     source: git
     version: "3.0.0"

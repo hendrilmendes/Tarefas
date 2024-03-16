@@ -12,17 +12,17 @@ dependencies:
     sdk: flutter
 
 # Dynamic Colors
-  dynamic_color: ^1.6.9
+  dynamic_color: ^1.7.0
 
 # Email
   flutter_email_sender: ^6.0.2
 
 # Firebase
-  firebase_core: ^2.24.2
-  firebase_crashlytics: ^3.4.9
-  firebase_performance: ^0.9.3+8
-  cloud_firestore: ^4.14.0
-  firebase_auth: ^4.16.0
+  firebase_core: ^2.27.0
+  firebase_crashlytics: ^3.4.17
+  firebase_performance: ^0.9.3+16
+  cloud_firestore: ^4.15.8
+  firebase_auth: ^4.17.8
 
 # Feedback
   feedback:
