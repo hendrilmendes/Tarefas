@@ -20,15 +20,19 @@ class _NotasScreenState extends State<NotasScreen> {
         'timestamp': Timestamp.now(),
       });
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Nota salva com sucesso!'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Nota salva com sucesso!'),
+        ),
+      );
       _noteController.clear();
     } catch (e) {
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Erro ao salvar nota.'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Erro ao salvar nota.'),
+        ),
+      );
     }
   }
 

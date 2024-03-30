@@ -21,18 +21,20 @@ main() async {
 
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-  runApp(BetterFeedback(
-    theme: FeedbackThemeData.light(),
-    darkTheme: FeedbackThemeData.dark(),
-    localizationsDelegates: [
-      GlobalMaterialLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalFeedbackLocalizationsDelegate(),
-    ],
-    localeOverride: const Locale('pt'),
-    child: const MyApp(),
-  ));
+  runApp(
+    BetterFeedback(
+      theme: FeedbackThemeData.light(),
+      darkTheme: FeedbackThemeData.dark(),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalFeedbackLocalizationsDelegate(),
+      ],
+      localeOverride: const Locale('pt'),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

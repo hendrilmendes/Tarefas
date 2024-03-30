@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
         String newTaskTitle = '';
 
         return AlertDialog(
-          title: const Text("Adicionar Tarefa"),
+          title: const Text("Nova Tarefa"),
           content: TextFormField(
             decoration: const InputDecoration(labelText: "Digite sua tarefa"),
             maxLines: null,
@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               child: const Text("Cancelar"),
             ),
-            TextButton(
+            ElevatedButton(
               onPressed: () async {
                 // Adicione a nova tarefa ao Firestore
                 await tasksCollection.add({
@@ -62,10 +62,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
 
                 setState(() {
-                  tasks.add(Task(
-                    title: newTaskTitle,
-                    completed: false,
-                  ));
+                  tasks.add(
+                    Task(
+                      title: newTaskTitle,
+                      completed: false,
+                    ),
+                  );
                 });
 
                 // ignore: use_build_context_synchronously
@@ -181,7 +183,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Tarefas"),

@@ -38,7 +38,7 @@ dependencies:
   http: ^1.2.0
   
 # Package Info
-  package_info_plus: ^5.0.1
+  package_info_plus: ^6.0.0
 
 # Path Provider
   path_provider: ^2.1.2
@@ -62,7 +62,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^3.0.1
+  flutter_lints: ^3.0.2
 
 flutter:
 

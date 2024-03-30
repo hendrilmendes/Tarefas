@@ -8,6 +8,7 @@ Novo:
 - Sistema de Feedback
 - Suporte ao Dynamic Colors do Android 12
 - Desative o Dynamic Colors caso não gostar
+- Melhorias no suporte a tablets
 
 Correções/Melhorias
 - Correções de bugs e melhorias de desempenho
