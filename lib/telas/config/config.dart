@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:in_app_review/in_app_review.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tarefas/auth/auth.dart';
@@ -73,20 +72,6 @@ class AccountUser extends StatelessWidget {
 class _ConfigScreenState extends State<ConfigScreen> {
   final User? _user = FirebaseAuth.instance.currentUser;
   final AuthService _authService = AuthService();
-  String appVersion = '';
-  String appBuild = '';
-
-  // Metodo para exibir a versao
-  @override
-  void initState() {
-    super.initState();
-    PackageInfo.fromPlatform().then((packageInfo) {
-      setState(() {
-        appVersion = packageInfo.version;
-        appBuild = packageInfo.buildNumber;
-      });
-    });
-  }
 
   Future<String> writeImageToStorage(Uint8List feedbackScreenshot) async {
     final Directory output = await getTemporaryDirectory();

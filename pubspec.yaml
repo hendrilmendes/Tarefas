@@ -18,11 +18,11 @@ dependencies:
   flutter_email_sender: ^6.0.2
 
 # Firebase
-  firebase_core: ^2.27.0
-  firebase_crashlytics: ^3.4.17
-  firebase_performance: ^0.9.3+16
-  cloud_firestore: ^4.15.8
-  firebase_auth: ^4.17.8
+  firebase_core: ^2.28.0
+  firebase_crashlytics: ^3.5.0
+  firebase_performance: ^0.9.4
+  cloud_firestore: ^4.16.0
+  firebase_auth: ^4.19.0
 
 # Feedback
   feedback:
@@ -35,7 +35,7 @@ dependencies:
   google_sign_in: ^6.2.1 
 
 # HTTP
-  http: ^1.2.0
+  http: ^1.2.1
   
 # Package Info
   package_info_plus: ^6.0.0
@@ -47,7 +47,7 @@ dependencies:
   provider: ^6.1.1
 
 # Review  
-  in_app_review: ^2.0.8
+  in_app_review: ^2.0.9
 
 # Shared Preferences
   shared_preferences: ^2.2.2
