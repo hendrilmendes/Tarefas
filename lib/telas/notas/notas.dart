@@ -77,7 +77,7 @@ class _NotasScreenState extends State<NotasScreen> {
               },
               child: const Text("Cancelar"),
             ),
-            ElevatedButton(
+            FilledButton.tonal(
               onPressed: () {
                 _saveNote();
                 Navigator.of(context).pop();
@@ -181,7 +181,7 @@ class NoteDetailPage extends StatelessWidget {
               maxLines: null,
             ),
             const SizedBox(height: 16.0),
-            FilledButton.tonal(
+            ElevatedButton(
               onPressed: () {
                 FirebaseFirestore.instance
                     .collection('notes')
