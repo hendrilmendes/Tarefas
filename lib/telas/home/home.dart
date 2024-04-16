@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               child: const Text("Cancelar"),
             ),
-            ElevatedButton(
+            FilledButton.tonal(
               onPressed: () async {
                 // Adicione a nova tarefa ao Firestore
                 await tasksCollection.add({

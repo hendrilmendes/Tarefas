@@ -181,7 +181,7 @@ class NoteDetailPage extends StatelessWidget {
               maxLines: null,
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
+            FilledButton.tonal(
               onPressed: () {
                 FirebaseFirestore.instance
                     .collection('notes')
