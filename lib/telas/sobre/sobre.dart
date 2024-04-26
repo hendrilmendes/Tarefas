@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -32,7 +33,7 @@ class _AboutPageState extends State<AboutPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sobre"),
+        title: Text(AppLocalizations.of(context)!.about),
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -64,17 +65,17 @@ class _AboutPageState extends State<AboutPage> {
                       ),
                     ),
                   ),
-                  const Text(
-                    "Todos os Direitos Reservados.",
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.copyright,
+                    style: const TextStyle(
                       fontSize: 12,
                     ),
                   ),
                   const Divider(),
                   const SizedBox(height: 10),
-                  const Text(
-                    "Um app simples para você salvar suas tarefas e anotações do dia a dia",
-                    style: TextStyle(fontSize: 14.0),
+                  Text(
+                    AppLocalizations.of(context)!.appDesc,
+                    style: const TextStyle(fontSize: 14.0),
                   ),
                   const SizedBox(height: 10),
                   const Divider(),
@@ -83,9 +84,9 @@ class _AboutPageState extends State<AboutPage> {
                     clipBehavior: Clip.hardEdge,
                     margin: const EdgeInsets.all(8.0),
                     child: ListTile(
-                      title: const Text("Versão"),
+                      title: Text(AppLocalizations.of(context)!.version),
                       subtitle: Text('v$appVersion Build: ($appBuild)'),
-                      leading: const Icon(Icons.task_outlined),
+                      leading: const Icon(Icons.task_alt_outlined),
                       onTap: () {
                         Navigator.pop(context);
                         launchUrl(
@@ -102,10 +103,9 @@ class _AboutPageState extends State<AboutPage> {
                     clipBehavior: Clip.hardEdge,
                     margin: const EdgeInsets.all(8.0),
                     child: ListTile(
-                      title: const Text("Política de Privacidade"),
-                      subtitle:
-                          const Text("Termos que garantem a sua privacidade"),
-                          leading: const Icon(Icons.privacy_tip_outlined),
+                      title: Text(AppLocalizations.of(context)!.privacy),
+                      subtitle: Text(AppLocalizations.of(context)!.privacySub),
+                      leading: const Icon(Icons.privacy_tip_outlined),
                       onTap: () {
                         Navigator.pop(context);
                         launchUrl(
@@ -117,13 +117,14 @@ class _AboutPageState extends State<AboutPage> {
                       },
                     ),
                   ),
-                  // Versao
+                  // Codigo Fonte
                   Card(
                     clipBehavior: Clip.hardEdge,
                     margin: const EdgeInsets.all(8.0),
                     child: ListTile(
-                      title: const Text("Código Fonte"),
-                      subtitle: const Text("Projeto disponível no GitHub"),
+                      title: Text(AppLocalizations.of(context)!.sourceCode),
+                      subtitle:
+                          Text(AppLocalizations.of(context)!.sourceCodeSub),
                       leading: const Icon(Icons.code_outlined),
                       onTap: () {
                         Navigator.pop(context);
@@ -141,17 +142,17 @@ class _AboutPageState extends State<AboutPage> {
                     clipBehavior: Clip.hardEdge,
                     margin: const EdgeInsets.all(8.0),
                     child: ListTile(
-                      title: const Text("Licenças de Código Aberto"),
-                      subtitle: const Text(
-                          "Softwares de terceiros usados na construção do app"),
-                          leading: const Icon(Icons.flutter_dash_outlined
-                        ),
+                      title: Text(AppLocalizations.of(context)!.openSource),
+                      subtitle:
+                          Text(AppLocalizations.of(context)!.openSourceSub),
+                      leading: const Icon(Icons.flutter_dash_outlined),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const LicensePage(
-                              applicationName: "Tarefas",
+                            builder: (context) => LicensePage(
+                              applicationName:
+                                  AppLocalizations.of(context)!.appName,
                             ),
                           ),
                         );

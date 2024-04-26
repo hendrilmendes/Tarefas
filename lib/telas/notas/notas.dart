@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NotasScreen extends StatefulWidget {
   // ignore: use_key_in_widget_constructors
@@ -15,22 +17,28 @@ class _NotasScreenState extends State<NotasScreen> {
 
   void _saveNote() async {
     try {
-      await FirebaseFirestore.instance.collection('notes').add({
-        'note': _noteController.text,
-        'timestamp': Timestamp.now(),
-      });
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Nota salva com sucesso!'),
-        ),
-      );
-      _noteController.clear();
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('notes').add({
+          'userId': user.uid,
+          'note': _noteController.text,
+          'timestamp': Timestamp.now(),
+        });
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            // ignore: use_build_context_synchronously
+            content: Text(AppLocalizations.of(context)!.salveNote),
+          ),
+        );
+        _noteController.clear();
+      }
     } catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Erro ao salvar nota.'),
+        SnackBar(
+          // ignore: use_build_context_synchronously
+          content: Text(AppLocalizations.of(context)!.erroSalveNote),
         ),
       );
     }
@@ -40,7 +48,7 @@ class _NotasScreenState extends State<NotasScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Anotações"),
+        title: Text(AppLocalizations.of(context)!.notes),
       ),
       body: const Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -60,34 +68,38 @@ class _NotasScreenState extends State<NotasScreen> {
   }
 
   Future<void> _showAddNoteDialog() async {
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Nova Anotação"),
-          content: TextFormField(
-            controller: _noteController,
-            decoration: const InputDecoration(labelText: "Digite sua anotação"),
-            maxLines: null,
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Cancelar"),
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations != null) {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(appLocalizations.newNote),
+            content: TextFormField(
+              controller: _noteController,
+              decoration:
+                  InputDecoration(labelText: appLocalizations.inputNote),
+              maxLines: null,
             ),
-            FilledButton.tonal(
-              onPressed: () {
-                _saveNote();
-                Navigator.of(context).pop();
-              },
-              child: const Text("Salvar"),
-            ),
-          ],
-        );
-      },
-    );
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(appLocalizations.cancel),
+              ),
+              FilledButton.tonal(
+                onPressed: () {
+                  _saveNote();
+                  Navigator.of(context).pop();
+                },
+                child: Text(appLocalizations.salve),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
 
@@ -98,24 +110,28 @@ class NotesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('notes').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('notes')
+          .where('userId', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+          .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator.adaptive());
         } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Nenhuma anotação encontrada 😅",
-                  style: TextStyle(fontSize: 18),
+                  AppLocalizations.of(context)!.noNotes,
+                  style: const TextStyle(fontSize: 18),
                 ),
               ],
             ),
           );
         } else if (snapshot.hasError) {
-          return const Center(child: Text("Erro ao carregar notas"));
+          return Center(
+              child: Text(AppLocalizations.of(context)!.errorLoadNotes));
         } else {
           final notes = snapshot.data!.docs;
           return ListView.builder(
@@ -168,7 +184,7 @@ class NoteDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Detalhes da Anotação"),
+        title: Text(AppLocalizations.of(context)!.detailsNotes),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -177,11 +193,12 @@ class NoteDetailPage extends StatelessWidget {
           children: <Widget>[
             TextFormField(
               controller: _noteController,
-              decoration: const InputDecoration(labelText: "Anotação"),
+              decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.note),
               maxLines: null,
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
+            FilledButton.tonal(
               onPressed: () {
                 FirebaseFirestore.instance
                     .collection('notes')
@@ -189,18 +206,43 @@ class NoteDetailPage extends StatelessWidget {
                     .update({'note': _noteController.text});
                 Navigator.pop(context);
               },
-              child: const Text("Salvar"),
+              child: Text(AppLocalizations.of(context)!.salve),
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
+            TextButton(
               onPressed: () {
-                FirebaseFirestore.instance
-                    .collection('notes')
-                    .doc(note.id)
-                    .delete();
-                Navigator.pop(context);
+                final appLocalizations = AppLocalizations.of(context);
+                if (appLocalizations != null) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text(appLocalizations.confirmDelete),
+                        content: Text(appLocalizations.confirmDeleteSub),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(appLocalizations.cancel),
+                          ),
+                          FilledButton.tonal(
+                            onPressed: () {
+                              FirebaseFirestore.instance
+                                  .collection('notes')
+                                  .doc(note.id)
+                                  .delete();
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(appLocalizations.delete),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
               },
-              child: const Text("Excluir"),
+              child: Text(AppLocalizations.of(context)!.delete),
             ),
           ],
         ),

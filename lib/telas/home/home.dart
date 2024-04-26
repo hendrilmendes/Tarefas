@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/tarefas/tarefas.dart';
@@ -31,54 +32,58 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _addTask() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        String newTaskTitle = '';
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations != null) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          String newTaskTitle = '';
 
-        return AlertDialog(
-          title: const Text("Nova Tarefa"),
-          content: TextFormField(
-            decoration: const InputDecoration(labelText: "Digite sua tarefa"),
-            maxLines: null,
-            onChanged: (value) {
-              newTaskTitle = value;
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
+          return AlertDialog(
+            title: Text(appLocalizations.newTask),
+            content: TextFormField(
+              decoration:
+                  InputDecoration(labelText: appLocalizations.inputTask),
+              maxLines: null,
+              onChanged: (value) {
+                newTaskTitle = value;
               },
-              child: const Text("Cancelar"),
             ),
-            FilledButton.tonal(
-              onPressed: () async {
-                // Adicione a nova tarefa ao Firestore
-                await tasksCollection.add({
-                  'title': newTaskTitle,
-                  'completed': false,
-                  'userId': _user!.uid,
-                });
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(appLocalizations.cancel),
+              ),
+              FilledButton.tonal(
+                onPressed: () async {
+                  // Adicione a nova tarefa ao Firestore
+                  await tasksCollection.add({
+                    'title': newTaskTitle,
+                    'completed': false,
+                    'userId': _user!.uid,
+                  });
 
-                setState(() {
-                  tasks.add(
-                    Task(
-                      title: newTaskTitle,
-                      completed: false,
-                    ),
-                  );
-                });
+                  setState(() {
+                    tasks.add(
+                      Task(
+                        title: newTaskTitle,
+                        completed: false,
+                      ),
+                    );
+                  });
 
-                // ignore: use_build_context_synchronously
-                Navigator.pop(context);
-              },
-              child: const Text("Adicionar"),
-            ),
-          ],
-        );
-      },
-    );
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context);
+                },
+                child: Text(appLocalizations.salve),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   Future<void> _loadTasks() async {
@@ -185,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tarefas"),
+        title: Text(AppLocalizations.of(context)!.appName),
       ),
       body: FutureBuilder<void>(
         future: _loadTasks(),
@@ -195,18 +200,18 @@ class _HomeScreenState extends State<HomeScreen> {
               child: CircularProgressIndicator.adaptive(),
             );
           } else if (snapshot.hasError) {
-            return const Center(
-              child: Text("Erro ao carregar tarefas"),
+            return Center(
+              child: Text(AppLocalizations.of(context)!.errorLoadTask),
             );
           } else {
             return tasks.isEmpty
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Nenhuma tarefa encontrada 😅",
-                          style: TextStyle(fontSize: 18),
+                          AppLocalizations.of(context)!.noTask,
+                          style: const TextStyle(fontSize: 18),
                         ),
                       ],
                     ),

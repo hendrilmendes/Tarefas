@@ -1,7 +1,13 @@
 Changelog Tarefas
 
 ======================================================
-#### 1.1.5 **/**/2024
+#### 1.1.8
+
+Correções/Melhorias
+- Correções de bugs e melhorias de desempenho
+
+======================================================
+#### 1.1.5
 
 Novo:
 - Faça suas anotações mais importantes

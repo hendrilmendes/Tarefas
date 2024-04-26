@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/widgets/botton_navigation.dart';
 
@@ -27,10 +28,10 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 50),
-            const Center(
+            Center(
               child: Text(
-                "Faça login para salvar suas tarefas e anotações em nuvem",
-                style: TextStyle(fontSize: 18),
+                AppLocalizations.of(context)!.homeLogin,
+                style: const TextStyle(fontSize: 18),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -77,9 +78,9 @@ class LoginScreen extends StatelessWidget {
                       height: 24,
                     ),
                     const SizedBox(width: 10),
-                    const Text(
-                      "Login com o Google",
-                      style: TextStyle(fontSize: 16),
+                    Text(
+                      AppLocalizations.of(context)!.googleLogin,
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ],
                 ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tarefas/telas/config/config.dart';
 import 'package:tarefas/telas/home/home.dart';
 import 'package:tarefas/telas/notas/notas.dart';
-import 'package:tarefas/telas/config/config.dart';
 
 class BottomNavigationContainer extends StatefulWidget {
   const BottomNavigationContainer({super.key});
@@ -43,21 +44,21 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
                   selectedIndex: currentIndex,
                   onDestinationSelected: onTabTapped,
                   labelType: NavigationRailLabelType.all,
-                  destinations: const [
+                  destinations: [
                     NavigationRailDestination(
-                      icon: Icon(Icons.task),
-                      selectedIcon: Icon(Icons.task_outlined),
-                      label: Text("Tarefas"),
+                      icon: const Icon(Icons.task_alt),
+                      selectedIcon: const Icon(Icons.task_alt_outlined),
+                      label: Text(AppLocalizations.of(context)!.appName),
                     ),
                     NavigationRailDestination(
-                      icon: Icon(Icons.notes),
-                      selectedIcon: Icon(Icons.notes_outlined),
-                      label: Text("Anotações"),
+                      icon: const Icon(Icons.notes),
+                      selectedIcon: const Icon(Icons.notes_outlined),
+                      label: Text(AppLocalizations.of(context)!.notes),
                     ),
                     NavigationRailDestination(
-                      icon: Icon(Icons.settings),
-                      selectedIcon: Icon(Icons.settings_outlined),
-                      label: Text("Ajustes"),
+                      icon: const Icon(Icons.settings),
+                      selectedIcon: const Icon(Icons.settings_outlined),
+                      label: Text(AppLocalizations.of(context)!.settings),
                     ),
                   ],
                 ),
@@ -71,7 +72,7 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
               // Bottom Nav
               bottomNavigationBar: NavigationBarTheme(
                 data: NavigationBarThemeData(
-                  labelTextStyle: WidgetStateProperty.all(
+                  labelTextStyle: MaterialStateProperty.all(
                     const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
                   ),
                 ),
@@ -79,21 +80,22 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
                   onDestinationSelected: onTabTapped,
                   selectedIndex: currentIndex,
                   labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-                  destinations: const [
+                  destinations: [
                     NavigationDestination(
-                      icon: Icon(Icons.task),
-                      selectedIcon: Icon(Icons.task_outlined),
-                      label: "Tarefas",
+                      icon: const Icon(Icons.task_alt),
+                      selectedIcon: const Icon(Icons.task_alt_outlined),
+                      label: AppLocalizations.of(context)!.appName,
+                    ),
+                    
+                    NavigationDestination(
+                      icon: const Icon(Icons.notes),
+                      selectedIcon: const Icon(Icons.notes_outlined),
+                      label: AppLocalizations.of(context)!.notes,
                     ),
                     NavigationDestination(
-                      icon: Icon(Icons.notes),
-                      selectedIcon: Icon(Icons.notes_outlined),
-                      label: "Anotações",
-                    ),
-                    NavigationDestination(
-                      icon: Icon(Icons.settings),
-                      selectedIcon: Icon(Icons.settings_outlined),
-                      label: "Ajustes",
+                      icon: const Icon(Icons.settings),
+                      selectedIcon: const Icon(Icons.settings_outlined),
+                      label: AppLocalizations.of(context)!.settings,
                     ),
                   ],
                 ),

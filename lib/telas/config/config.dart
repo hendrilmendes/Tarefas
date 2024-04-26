@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -87,7 +88,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Ajustes"),
+         title: Text(AppLocalizations.of(context)!.settings),
         actions: [
           IconButton(
             color: Colors.blue,
@@ -97,7 +98,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
               // ignore: use_build_context_synchronously
               Navigator.pushReplacementNamed(context, '/login');
             },
-            tooltip: "Desconectar",
+            tooltip: AppLocalizations.of(context)!.desconect,
           ),
         ],
       ),
@@ -105,10 +106,12 @@ class _ConfigScreenState extends State<ConfigScreen> {
         children: [
           AccountUser(user: _user),
           const Divider(),
-          _buildCategoryHeader("Interface", Icons.palette_outlined),
-          _buildThemeSettings(themeModel),
+          _buildCategoryHeader(
+              AppLocalizations.of(context)!.interface, Icons.palette_outlined),
+          _buildThemeSettings(context, themeModel),
           _buildDynamicColors(themeModel),
-          _buildCategoryHeader("Outros", Icons.more_horiz_outlined),
+          _buildCategoryHeader(
+              AppLocalizations.of(context)!.outhers, Icons.more_horiz_outlined),
           _buildUpdateSettings(),
           _buildReview(),
           _buildSupportSettings(),
@@ -134,23 +137,72 @@ class _ConfigScreenState extends State<ConfigScreen> {
     );
   }
 
-  Widget _buildThemeSettings(ThemeModel themeModel) {
+  void _showThemeDialog(BuildContext context, ThemeModel themeModel) {
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(appLocalizations.themeSelect),
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RadioListTile<ThemeModeType>(
+                      title: Text(appLocalizations.lightMode),
+                      value: ThemeModeType.light,
+                      groupValue: themeModel.themeMode,
+                      onChanged: (value) {
+                        setState(() {
+                          themeModel.changeThemeMode(value!);
+                        });
+                        Navigator.pop(context);
+                      },
+                    ),
+                    RadioListTile<ThemeModeType>(
+                      title: Text(appLocalizations.darkMode),
+                      value: ThemeModeType.dark,
+                      groupValue: themeModel.themeMode,
+                      onChanged: (value) {
+                        setState(() {
+                          themeModel.changeThemeMode(value!);
+                        });
+                        Navigator.pop(context);
+                      },
+                    ),
+                    RadioListTile<ThemeModeType>(
+                      title: Text(appLocalizations.systemMode),
+                      value: ThemeModeType.system,
+                      groupValue: themeModel.themeMode,
+                      onChanged: (value) {
+                        setState(() {
+                          themeModel.changeThemeMode(value!);
+                        });
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  Widget _buildThemeSettings(BuildContext context, ThemeModel themeModel) {
     return Card(
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.all(8.0),
       child: ListTile(
-        title: const Text("Modo Escuro"),
-        subtitle: const Text(
-          "O modo escuro possibilita uma experiência melhor ao usar o app em ambientes noturnos",
-        ),
-        trailing: Switch(
-          activeColor: Colors.blue,
-          value: themeModel.isDarkMode,
-          onChanged: (value) {
-            themeModel.toggleDarkMode();
-            themeModel.saveThemePreference(value);
-          },
-        ),
+        title: Text(AppLocalizations.of(context)!.theme),
+        subtitle: Text(AppLocalizations.of(context)!.themeSub),
+        onTap: () {
+          _showThemeDialog(context, themeModel);
+        },
       ),
     );
   }
@@ -160,9 +212,9 @@ class _ConfigScreenState extends State<ConfigScreen> {
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.all(8.0),
       child: ListTile(
-        title: const Text("Dynamic Colors"),
-        subtitle: const Text(
-          "O Dynamic Colors proporciona uma interface agradável de acordo com o seu papel de parede (Android 12+)",
+        title: Text(AppLocalizations.of(context)!.dynamicColors),
+        subtitle: Text(
+          AppLocalizations.of(context)!.dynamicColorsSub,
         ),
         trailing: Switch(
           activeColor: Colors.blue,
@@ -181,8 +233,8 @@ class _ConfigScreenState extends State<ConfigScreen> {
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.all(8.0),
       child: ListTile(
-        title: const Text("Atualizações"),
-        subtitle: const Text("Toque para buscar por novas versões do app"),
+        title: Text(AppLocalizations.of(context)!.update),
+        subtitle: Text(AppLocalizations.of(context)!.updateSub),
         leading: const Icon(Icons.update_outlined),
         onTap: () {
           Updater.checkForUpdates(context);
@@ -196,11 +248,11 @@ class _ConfigScreenState extends State<ConfigScreen> {
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.all(8.0),
       child: ListTile(
-        title: const Text(
-          "Suporte",
+        title: Text(
+          AppLocalizations.of(context)!.support,
         ),
-        subtitle: const Text(
-          "Encontrou um bug ou deseja sugerir algo? Entre em contato conosco 😁",
+        subtitle: Text(
+          AppLocalizations.of(context)!.supportSub,
         ),
         leading: const Icon(Icons.support_outlined),
         onTap: () {
@@ -210,7 +262,8 @@ class _ConfigScreenState extends State<ConfigScreen> {
 
             final Email email = Email(
               body: feedback.text,
-              subject: 'Tarefas',
+              // ignore: use_build_context_synchronously
+              subject: AppLocalizations.of(context)!.appName,
               recipients: ['hendrilmendes2015@gmail.com'],
               attachmentPaths: [screenshotFilePath],
               isHTML: false,
@@ -227,8 +280,8 @@ class _ConfigScreenState extends State<ConfigScreen> {
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.all(8.0),
       child: ListTile(
-        title: const Text("Avalie o App"),
-        subtitle: const Text("Faça uma avaliação do nosso app"),
+        title: Text(AppLocalizations.of(context)!.review),
+        subtitle: Text(AppLocalizations.of(context)!.reviewSub),
         leading: const Icon(Icons.rate_review_outlined),
         onTap: () async {
           final InAppReview inAppReview = InAppReview.instance;
@@ -246,8 +299,10 @@ class _ConfigScreenState extends State<ConfigScreen> {
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.all(8.0),
       child: ListTile(
-        title: const Text("Sobre"),
-        subtitle: const Text("Um pouco mais sobre o app"),
+        title: Text(
+          AppLocalizations.of(context)!.about,
+        ),
+        subtitle: Text(AppLocalizations.of(context)!.aboutSub),
         leading: const Icon(Icons.info_outlined),
         onTap: () {
           Navigator.push(
