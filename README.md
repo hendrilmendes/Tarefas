@@ -26,6 +26,8 @@ Um app simples para você salvar suas tarefas e anotações do dia a dia
 * App feito em Flutter disponível para iOS e Android
 * Firebase para monitorar o desempenho, erros do app e banco de dados
 * Excluir tarefas
+* Fazer anotações
+* Excluir anotações
 * Marcar como concluído
 ##
 
