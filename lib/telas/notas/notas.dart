@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tarefas/telas/notas/notas_details.dart';
 
 class NotasScreen extends StatefulWidget {
   // ignore: use_key_in_widget_constructors
@@ -28,7 +29,7 @@ class _NotasScreenState extends State<NotasScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             // ignore: use_build_context_synchronously
-            content: Text(AppLocalizations.of(context)!.salveNote),
+            content: Text(AppLocalizations.of(context)!.saveNote),
           ),
         );
         _noteController.clear();
@@ -38,7 +39,7 @@ class _NotasScreenState extends State<NotasScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           // ignore: use_build_context_synchronously
-          content: Text(AppLocalizations.of(context)!.erroSalveNote),
+          content: Text(AppLocalizations.of(context)!.errosaveNote),
         ),
       );
     }
@@ -93,7 +94,7 @@ class _NotasScreenState extends State<NotasScreen> {
                   _saveNote();
                   Navigator.of(context).pop();
                 },
-                child: Text(appLocalizations.salve),
+                child: Text(appLocalizations.save),
               ),
             ],
           );
@@ -131,7 +132,8 @@ class NotesList extends StatelessWidget {
           );
         } else if (snapshot.hasError) {
           return Center(
-              child: Text(AppLocalizations.of(context)!.errorLoadNotes));
+            child: Text(AppLocalizations.of(context)!.errorLoadNotes),
+          );
         } else {
           final notes = snapshot.data!.docs;
           return ListView.builder(
@@ -167,85 +169,6 @@ class NoteCard extends StatelessWidget {
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class NoteDetailPage extends StatelessWidget {
-  final QueryDocumentSnapshot<Map<String, dynamic>> note;
-  final TextEditingController _noteController = TextEditingController();
-
-  NoteDetailPage({super.key, required this.note}) {
-    _noteController.text = note['note'];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.detailsNotes),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            TextFormField(
-              controller: _noteController,
-              decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.note),
-              maxLines: null,
-            ),
-            const SizedBox(height: 16.0),
-            FilledButton.tonal(
-              onPressed: () {
-                FirebaseFirestore.instance
-                    .collection('notes')
-                    .doc(note.id)
-                    .update({'note': _noteController.text});
-                Navigator.pop(context);
-              },
-              child: Text(AppLocalizations.of(context)!.salve),
-            ),
-            const SizedBox(height: 16.0),
-            TextButton(
-              onPressed: () {
-                final appLocalizations = AppLocalizations.of(context);
-                if (appLocalizations != null) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text(appLocalizations.confirmDelete),
-                        content: Text(appLocalizations.confirmDeleteSub),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(appLocalizations.cancel),
-                          ),
-                          FilledButton.tonal(
-                            onPressed: () {
-                              FirebaseFirestore.instance
-                                  .collection('notes')
-                                  .doc(note.id)
-                                  .delete();
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(appLocalizations.delete),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
-              },
-              child: Text(AppLocalizations.of(context)!.delete),
-            ),
-          ],
-        ),
       ),
     );
   }

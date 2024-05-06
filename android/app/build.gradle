@@ -1,5 +1,8 @@
 plugins {
     id "com.android.application"
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.firebase-perf'
+    id 'com.google.firebase.crashlytics'
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
@@ -67,6 +70,9 @@ android {
         release {
             signingConfig signingConfigs.release
         }
+        debug {
+            signingConfig signingConfigs.release
+        }
     }
 }
 
@@ -75,6 +81,6 @@ flutter {
 }
 
 dependencies {
-    implementation(platform('com.google.firebase:firebase-bom:32.7.0'))
-    implementation('com.google.firebase:firebase-analytics-ktx:21.5.0')
+    implementation(platform('com.google.firebase:firebase-bom:33.0.0'))
+    implementation('com.google.firebase:firebase-analytics-ktx:22.0.0')
 }

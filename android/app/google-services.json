@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "68248536741-s78brecfnjh0ip36bqb6omnbibh43rp8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.hendrilmendes.tarefas",
+            "certificate_hash": "354553dd4e2caa7b395e8d0de54bd67309710f94"
+          }
+        },
+        {
           "client_id": "68248536741-vdtbil27ks0b1jgjeup7lmhutfoge5np.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

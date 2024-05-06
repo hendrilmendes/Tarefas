@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:app_settings/app_settings.dart';
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -88,7 +89,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
 
     return Scaffold(
       appBar: AppBar(
-         title: Text(AppLocalizations.of(context)!.settings),
+        title: Text(AppLocalizations.of(context)!.settings),
         actions: [
           IconButton(
             color: Colors.blue,
@@ -106,6 +107,9 @@ class _ConfigScreenState extends State<ConfigScreen> {
         children: [
           AccountUser(user: _user),
           const Divider(),
+          _buildCategoryHeader(AppLocalizations.of(context)!.notification,
+              Icons.notifications_outlined),
+          _buildNotificationSettings(),
           _buildCategoryHeader(
               AppLocalizations.of(context)!.interface, Icons.palette_outlined),
           _buildThemeSettings(context, themeModel),
@@ -134,6 +138,19 @@ class _ConfigScreenState extends State<ConfigScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildNotificationSettings() {
+    return Card(
+      clipBehavior: Clip.hardEdge,
+      margin: const EdgeInsets.all(8.0),
+      child: ListTile(
+          title: Text(AppLocalizations.of(context)!.notification),
+          subtitle: Text(AppLocalizations.of(context)!.notificationSub),
+          onTap: () {
+            AppSettings.openAppSettings(type: AppSettingsType.notification);
+          }),
     );
   }
 

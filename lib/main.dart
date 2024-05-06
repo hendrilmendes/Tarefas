@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ import 'package:tarefas/firebase_options.dart';
 import 'package:tarefas/telas/login/login.dart';
 import 'package:tarefas/tema/tema.dart';
 import 'package:tarefas/widgets/botton_navigation.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +23,15 @@ main() async {
   );
 
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()!
+      .requestNotificationsPermission();
+
+  tz.initializeTimeZones();
 
   runApp(
     BetterFeedback(

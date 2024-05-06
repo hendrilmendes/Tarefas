@@ -1,6 +1,18 @@
 Changelog Tarefas
 
 ======================================================
+#### 1.2.0 (Em desenvolvimento)
+
+Novo:
+- Agendamento de tarefas
+- Implementado suporte a separação de tarefas concluídas e pendentes
+- Implementado suporte a edição das tarefas
+
+Correções/Melhorias
+- Ajustes visuais
+- Correções de bugs e melhorias de desempenho
+
+======================================================
 #### 1.1.8
 
 Correções/Melhorias
