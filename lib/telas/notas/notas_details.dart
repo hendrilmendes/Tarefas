@@ -24,7 +24,7 @@ class NoteDetailPage extends StatelessWidget {
             TextFormField(
               controller: _noteController,
               decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.note),
+                  labelText: AppLocalizations.of(context)!.inputNote),
               maxLines: null,
             ),
             const SizedBox(height: 16.0),

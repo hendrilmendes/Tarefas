@@ -29,6 +29,8 @@ Um app simples para você salvar suas tarefas e anotações do dia a dia
 * Fazer anotações
 * Excluir anotações
 * Marcar como concluído
+* Edição de Tarefas e Anotações
+* Agendamento de Tarefas
 ##
 
 ### O que há de novo?

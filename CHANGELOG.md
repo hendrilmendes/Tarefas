@@ -13,13 +13,13 @@ Correções/Melhorias
 - Correções de bugs e melhorias de desempenho
 
 ======================================================
-#### 1.1.8
+#### 1.1.8 - 26/04/2024
 
 Correções/Melhorias
 - Correções de bugs e melhorias de desempenho
 
 ======================================================
-#### 1.1.5
+#### 1.1.5 - 10/03/2024
 
 Novo:
 - Faça suas anotações mais importantes
@@ -34,5 +34,5 @@ Correções/Melhorias
 - Melhorias no Updater
 
 ======================================================
-#### 1.0.0 28/12/2023
+#### 1.0.0 - 28/12/2023
 - Primeira Versão

@@ -32,7 +32,7 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.taskEdit),
+        title: Text(AppLocalizations.of(context)!.taskDetails),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -90,7 +90,7 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
               ),
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
+            FilledButton.tonal(
               onPressed: () {
                 final newTitle = _controller.text.trim();
                 if (newTitle.isNotEmpty) {

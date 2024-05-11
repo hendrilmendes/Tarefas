@@ -1,3 +1,4 @@
+import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:feedback/feedback.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,6 +32,8 @@ main() async {
           AndroidFlutterLocalNotificationsPlugin>()!
       .requestNotificationsPermission();
 
+  await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+  
   tz.initializeTimeZones();
 
   runApp(

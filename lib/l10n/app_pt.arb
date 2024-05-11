@@ -15,7 +15,6 @@
     "delete": "Apagar",
     "save": "Salvar",
     "notesDetails": "Detalhes da Anotação",
-    "note": "Anotação",
     "inputTask": "Digite sua tarefa",
     "inputNote": "Digite sua anotação",
     "errorLoadTask": "Erro ao carregar tarefas",
@@ -49,9 +48,8 @@
     "support": "Suporte",
     "supportSub": "Encontrou um bug ou deseja sugerir algo? Entre em contato conosco 😁",
     "review": "Avalie o App",
-    "reviewSub": "Faça uma avaliação na Google Play Store",
+    "reviewSub": "Faça uma avaliação na loja de apps",
     "aboutSub": "Um pouco mais sobre o app",
-    "searchFor": "Procurar por",
     "newUpdate": "Nova versão disponível",
     "news": "Novidades:",
     "after": "DEPOIS",
@@ -61,10 +59,10 @@
     "pendants": "Tarefas Pendentes",
     "completed": "Tarefas Concluídas",
     "dateTime": "Selecione Data e Hora",
-    "taskEdit": "Editar Tarefa",
-    "notificationTask": "Opa, tudo bem? Tem uma tarefa pendente ainda",
+    "taskDetails": "Detalhes da Tarefa",
+    "notificationTask": "Opa, tudo bem? Passando pra te lembrar de uma tarefa",
     "error": "Erro",
     "errorSub": "A data e hora são necessárias",
     "notification": "Notificações",
-    "notificationSub": "Notificações serão enviadas informando sobre suas tarefas "
+    "notificationSub": "Notificações serão enviadas informando sobre suas tarefas"
 }
