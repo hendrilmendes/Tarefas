@@ -1,7 +1,7 @@
 Changelog Tarefas
 
 ======================================================
-#### 1.2.0 (Em desenvolvimento)
+#### 1.2.0 - 20/05/2024
 
 Novo:
 - Agendamento de tarefas
