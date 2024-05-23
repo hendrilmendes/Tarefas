@@ -24,7 +24,9 @@ class NoteDetailPage extends StatelessWidget {
             TextFormField(
               controller: _noteController,
               decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.inputNote),
+                labelText: AppLocalizations.of(context)!.inputNote,
+                border: const OutlineInputBorder(),
+              ),
               maxLines: null,
             ),
             const SizedBox(height: 16.0),
@@ -71,6 +73,7 @@ class NoteDetailPage extends StatelessWidget {
                     },
                   );
                 }
+                Navigator.pop(context);
               },
               child: Text(AppLocalizations.of(context)!.delete),
             ),

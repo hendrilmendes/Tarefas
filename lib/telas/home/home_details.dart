@@ -38,12 +38,14 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
+          children: <Widget>[
+            TextFormField(
               controller: _controller,
               decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.inputTask,
+                labelText: AppLocalizations.of(context)!.inputNote,
+                border: const OutlineInputBorder(),
               ),
+              maxLines: null,
             ),
             const SizedBox(height: 16.0),
             GestureDetector(

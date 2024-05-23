@@ -96,8 +96,9 @@ class _ConfigScreenState extends State<ConfigScreen> {
             icon: const Icon(Icons.exit_to_app_outlined),
             onPressed: () async {
               await _authService.signOut();
-              // ignore: use_build_context_synchronously
-              Navigator.pushReplacementNamed(context, '/login');
+              if (context.mounted) {
+                Navigator.pushReplacementNamed(context, '/login');
+              }
             },
             tooltip: AppLocalizations.of(context)!.desconect,
           ),

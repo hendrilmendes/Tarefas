@@ -17,7 +17,6 @@
     "notesDetails": "Detalhes da Anotação",
     "inputTask": "Digite sua tarefa",
     "inputNote": "Digite sua anotação",
-    "errorLoadTask": "Erro ao carregar tarefas",
     "errorLoadNotes": "Erro ao carregar anotações",
     "noTask": "Nenhuma tarefa encontrada 😅",
     "noNotes": "Nenhuma anotação encontrada 😅",
@@ -58,11 +57,14 @@
     "noUpdateSub": "Tudo em dias parceiro 🤠",
     "pendants": "Tarefas Pendentes",
     "completed": "Tarefas Concluídas",
-    "dateTime": "Selecione Data e Hora",
+    "dateTime": "Selecione a data e hora",
     "taskDetails": "Detalhes da Tarefa",
     "notificationTask": "Opa, tudo bem? Passando pra te lembrar de uma tarefa",
     "error": "Erro",
-    "errorSub": "A data e hora são necessárias",
+    "inputDateError": "A data e hora são necessárias",
+    "inputTaskError":  "Não e possível adicionar uma tarefa em branco",
+    "inputNoteError":  "Não e possível salvar uma anotação em branco",
     "notification": "Notificações",
-    "notificationSub": "Notificações serão enviadas informando sobre suas tarefas"
+    "notificationSub": "Notificações serão enviadas informando sobre suas tarefas",
+    "confirmDeleteTask": "Deseja realmente apagar a tarefa?"
 }

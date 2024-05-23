@@ -20,19 +20,28 @@ class _NotasScreenState extends State<NotasScreen> {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        await FirebaseFirestore.instance.collection('notes').add({
-          'userId': user.uid,
-          'note': _noteController.text,
-          'timestamp': Timestamp.now(),
-        });
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            // ignore: use_build_context_synchronously
-            content: Text(AppLocalizations.of(context)!.saveNote),
-          ),
-        );
-        _noteController.clear();
+        String noteText = _noteController.text.trim();
+        if (noteText.isNotEmpty) {
+          await FirebaseFirestore.instance.collection('notes').add({
+            'userId': user.uid,
+            'note': noteText,
+            'timestamp': Timestamp.now(),
+          });
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              // ignore: use_build_context_synchronously
+              content: Text(AppLocalizations.of(context)!.saveNote),
+            ),
+          );
+          _noteController.clear();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.inputNoteError),
+            ),
+          );
+        }
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
@@ -117,7 +126,9 @@ class NotesList extends StatelessWidget {
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator.adaptive());
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
         } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return Center(
             child: Column(

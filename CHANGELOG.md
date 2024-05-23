@@ -1,6 +1,15 @@
 Changelog Tarefas
 
 ======================================================
+#### 1.2.1 - 23/05/2024
+
+Correções/Melhorias
+- Agora há um confirmação de exclusão das tarefas
+- Corrigido bug que permitia adicionar tarefas e anotações em branco
+- Corrigido bug que ao apagar as anotações não atualizava a tela
+- Melhorias internas
+
+======================================================
 #### 1.2.0 - 20/05/2024
 
 Novo:

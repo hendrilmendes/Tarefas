@@ -2,7 +2,7 @@ name: tarefas
 description: "Um app simples para você salvar suas tarefas e anotações do dia a dia"
 publish_to: 'none'
 
-version: 1.2.0+20
+version: 1.2.1+21
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -24,11 +24,11 @@ dependencies:
   flutter_email_sender: ^6.0.2
 
 # Firebase
-  cloud_firestore: ^4.17.3
-  firebase_auth: ^4.19.5
-  firebase_core: ^2.31.0
-  firebase_crashlytics: ^3.5.5
-  firebase_performance: ^0.9.4+5
+  cloud_firestore: ^4.17.4
+  firebase_auth: ^4.19.6
+  firebase_core: ^2.31.1
+  firebase_crashlytics: ^3.5.6
+  firebase_performance: ^0.9.4+6
 
 # Flutter Local Notifications
   flutter_local_notifications: ^17.1.2
@@ -86,14 +86,7 @@ flutter:
   assets:
     - assets/img/
 
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+fonts:
+    - family: OpenSans
+      fonts:
+        - asset: assets/fonts/OpenSans.ttf
