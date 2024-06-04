@@ -1,6 +1,12 @@
 Changelog Tarefas
 
 ======================================================
+
+#### *.*.* - Em desenvolvimento
+
+Correções/Melhorias
+- 
+
 #### 1.2.1 - 23/05/2024
 
 Correções/Melhorias
