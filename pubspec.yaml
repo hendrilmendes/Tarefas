@@ -2,7 +2,7 @@ name: tarefas
 description: "Um app simples para você salvar suas tarefas e anotações do dia a dia"
 publish_to: 'none'
 
-version: 1.2.1+21
+version: 1.2.2+22
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -24,11 +24,11 @@ dependencies:
   flutter_email_sender: ^6.0.2
 
 # Firebase
-  cloud_firestore: ^5.0.0
-  firebase_auth: ^5.0.0
-  firebase_core: ^3.0.0
-  firebase_crashlytics: ^4.0.0
-  firebase_performance: ^0.10.0
+  cloud_firestore: ^5.0.1
+  firebase_auth: ^5.1.0
+  firebase_core: ^3.1.0
+  firebase_crashlytics: ^4.0.1
+  firebase_performance: ^0.10.0+1
 
 # Flutter Local Notifications
   flutter_local_notifications: ^17.1.2
@@ -64,6 +64,9 @@ dependencies:
 # Shared Preferences
   shared_preferences: ^2.2.2
 
+# Share Plus
+  share_plus: ^9.0.0
+  
 # Timezone
   timezone: ^0.9.3
 

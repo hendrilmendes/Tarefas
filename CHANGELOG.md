@@ -2,10 +2,12 @@ Changelog Tarefas
 
 ======================================================
 
-#### *.*.* - Em desenvolvimento
+#### 1.2.2 - Em desenvolvimento
+Novo
+- Compartilhe suas anotações
 
 Correções/Melhorias
-- 
+- Layout da tela "Detalhes da Anotação" ajustado para melhor suportar anotações extensas, evitando sobreposição com o teclado
 
 #### 1.2.1 - 23/05/2024
 

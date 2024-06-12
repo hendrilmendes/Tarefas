@@ -66,5 +66,7 @@
     "inputNoteError":  "Não e possível salvar uma anotação em branco",
     "notification": "Notificações",
     "notificationSub": "Notificações serão enviadas informando sobre suas tarefas",
-    "confirmDeleteTask": "Deseja realmente apagar a tarefa?"
+    "confirmDeleteTask": "Deseja realmente apagar a tarefa?",
+    "share": "Compartilhar",
+    "repeat": "Repetir Tarefa"
 }

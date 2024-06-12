@@ -3,7 +3,7 @@ Um app simples para você salvar suas tarefas e anotações do dia a dia
 
 ### Screenshots
 
-<img src="screenshots/preview.jpeg?raw=true" width="32%"> <img src="screenshots/preview2.jpeg?raw=true" width="32%"> <img src="screenshots/preview3.jpeg?raw=true" width="32%"> <img src="screenshots/preview4.jpeg?raw=true" width="32%">
+<img src="screenshots/preview.jpeg?raw=true" width="32%"> <img src="screenshots/preview2.jpeg?raw=true" width="32%"> <img src="screenshots/preview3.jpeg?raw=true" width="32%">
 
 ##
 
@@ -39,4 +39,4 @@ Veja as novidades em [Changelog](CHANGELOG.md)
 ##
 
 ## Licença
-Este projeto está licenciado sob a Licença MIT - veja [LICENSE](LICENSE.md)
+Este projeto está licenciado sob a [Licença MIT](LICENSE.md)
