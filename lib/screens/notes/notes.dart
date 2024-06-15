@@ -2,18 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:tarefas/telas/notas/notas_details.dart';
+import 'package:tarefas/screens/notes/notes_details.dart';
 
-class NotasScreen extends StatefulWidget {
+class NotesScreen extends StatefulWidget {
   // ignore: use_key_in_widget_constructors
-  const NotasScreen({Key? key});
+  const NotesScreen({Key? key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _NotasScreenState createState() => _NotasScreenState();
+  _NotesScreenState createState() => _NotesScreenState();
 }
 
-class _NotasScreenState extends State<NotasScreen> {
+class _NotesScreenState extends State<NotesScreen> {
   final TextEditingController _noteController = TextEditingController();
 
   void _saveNote() async {

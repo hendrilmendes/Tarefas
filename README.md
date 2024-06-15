@@ -10,7 +10,6 @@ Um app simples para você salvar suas tarefas e anotações do dia a dia
 ### Versão
 [![made-with-flutter](https://img.shields.io/badge/Made%20with-Flutter-1f425f.svg)](https://flutter.dev/)
 ![Release](https://img.shields.io/github/v/release/hendrilmendes/Tarefas)
-![GitHub all releases](https://img.shields.io/github/downloads/hendrilmendes/Tarefas/total?color=white&style=plastic)
 ##
 
 ### Download

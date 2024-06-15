@@ -2,7 +2,7 @@ name: tarefas
 description: "Um app simples para você salvar suas tarefas e anotações do dia a dia"
 publish_to: 'none'
 
-version: 1.2.2+22
+version: 1.2.4+24
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -61,14 +61,17 @@ dependencies:
 # Review  
   in_app_review: ^2.0.9
 
+# Share Plus
+  share_plus: ^9.0.0  
+
 # Shared Preferences
   shared_preferences: ^2.2.2
-
-# Share Plus
-  share_plus: ^9.0.0
   
 # Timezone
   timezone: ^0.9.3
+
+# Toast
+  fluttertoast: ^8.2.6
 
 # Url Launcher
   url_launcher: ^6.3.0

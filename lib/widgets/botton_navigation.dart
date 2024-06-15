@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:tarefas/telas/config/config.dart';
-import 'package:tarefas/telas/home/home.dart';
-import 'package:tarefas/telas/notas/notas.dart';
+import 'package:tarefas/screens/settings/settings.dart';
+import 'package:tarefas/screens/home/home.dart';
+import 'package:tarefas/screens/notes/notes.dart';
 
 class BottomNavigationContainer extends StatefulWidget {
   const BottomNavigationContainer({super.key});
@@ -16,10 +16,10 @@ class BottomNavigationContainer extends StatefulWidget {
 class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
   int currentIndex = 0;
 
-  final List<Widget> screens = const [
-    HomeScreen(),
-    NotasScreen(),
-    ConfigScreen(),
+  final List<Widget> screens = [
+    const HomeScreen(),
+    const NotesScreen(),
+    SettingsScreen(),
   ];
 
   // Metodo da button nav
@@ -86,7 +86,6 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
                       selectedIcon: const Icon(Icons.task_alt_outlined),
                       label: AppLocalizations.of(context)!.appName,
                     ),
-                    
                     NavigationDestination(
                       icon: const Icon(Icons.notes),
                       selectedIcon: const Icon(Icons.notes_outlined),

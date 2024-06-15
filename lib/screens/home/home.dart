@@ -6,8 +6,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:tarefas/auth/auth.dart';
-import 'package:tarefas/tarefas/tarefas.dart';
-import 'package:tarefas/telas/home/home_details.dart';
+import 'package:tarefas/tasks/tasks.dart';
+import 'package:tarefas/screens/home/home_details.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class HomeScreen extends StatefulWidget {

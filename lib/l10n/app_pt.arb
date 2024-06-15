@@ -4,7 +4,7 @@
     "notes": "Anotações",
     "settings": "Ajustes",
     "desconect": "Desconectar",
-    "homeLogin": "Faça login para salvar suas tarefas e anotações em nuvem",
+    "homeLogin": "Bem vindo ao nosso app, aproveite 😁",
     "googleLogin": "Login com o Google",
     "ok": "OK",
     "newTask": "Nova Tarefa",
@@ -21,10 +21,10 @@
     "noTask": "Nenhuma tarefa encontrada 😅",
     "noNotes": "Nenhuma anotação encontrada 😅",
     "confirmDelete": "Confirmar exclusão",
-    "confirmDeleteSub": "Tem certeza de que deseja excluir esta nota?",
+    "confirmDeleteSub": "Tem certeza de que deseja excluir esta anotação?",
     "about": "Sobre",
-    "copyright": "Todos os direitos reservados.",
-    "appDesc": "Um app simples para você salvar suas tarefas e anotações do dia a dia",
+    "copyright": "Todos os direitos reservados",
+    "appDesc": "Um app para você salvar suas tarefas e anotações do dia a dia",
     "version": "Versão",
     "privacy": "Política de Privacidade",
     "privacySub": "Termos que garantem a sua privacidade",
@@ -68,5 +68,5 @@
     "notificationSub": "Notificações serão enviadas informando sobre suas tarefas",
     "confirmDeleteTask": "Deseja realmente apagar a tarefa?",
     "share": "Compartilhar",
-    "repeat": "Repetir Tarefa"
+    "alreadyReviewed": "Você já avaliou o app"
 }
