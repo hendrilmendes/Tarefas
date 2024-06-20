@@ -2,7 +2,7 @@ Changelog Tarefas
 
 ======================================================
 
-#### 1.2.4 - Em desenvolvimento
+#### 1.2.5 - 20/06/2024
 Novo
 - Compartilhe suas anotações
 

@@ -1,8 +1,8 @@
 name: tarefas
-description: "Um app simples para você salvar suas tarefas e anotações do dia a dia"
+description: "Um app para você salvar suas tarefas e anotações do dia a dia"
 publish_to: 'none'
 
-version: 1.2.4+24
+version: 1.2.5+25
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
