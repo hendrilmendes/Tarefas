@@ -1,7 +1,12 @@
 Changelog Tarefas
 
 ======================================================
+#### 1.3.0 - 16/07/2024
 
+Correções/Melhorias
+- Correções internas
+
+======================================================
 #### 1.2.5 - 20/06/2024
 Novo
 - Compartilhe suas anotações
@@ -10,6 +15,7 @@ Correções/Melhorias
 - Layout da tela "Detalhes da Anotação" ajustado para melhor suportar anotações extensas, evitando sobreposição com o teclado
 - Ajustes na tela de login
 
+======================================================
 #### 1.2.1 - 23/05/2024
 
 Correções/Melhorias

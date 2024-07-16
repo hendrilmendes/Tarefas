@@ -13,7 +13,7 @@ import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/firebase_options.dart';
 import 'package:tarefas/screens/login/login.dart';
 import 'package:tarefas/theme/theme.dart';
-import 'package:tarefas/widgets/botton_navigation.dart';
+import 'package:tarefas/widgets/bottom_navigation.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 
 main() async {

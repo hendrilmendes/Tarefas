@@ -19,7 +19,7 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
   final List<Widget> screens = [
     const HomeScreen(),
     const NotesScreen(),
-    SettingsScreen(),
+    const SettingsScreen(),
   ];
 
   // Metodo da button nav

@@ -4,7 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:tarefas/tasks/tasks.dart';
-import 'package:tarefas/widgets/botton_navigation.dart';
+import 'package:tarefas/widgets/bottom_navigation.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class HomeDetailsScreen extends StatefulWidget {
