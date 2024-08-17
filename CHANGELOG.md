@@ -1,6 +1,15 @@
 Changelog Tarefas
 
 ======================================================
+#### 1.3.2 - Em desenvolvimento
+
+Novo
+- 
+
+Correções/Melhorias
+- Melhorias no carregamento de tarefas offline
+
+======================================================
 #### 1.3.0 - 16/07/2024
 
 Correções/Melhorias

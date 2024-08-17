@@ -21,8 +21,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final AuthService _authService = AuthService();
   User? _user;
-  final List<Task> _pendingTasks = [];
-  final List<Task> _completedTasks = [];
+  List<Task> _pendingTasks = [];
+  List<Task> _completedTasks = [];
   int _taskIdCounter = 0;
   String _loadingMessage = '';
   bool _isLoading = true;
@@ -40,7 +40,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     if (_user != null) {
-      _loadTasks();
+      // Somente carregue as tarefas se ainda não tiverem sido carregadas
+      if (_pendingTasks.isEmpty && _completedTasks.isEmpty) {
+        _loadTasks();
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } else {
       if (kDebugMode) {
         print('Usuário nulo ao carregar tarefas.');
@@ -77,10 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         setState(() {
-          _pendingTasks.clear();
-          _pendingTasks.addAll(pendingTasks);
-          _completedTasks.clear();
-          _completedTasks.addAll(completedTasks);
+          _pendingTasks = pendingTasks;
+          _completedTasks = completedTasks;
           _loadingMessage = '';
         });
       } else {
