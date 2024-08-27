@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart'; // Importar a biblioteca share_plus
 import 'package:tarefas/tasks/tasks.dart';
 import 'package:tarefas/widgets/bottom_navigation.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -20,6 +22,7 @@ class HomeDetailsScreen extends StatefulWidget {
 class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
   late TextEditingController _controller;
   late DateTime? _selectedDateTime;
+  User? _user;
 
   @override
   void initState() {
@@ -42,7 +45,7 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
             TextFormField(
               controller: _controller,
               decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.inputNote,
+                labelText: AppLocalizations.of(context)!.inputTask,
                 border: const OutlineInputBorder(),
               ),
               maxLines: null,
@@ -91,25 +94,127 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16.0),
-            FilledButton.tonal(
-              onPressed: () {
-                final newTitle = _controller.text.trim();
-                if (newTitle.isNotEmpty) {
-                  final updatedTask = Task(
-                    title: newTitle,
-                    completed: widget.task.completed,
-                    id: widget.task.id,
-                    dateTime: _selectedDateTime,
-                  );
-                  _updateTask(updatedTask);
-                }
-              },
-              child: Text(AppLocalizations.of(context)!.save),
-            ),
           ],
         ),
       ),
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 6.0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                  tooltip: AppLocalizations.of(context)!.delete,
+                  icon: const Icon(Icons.delete_outlined),
+                  onPressed: () {
+                    _delete();
+                    Navigator.of(context).pop();
+                  }),
+              IconButton(
+                tooltip: AppLocalizations.of(context)!.save,
+                icon: const Icon(Icons.save_alt),
+                onPressed: () {
+                  final newTitle = _controller.text.trim();
+                  if (newTitle.isNotEmpty) {
+                    final updatedTask = Task(
+                      title: newTitle,
+                      completed: widget.task.completed,
+                      id: widget.task.id,
+                      dateTime: _selectedDateTime,
+                    );
+                    _updateTask(updatedTask);
+                  }
+                },
+              ),
+              IconButton(
+                tooltip: AppLocalizations.of(context)!.share,
+                icon: const Icon(Icons.share_outlined),
+                onPressed: _shareTask,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+Future<void> _delete() async {
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations != null) {
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(appLocalizations.confirmDelete),
+            content: Text(appLocalizations.confirmDeleteTask),
+            actions: <Widget>[
+              TextButton(
+                child: Text(appLocalizations.cancel),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              FilledButton.tonal(
+                child: Text(appLocalizations.delete),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              ),
+            ],
+          );
+        },
+      );
+
+      if (confirm != true) {
+        return;
+      }
+
+      try {
+        final taskId = widget.task.title;
+
+        final querySnapshot = await tasksCollection
+            .where('userId', isEqualTo: _user!.uid)
+            .where('title', isEqualTo: taskId)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          final docId = querySnapshot.docs.first.id;
+          await tasksCollection.doc(docId).delete();
+
+          FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+              FlutterLocalNotificationsPlugin();
+          await flutterLocalNotificationsPlugin.cancel(widget.task.id.hashCode);
+
+          if (kDebugMode) {
+            print('Tarefa removida Firestore: $taskId');
+          }
+        } else {
+          if (kDebugMode) {
+            print('Tarefa não encontrada no Firestore: $taskId');
+          }
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Erro ao apagar tarefa: $e');
+        }
+      }
+
+      // Retorna para a tela anterior após a remoção
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pop();
+    }
+  }
+
+  void _shareTask() {
+    final formattedDate = _selectedDateTime != null
+        ? DateFormat('dd/MM/yyyy - HH:mm').format(_selectedDateTime!)
+        : AppLocalizations.of(context)!.noDate;
+
+    Share.share(
+      '${AppLocalizations.of(context)!.taskTitle}: ${widget.task.title}\n'
+      '${AppLocalizations.of(context)!.dateTitle}: $formattedDate',
     );
   }
 

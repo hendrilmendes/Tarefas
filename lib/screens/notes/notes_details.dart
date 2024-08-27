@@ -3,12 +3,68 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
-class NoteDetailPage extends StatelessWidget {
+class NoteDetailPage extends StatefulWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> note;
+
+  const NoteDetailPage({super.key, required this.note});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _NoteDetailPageState createState() => _NoteDetailPageState();
+}
+
+class _NoteDetailPageState extends State<NoteDetailPage> {
   final TextEditingController _noteController = TextEditingController();
 
-  NoteDetailPage({super.key, required this.note}) {
-    _noteController.text = note['note'];
+  @override
+  void initState() {
+    super.initState();
+    _noteController.text = widget.note['note'];
+  }
+
+  void _saveNote() {
+    FirebaseFirestore.instance
+        .collection('notes')
+        .doc(widget.note.id)
+        .update({'note': _noteController.text});
+    Navigator.pop(context);
+  }
+
+  void _deleteNote() {
+    final appLocalizations = AppLocalizations.of(context);
+    if (appLocalizations != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(appLocalizations.confirmDelete),
+            content: Text(appLocalizations.confirmDeleteSub),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(appLocalizations.cancel),
+              ),
+              FilledButton.tonal(
+                onPressed: () {
+                  FirebaseFirestore.instance
+                      .collection('notes')
+                      .doc(widget.note.id)
+                      .delete();
+                  Navigator.of(context).pop();
+                },
+                child: Text(appLocalizations.delete),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _shareNote() {
+    Share.share(widget.note['note']);
   }
 
   @override
@@ -31,60 +87,34 @@ class NoteDetailPage extends StatelessWidget {
                 ),
                 maxLines: null,
               ),
-              const SizedBox(height: 16.0),
-              FilledButton.tonal(
-                onPressed: () {
-                  FirebaseFirestore.instance
-                      .collection('notes')
-                      .doc(note.id)
-                      .update({'note': _noteController.text});
-                  Navigator.pop(context);
-                },
-                child: Text(AppLocalizations.of(context)!.save),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 6.0,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                  tooltip: AppLocalizations.of(context)!.delete,
+                  icon: const Icon(Icons.delete_outlined),
+                  onPressed: () {
+                    _deleteNote();
+                    Navigator.of(context).pop();
+                  }),
+              IconButton(
+                tooltip: AppLocalizations.of(context)!.save,
+                icon: const Icon(Icons.save_alt),
+                onPressed: _saveNote,
               ),
-              const SizedBox(height: 16.0),
-              TextButton(
-                onPressed: () {
-                  final appLocalizations = AppLocalizations.of(context);
-                  if (appLocalizations != null) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text(appLocalizations.confirmDelete),
-                          content: Text(appLocalizations.confirmDeleteSub),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(appLocalizations.cancel),
-                            ),
-                            FilledButton.tonal(
-                              onPressed: () {
-                                FirebaseFirestore.instance
-                                    .collection('notes')
-                                    .doc(note.id)
-                                    .delete();
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(appLocalizations.delete),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                  Navigator.pop(context);
-                },
-                child: Text(AppLocalizations.of(context)!.delete),
-              ),
-              const SizedBox(height: 16.0),
-              TextButton(
-                onPressed: () {
-                  Share.share(note['note']);
-                },
-                child: Text(AppLocalizations.of(context)!.share),
+              IconButton(
+                tooltip: AppLocalizations.of(context)!.share,
+                icon: const Icon(Icons.share_outlined),
+                onPressed: _shareNote,
               ),
             ],
           ),

@@ -105,7 +105,7 @@ class _AboutPageState extends State<AboutPage> {
                     child: ListTile(
                       title: Text(AppLocalizations.of(context)!.privacy),
                       subtitle: Text(AppLocalizations.of(context)!.privacySub),
-                      leading: const Icon(Icons.privacy_tip_outlined),
+                      leading: const Icon(Icons.shield_outlined),
                       onTap: () {
                         Navigator.pop(context);
                         launchUrl(
@@ -145,7 +145,7 @@ class _AboutPageState extends State<AboutPage> {
                       title: Text(AppLocalizations.of(context)!.openSource),
                       subtitle:
                           Text(AppLocalizations.of(context)!.openSourceSub),
-                      leading: const Icon(Icons.flutter_dash_outlined),
+                      leading: const Icon(Icons.folder_open),
                       onTap: () {
                         Navigator.push(
                           context,

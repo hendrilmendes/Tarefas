@@ -5,8 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:tarefas/screens/notes/notes_details.dart';
 
 class NotesScreen extends StatefulWidget {
-  // ignore: use_key_in_widget_constructors
-  const NotesScreen({Key? key});
+  const NotesScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -114,8 +113,7 @@ class _NotesScreenState extends State<NotesScreen> {
 }
 
 class NotesList extends StatelessWidget {
-  // ignore: use_key_in_widget_constructors
-  const NotesList({Key? key});
+  const NotesList({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +150,10 @@ class NotesList extends StatelessWidget {
             itemBuilder: (context, index) {
               final note =
                   notes[index] as QueryDocumentSnapshot<Map<String, dynamic>>;
-              return NoteCard(note: note);
+              return Card(
+                clipBehavior: Clip.hardEdge,
+                child: NoteCard(note: note),
+              );
             },
           );
         }
@@ -166,10 +167,72 @@ class NoteCard extends StatelessWidget {
 
   const NoteCard({super.key, required this.note});
 
+  Future<bool?> _confirmDelete(BuildContext context) async {
+    final appLocalizations = AppLocalizations.of(context);
+    bool? confirmed = false;
+
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(appLocalizations!.confirmDelete),
+          content: Text(appLocalizations.confirmDeleteSub),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Fecha o diálogo sem excluir
+              },
+              child: Text(appLocalizations.cancel),
+            ),
+            FilledButton.tonal(
+              onPressed: () async {
+                confirmed = true;
+                Navigator.of(context).pop(); // Fecha o diálogo
+              },
+              child: Text(appLocalizations.delete),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      // Aqui excluímos a nota se a confirmação foi positiva
+      await FirebaseFirestore.instance
+          .collection('notes')
+          .doc(note.id)
+          .delete();
+
+      // Mostramos o SnackBar após garantir que o contexto está ativo
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(appLocalizations!.noteDeleted),
+        ),
+      );
+    }
+
+    return confirmed;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.hardEdge,
+    return Dismissible(
+      key: Key(note.id),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (direction) async {
+        return await _confirmDelete(context);
+      },
+      background: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: const Icon(
+          Icons.delete_outline,
+          color: Colors.white,
+          size: 32.0,
+        ),
+      ),
       child: ListTile(
         title: Text(note['note']),
         onTap: () {

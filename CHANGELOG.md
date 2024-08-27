@@ -1,13 +1,18 @@
 Changelog Tarefas
 
 ======================================================
-#### 1.3.2 - Em desenvolvimento
+#### 2.0.0 - Em desenvolvimento
 
 Novo
-- 
+- Novo design para a tela de atualizações
+- Compartilhe suas tarefas
+- Detalhes das Tarefas e Anotações recebeu uma melhoria visual
+- As tarefas agora contam com um design mais intuitivo
+- Exclua as anotações ao arrastar para o lado
 
 Correções/Melhorias
 - Melhorias no carregamento de tarefas offline
+- Ajustes na interface
 
 ======================================================
 #### 1.3.0 - 16/07/2024

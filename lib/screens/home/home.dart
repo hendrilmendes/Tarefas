@@ -505,8 +505,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: _pendingTasks.length,
                                 itemBuilder: (context, index) {
-                                  return buildTaskItem(
-                                      _pendingTasks[index], true);
+                                  return Card(
+                                    clipBehavior: Clip.hardEdge,
+                                    child: buildTaskItem(
+                                        _pendingTasks[index], true),
+                                  );
                                 },
                               ),
                             ],
@@ -530,8 +533,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: _completedTasks.length,
                                 itemBuilder: (context, index) {
-                                  return buildTaskItem(
-                                      _completedTasks[index], false);
+                                  return Card(
+                                    clipBehavior: Clip.hardEdge,
+                                    child: buildTaskItem(
+                                        _completedTasks[index], false),
+                                  );
                                 },
                               ),
                             ],
