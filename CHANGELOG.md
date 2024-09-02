@@ -1,7 +1,7 @@
 Changelog Tarefas
 
 ======================================================
-#### 2.0.0 - Em desenvolvimento
+#### 2.0.0 - 02/09/2024
 
 Novo
 - Novo design para a tela de atualizações
