@@ -1,76 +1,113 @@
 Changelog Tarefas
 
 ======================================================
-#### 2.0.0 - 02/09/2024
 
-Novo
+## [2.0.0](https://github.com/hendrilmendes/Tarefas/compare/1.3.0..2.0.0) (02-09-2024)
+
+## Alterações
+
+### Correções
+
+- Melhorias no carregamento de tarefas offline
+- Ajustes na interface
+
+### Features
+
 - Novo design para a tela de atualizações
 - Compartilhe suas tarefas
 - Detalhes das Tarefas e Anotações recebeu uma melhoria visual
 - As tarefas agora contam com um design mais intuitivo
 - Exclua as anotações ao arrastar para o lado
 
-Correções/Melhorias
-- Melhorias no carregamento de tarefas offline
-- Ajustes na interface
-
 ======================================================
-#### 1.3.0 - 16/07/2024
 
-Correções/Melhorias
+## [1.3.0](https://github.com/hendrilmendes/Tarefas/compare/1.2.5..1.3.0) (16-07-2024)
+
+## Alterações
+
+### Correções
+
 - Correções internas
 
 ======================================================
-#### 1.2.5 - 20/06/2024
-Novo
-- Compartilhe suas anotações
 
-Correções/Melhorias
+## [1.2.5](https://github.com/hendrilmendes/Tarefas/compare/1.2.1..1.2.5) (20-06-2024)
+
+## Alterações
+
+### Correções
+
 - Layout da tela "Detalhes da Anotação" ajustado para melhor suportar anotações extensas, evitando sobreposição com o teclado
 - Ajustes na tela de login
 
-======================================================
-#### 1.2.1 - 23/05/2024
+### Features
 
-Correções/Melhorias
+- Compartilhe suas anotações
+
+======================================================
+
+## [1.2.1](https://github.com/hendrilmendes/Tarefas/compare/1.2.0..1.2.1) (23-05-2024)
+
+## Alterações
+
+### Correções
+
 - Agora há um confirmação de exclusão das tarefas
 - Corrigido bug que permitia adicionar tarefas e anotações em branco
 - Corrigido bug que ao apagar as anotações não atualizava a tela
 - Melhorias internas
 
 ======================================================
-#### 1.2.0 - 20/05/2024
 
-Novo:
+## [1.2.0](https://github.com/hendrilmendes/Tarefas/compare/1.1.8..1.2.0) (20-05-2024)
+
+## Alterações
+
+### Correções
+
+- Ajustes visuais
+- Correções de bugs e melhorias de desempenho
+
+### Features
+
 - Agendamento de tarefas
 - Implementado suporte a separação de tarefas concluídas e pendentes
 - Implementado suporte a edição das tarefas
 
-Correções/Melhorias
-- Ajustes visuais
+======================================================
+
+## [1.1.8] (26-04-2024)
+
+## Alterações
+
+### Correções
+
 - Correções de bugs e melhorias de desempenho
 
 ======================================================
-#### 1.1.8 - 26/04/2024
 
-Correções/Melhorias
+## [1.1.5] (10-03-2024)
+
+## Alterações
+
+### Correções
+
 - Correções de bugs e melhorias de desempenho
+- Ajustes e melhorias de design
+- Melhorias no Updater
 
-======================================================
-#### 1.1.5 - 10/03/2024
+### Features
 
-Novo:
 - Faça suas anotações mais importantes
 - Sistema de Feedback
 - Suporte ao Dynamic Colors do Android 12
 - Desative o Dynamic Colors caso não gostar
 - Melhorias no suporte a tablets
 
-Correções/Melhorias
-- Correções de bugs e melhorias de desempenho
-- Ajustes e melhorias de design
-- Melhorias no Updater
-
 ======================================================
-#### 1.0.0 - 28/12/2023
+
+## [1.0.0] (28-12-2023)
+
+## Alterações
+
 - Primeira Versão
