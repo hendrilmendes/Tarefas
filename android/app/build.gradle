@@ -33,7 +33,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.github.hendrilmendes.tarefas"
-    compileSdk 34
+    compileSdk 35
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -52,7 +52,7 @@ android {
     defaultConfig {
         applicationId "com.github.hendrilmendes.tarefas"
         minSdkVersion 26
-        targetSdk 34
+        targetSdk 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
