@@ -2,7 +2,7 @@ Changelog Tarefas
 
 ======================================================
 
-## [2.1.0](https://github.com/hendrilmendes/Tarefas/compare/2.0.0..2.2.0) (**-**-****)
+## [2.1.0](https://github.com/hendrilmendes/Tarefas/compare/2.0.0..2.2.0) (09-11-2024)
 
 ## Alterações
 
