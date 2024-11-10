@@ -63,12 +63,20 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
                   ],
                 ),
                 const VerticalDivider(thickness: 1, width: 1),
-                Expanded(child: screens[currentIndex]),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: screens[currentIndex],
+                  ),
+                ),
               ],
             );
           } else {
             return Scaffold(
-              body: screens[currentIndex],
+              body: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: screens[currentIndex],
+              ),
               // Bottom Nav
               bottomNavigationBar: NavigationBarTheme(
                 data: NavigationBarThemeData(

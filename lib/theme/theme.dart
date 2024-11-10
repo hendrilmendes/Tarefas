@@ -8,6 +8,10 @@ class ThemeModel extends ChangeNotifier {
   bool _isDynamicColorsEnabled = true;
   ThemeModeType _themeMode = ThemeModeType.light;
 
+  static const String darkModeKey = 'darkModeEnabled';
+  static const String dynamicColorsKey = 'dynamicColorsEnabled';
+  static const String themeModeKey = 'themeMode';
+
   ThemeModel() {
     _loadThemePreference();
   }
@@ -18,38 +22,37 @@ class ThemeModel extends ChangeNotifier {
 
   void toggleDarkMode() {
     _isDarkMode = !_isDarkMode;
+    _savePreference(darkModeKey, _isDarkMode);
     notifyListeners();
   }
 
   void toggleDynamicColors() {
     _isDynamicColorsEnabled = !_isDynamicColorsEnabled;
+    _savePreference(dynamicColorsKey, _isDynamicColorsEnabled);
     notifyListeners();
   }
 
   void changeThemeMode(ThemeModeType mode) {
     _themeMode = mode;
-    saveThemeModePreference(mode);
+    _savePreference(themeModeKey, mode.toString());
     notifyListeners();
   }
 
   Future<void> _loadThemePreference() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _isDarkMode = prefs.getBool('darkModeEnabled') ?? true;
-    _isDynamicColorsEnabled = prefs.getBool('dynamicColorsEnabled') ?? true;
-    _themeMode = _getSavedThemeMode(prefs.getString('themeMode'));
+    _isDarkMode = prefs.getBool(darkModeKey) ?? true;
+    _isDynamicColorsEnabled = prefs.getBool(dynamicColorsKey) ?? true;
+    _themeMode = _getSavedThemeMode(prefs.getString(themeModeKey));
     notifyListeners();
   }
 
-
-
-  void saveDynamicPreference(bool value) async {
+  Future<void> _savePreference(String key, dynamic value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('dynamicColorsEnabled', value);
-  }
-
-  void saveThemeModePreference(ThemeModeType mode) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('themeMode', mode.toString());
+    if (value is bool) {
+      prefs.setBool(key, value);
+    } else if (value is String) {
+      prefs.setString(key, value);
+    }
   }
 
   ThemeModeType _getSavedThemeMode(String? mode) {

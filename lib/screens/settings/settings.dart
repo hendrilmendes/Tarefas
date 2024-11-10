@@ -51,7 +51,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settings),
+        title: Text(
+          AppLocalizations.of(context)!.settings,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        elevation: 0.5,
       ),
       body: ListView(
         children: [
@@ -64,7 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ThemeSettings(themeModel: themeModel),
           if (_isAndroid12) const DynamicColorsSettings(),
           buildCategoryHeader(
-              AppLocalizations.of(context)!.outhers, Icons.more_horiz_outlined),
+              AppLocalizations.of(context)!.others, Icons.more_horiz_outlined),
           buildUpdateSettings(context),
           buildReviewSettings(context),
           buildSupportSettings(context),

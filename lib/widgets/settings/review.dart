@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Widget buildReviewSettings(BuildContext context) {
   return Card(
+    elevation: 3,
     clipBehavior: Clip.hardEdge,
     margin: const EdgeInsets.all(8.0),
     child: ListTile(

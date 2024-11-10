@@ -2,6 +2,23 @@ Changelog Tarefas
 
 ======================================================
 
+## [2.1.0](https://github.com/hendrilmendes/Tarefas/compare/2.0.0..2.2.0) (**-**-****)
+
+## Alterações
+
+### Correções
+
+- Correções de bugs
+- Melhorias no código
+- Melhroias no sistema de atualizações
+
+### Features
+
+- Interface agora conta com novos elementos e ajustes visuais
+- Novas animações de transição de telas
+
+======================================================
+
 ## [2.0.0](https://github.com/hendrilmendes/Tarefas/compare/1.3.0..2.0.0) (02-09-2024)
 
 ## Alterações

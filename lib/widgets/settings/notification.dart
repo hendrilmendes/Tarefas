@@ -15,6 +15,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 3,
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.all(8.0),
       child: ListTile(

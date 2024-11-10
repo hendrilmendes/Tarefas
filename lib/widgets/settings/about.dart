@@ -4,6 +4,7 @@ import 'package:tarefas/screens/about/about.dart';
 
 Widget buildAboutSettings(BuildContext context) {
   return Card(
+    elevation: 3,
     clipBehavior: Clip.hardEdge,
     margin: const EdgeInsets.all(8.0),
     child: ListTile(

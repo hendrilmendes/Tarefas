@@ -125,15 +125,16 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: ListTile(
         title: Text(task.title),
-        onTap: () {
-          if (isPending) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => HomeDetailsScreen(
-                  task: task,
-                ),
+        onTap: () async {
+          final result = await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => HomeDetailsScreen(
+                task: task,
               ),
-            );
+            ),
+          );
+          if (result == true) {
+            await _loadTasks();
           }
         },
         trailing: isPending
@@ -167,6 +168,54 @@ class _HomeScreenState extends State<HomeScreen> {
                     TextFormField(
                       decoration: InputDecoration(
                         labelText: appLocalizations.inputTask,
+                        labelStyle: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.7),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.5),
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).colorScheme.surface,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(100),
+                          borderSide: BorderSide(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.3),
+                            width: 1.5,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50),
+                          borderSide: BorderSide(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.5),
+                            width: 2,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50),
+                          borderSide: BorderSide(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.5),
+                            width: 1.5,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 16.0),
                       ),
                       maxLines: null,
                       onChanged: (value) {
@@ -415,6 +464,10 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       );
 
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+          FlutterLocalNotificationsPlugin();
+      await flutterLocalNotificationsPlugin.cancel(task.id.hashCode);
+
       if (confirm != true) {
         // Se o usuário cancelar, readicione a tarefa na lista e recarregue as tarefas
         setState(() {
@@ -467,7 +520,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final appLocalizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(appLocalizations.appName),
+        title: Text(
+          appLocalizations.appName,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        elevation: 0.5,
       ),
       body: _isLoading
           ? const Center(
@@ -506,7 +564,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 itemCount: _pendingTasks.length,
                                 itemBuilder: (context, index) {
                                   return Card(
-                                    clipBehavior: Clip.hardEdge,
+                                    clipBehavior: Clip.antiAlias,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(100.0),
+                                    ),
+                                    elevation: 3,
                                     child: buildTaskItem(
                                         _pendingTasks[index], true),
                                   );
@@ -534,7 +597,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 itemCount: _completedTasks.length,
                                 itemBuilder: (context, index) {
                                   return Card(
-                                    clipBehavior: Clip.hardEdge,
+                                    clipBehavior: Clip.antiAlias,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(100.0),
+                                    ),
+                                    elevation: 3,
                                     child: buildTaskItem(
                                         _completedTasks[index], false),
                                   );
@@ -546,7 +614,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addTask,
-        child: const Icon(Icons.add_outlined),
+        elevation: 3,
+        child: Icon(
+          Icons.add_outlined,
+        ),
       ),
     );
   }

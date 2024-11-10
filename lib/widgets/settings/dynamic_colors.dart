@@ -17,6 +17,7 @@ class _DynamicColorsSettingsState extends State<DynamicColorsSettings> {
     final themeModel = Provider.of<ThemeModel>(context);
 
     return Card(
+      elevation: 3,
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.all(8.0),
       child: ListTile(
@@ -29,7 +30,6 @@ class _DynamicColorsSettingsState extends State<DynamicColorsSettings> {
           value: themeModel.isDynamicColorsEnabled,
           onChanged: (value) {
             themeModel.toggleDynamicColors();
-            themeModel.saveDynamicPreference(value);
           },
         ),
       ),

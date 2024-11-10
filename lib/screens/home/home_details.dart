@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart'; // Importar a biblioteca share_plus
+import 'package:share_plus/share_plus.dart';
 import 'package:tarefas/tasks/tasks.dart';
-import 'package:tarefas/widgets/bottom_navigation.dart';
+import 'package:tarefas/widgets/custom_textfield.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class HomeDetailsScreen extends StatefulWidget {
@@ -22,7 +22,7 @@ class HomeDetailsScreen extends StatefulWidget {
 class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
   late TextEditingController _controller;
   late DateTime? _selectedDateTime;
-  User? _user;
+  final User? _user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -35,86 +35,120 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.taskDetails),
+        title: Text(
+          AppLocalizations.of(context)!.taskDetails,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        elevation: 0.5,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            TextFormField(
+            ModernTextField(
               controller: _controller,
-              decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.inputTask,
-                border: const OutlineInputBorder(),
-              ),
-              maxLines: null,
+              label: AppLocalizations.of(context)!.inputTask,
             ),
             const SizedBox(height: 16.0),
             GestureDetector(
-              onTap: () async {
-                final selectedDate = await showDatePicker(
-                  context: context,
-                  initialDate: _selectedDateTime ?? DateTime.now(),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime(2100),
-                );
-                if (selectedDate != null) {
-                  final selectedTime = await showTimePicker(
-                    // ignore: use_build_context_synchronously
+                onTap: () async {
+                  final selectedDate = await showDatePicker(
                     context: context,
-                    initialTime: TimeOfDay.fromDateTime(
-                      _selectedDateTime ?? DateTime.now(),
-                    ),
+                    initialDate: _selectedDateTime ?? DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(2100),
                   );
-                  if (selectedTime != null) {
-                    setState(() {
-                      _selectedDateTime = DateTime(
-                        selectedDate.year,
-                        selectedDate.month,
-                        selectedDate.day,
-                        selectedTime.hour,
-                        selectedTime.minute,
-                      );
-                    });
+                  if (selectedDate != null) {
+                    final selectedTime = await showTimePicker(
+                      // ignore: use_build_context_synchronously
+                      context: context,
+                      initialTime: TimeOfDay.fromDateTime(
+                        _selectedDateTime ?? DateTime.now(),
+                      ),
+                    );
+                    if (selectedTime != null) {
+                      setState(() {
+                        _selectedDateTime = DateTime(
+                          selectedDate.year,
+                          selectedDate.month,
+                          selectedDate.day,
+                          selectedTime.hour,
+                          selectedTime.minute,
+                        );
+                      });
+                    }
                   }
-                }
-              },
-              child: Row(
-                children: [
-                  const Icon(Icons.calendar_today),
-                  const SizedBox(width: 8),
-                  Text(
-                    _selectedDateTime != null
-                        ? DateFormat('dd/MM/yyyy - HH:mm')
-                            .format(_selectedDateTime!)
-                        : AppLocalizations.of(context)!.dateTime,
-                    style: const TextStyle(fontSize: 16),
+                },
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(100.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.calendar_today,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _selectedDateTime != null
+                              ? DateFormat('dd/MM/yyyy - HH:mm')
+                                  .format(_selectedDateTime!)
+                              : AppLocalizations.of(context)!.dateTime,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
+                )),
           ],
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 6.0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 40.0),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(100),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 10,
+                offset: Offset(0, 5),
+              ),
+            ],
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                  tooltip: AppLocalizations.of(context)!.delete,
-                  icon: const Icon(Icons.delete_outlined),
-                  onPressed: () {
-                    _delete();
-                    Navigator.of(context).pop();
-                  }),
+                tooltip: AppLocalizations.of(context)!.delete,
+                icon: const Icon(Icons.delete_outlined),
+                onPressed: () {
+                  _delete();
+                },
+              ),
               IconButton(
                 tooltip: AppLocalizations.of(context)!.save,
-                icon: const Icon(Icons.save_alt),
+                icon: const Icon(Icons.check_circle_outline),
                 onPressed: () {
                   final newTitle = _controller.text.trim();
                   if (newTitle.isNotEmpty) {
@@ -140,7 +174,7 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
     );
   }
 
-Future<void> _delete() async {
+  Future<void> _delete() async {
     final appLocalizations = AppLocalizations.of(context);
     if (appLocalizations != null) {
       final confirm = await showDialog<bool>(
@@ -190,6 +224,9 @@ Future<void> _delete() async {
           if (kDebugMode) {
             print('Tarefa removida Firestore: $taskId');
           }
+
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pop(true);
         } else {
           if (kDebugMode) {
             print('Tarefa não encontrada no Firestore: $taskId');
@@ -200,10 +237,6 @@ Future<void> _delete() async {
           print('Erro ao apagar tarefa: $e');
         }
       }
-
-      // Retorna para a tela anterior após a remoção
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pop();
     }
   }
 
@@ -272,13 +305,10 @@ Future<void> _delete() async {
         );
 
         // ignore: use_build_context_synchronously
-        Navigator.pop(context);
+        Navigator.of(context).pop();
+
         // ignore: use_build_context_synchronously
-        await Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => const BottomNavigationContainer(),
-          ),
-        );
+        Navigator.of(context).pop();
       } catch (e) {
         if (kDebugMode) {
           print('Error updating task: $e');

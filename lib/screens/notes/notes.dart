@@ -57,7 +57,12 @@ class _NotesScreenState extends State<NotesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.notes),
+        title: Text(
+          AppLocalizations.of(context)!.notes,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        elevation: 0.5,
       ),
       body: const Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -86,8 +91,53 @@ class _NotesScreenState extends State<NotesScreen> {
             title: Text(appLocalizations.newNote),
             content: TextFormField(
               controller: _noteController,
-              decoration:
-                  InputDecoration(labelText: appLocalizations.inputNote),
+              decoration: InputDecoration(
+                labelText: appLocalizations.inputNote,
+                labelStyle: TextStyle(
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                ),
+                hintStyle: TextStyle(
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                ),
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(100),
+                  borderSide: BorderSide(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.3),
+                    width: 1.5,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  borderSide: BorderSide(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.5),
+                    width: 2,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  borderSide: BorderSide(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.5),
+                    width: 1.5,
+                  ),
+                ),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              ),
               maxLines: null,
             ),
             actions: <Widget>[
@@ -151,7 +201,11 @@ class NotesList extends StatelessWidget {
               final note =
                   notes[index] as QueryDocumentSnapshot<Map<String, dynamic>>;
               return Card(
+                elevation: 3,
                 clipBehavior: Clip.hardEdge,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(35),
+                ),
                 child: NoteCard(note: note),
               );
             },
