@@ -10,7 +10,7 @@ Changelog Tarefas
 
 - Correções de bugs
 - Melhorias no código
-- Melhroias no sistema de atualizações
+- Melhorias no sistema de atualizações
 
 ### Features
 
