@@ -82,7 +82,6 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        elevation: 0.5,
       ),
       body: SingleChildScrollView(
         child: Padding(

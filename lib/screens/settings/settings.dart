@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:tarefas/theme/theme.dart';
 import 'package:tarefas/widgets/settings/about.dart';
 import 'package:tarefas/widgets/settings/accounts.dart';
-import 'package:tarefas/widgets/settings/category.dart';
 import 'package:tarefas/widgets/settings/dynamic_colors.dart';
 import 'package:tarefas/widgets/settings/notification.dart';
 import 'package:tarefas/widgets/settings/review.dart';
@@ -45,7 +44,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     final themeModel = Provider.of<ThemeModel>(context);
 
@@ -56,24 +55,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        elevation: 0.5,
       ),
       body: ListView(
         children: [
           AccountUser(user: _user),
-          buildCategoryHeader(AppLocalizations.of(context)!.notification,
-              Icons.notifications_outlined),
-          const NotificationSettings(),
-          buildCategoryHeader(
-              AppLocalizations.of(context)!.interface, Icons.palette_outlined),
-          ThemeSettings(themeModel: themeModel),
-          if (_isAndroid12) const DynamicColorsSettings(),
-          buildCategoryHeader(
-              AppLocalizations.of(context)!.others, Icons.more_horiz_outlined),
-          buildUpdateSettings(context),
-          buildReviewSettings(context),
-          buildSupportSettings(context),
-          buildAboutSettings(context),
+          const SizedBox(height: 8),
+          _buildSectionCard(
+            context,
+            const NotificationSettings(),
+          ),
+          const SizedBox(height: 8),
+          _buildSectionCard(
+            context,
+            Column(
+              children: [
+                ThemeSettings(themeModel: themeModel),
+               if (_isAndroid12) const DynamicColorsSettings(),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          _buildSectionCard(
+            context,
+            Column(
+              children: [
+                buildUpdateSettings(context),
+                buildReviewSettings(context),
+                buildSupportSettings(context),
+                buildAboutSettings(context),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionCard(
+    BuildContext context,
+    Widget child,
+  ) {
+    return Card(
+      clipBehavior: Clip.hardEdge,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      color: Theme.of(context).listTileTheme.tileColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          child,
         ],
       ),
     );

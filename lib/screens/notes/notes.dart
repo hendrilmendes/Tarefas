@@ -62,7 +62,6 @@ class _NotesScreenState extends State<NotesScreen> {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        elevation: 0.5,
       ),
       body: const Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

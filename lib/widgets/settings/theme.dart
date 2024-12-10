@@ -110,17 +110,13 @@ class ThemeSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      clipBehavior: Clip.hardEdge,
-      margin: const EdgeInsets.all(8.0),
-      child: ListTile(
-        title: Text(AppLocalizations.of(context)!.theme),
-        subtitle: Text(AppLocalizations.of(context)!.themeSub),
-        onTap: () {
-          _showThemeDialog(context, themeModel);
-        },
-      ),
+    return ListTile(
+      title: Text(AppLocalizations.of(context)!.theme),
+      subtitle: Text(AppLocalizations.of(context)!.themeSub),
+      tileColor: Theme.of(context).listTileTheme.tileColor,
+      onTap: () {
+        _showThemeDialog(context, themeModel);
+      },
     );
   }
 }

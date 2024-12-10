@@ -12,10 +12,10 @@ class AccountUser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
       ),
+      color: Theme.of(context).listTileTheme.tileColor,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -25,6 +25,7 @@ class AccountUser extends StatelessWidget {
               CircleAvatar(
                 radius: 30,
                 backgroundImage: NetworkImage(user!.photoURL ?? ''),
+                backgroundColor: Colors.grey.shade200,
               ),
             if (user != null) const SizedBox(width: 20),
             if (user != null)
@@ -34,15 +35,16 @@ class AccountUser extends StatelessWidget {
                   children: [
                     Text(
                       user!.displayName ?? '',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
+                        color: Theme.of(context).textTheme.bodyLarge?.color,
                       ),
                     ),
                     Text(
                       user!.email ?? '',
-                      style: const TextStyle(
-                        color: Colors.grey,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
                       ),
                     ),
                   ],
@@ -51,7 +53,7 @@ class AccountUser extends StatelessWidget {
             if (user != null)
               IconButton(
                 color: Colors.blue,
-                icon: const Icon(Icons.logout),
+                icon: const Icon(Icons.logout_outlined),
                 onPressed: () async {
                   await _authService.signOut();
                   if (context.mounted) {

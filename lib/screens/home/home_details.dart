@@ -40,7 +40,6 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        elevation: 0.5,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -128,126 +128,114 @@ class _AboutPageState extends State<AboutPage> {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        elevation: 0.5,
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              children: [
-                const SizedBox(height: 20),
-                const Card(
-                  elevation: 15,
-                  shape: CircleBorder(),
-                  clipBehavior: Clip.antiAlias,
-                  child: SizedBox(
-                    width: 80,
-                    child: Image(
-                      image: AssetImage('assets/img/ic_launcher.png'),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  const SizedBox(height: 20),
+                  const Card(
+                    elevation: 15,
+                    shape: CircleBorder(),
+                    clipBehavior: Clip.antiAlias,
+                    child: SizedBox(
+                      width: 80,
+                      child: Image(
+                        image: AssetImage('assets/img/ic_launcher.png'),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: Text(
-                    'Copyright © Hendril Mendes, 2023-$currentYear',
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      'Copyright © Hendril Mendes, 2023-$currentYear',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                  Text(
+                    AppLocalizations.of(context)!.copyright,
                     style: const TextStyle(fontSize: 12),
                   ),
-                ),
-                Text(
-                  AppLocalizations.of(context)!.copyright,
-                  style: const TextStyle(fontSize: 12),
-                ),
-                const Divider(),
-                const SizedBox(height: 10),
-                Text(
-                  AppLocalizations.of(context)!.appDesc,
-                  style: const TextStyle(fontSize: 14.0),
-                ),
-                const SizedBox(height: 10),
-                const Divider(),
-                // Versão
-                Card(
-                  elevation: 3,
-                  clipBehavior: Clip.hardEdge,
-                  margin: const EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text(AppLocalizations.of(context)!.version),
-                    subtitle: Text('v$appVersion Build: ($appBuild)'),
-                    leading: const Icon(Icons.task_alt_outlined),
-                    onTap: () {
-                      _showReleaseInfo(context);
-                    },
+                  const Divider(),
+                  const SizedBox(height: 10),
+                  Text(
+                    AppLocalizations.of(context)!.appDesc,
+                    style: const TextStyle(fontSize: 14.0),
                   ),
-                ),
-                // Política de privacidade
-                Card(
-                  elevation: 3,
-                  clipBehavior: Clip.hardEdge,
-                  margin: const EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text(AppLocalizations.of(context)!.privacy),
-                    subtitle: Text(AppLocalizations.of(context)!.privacySub),
-                    leading: const Icon(Icons.shield_outlined),
-                    onTap: () {
-                      Navigator.pop(context);
-                      launchUrl(
-                        Uri.parse(
-                          'https://br-newsdroid.blogspot.com/p/politica-de-privacidade.html',
+                  const SizedBox(height: 10),
+                  const Divider(),
+                  Card(
+                    clipBehavior: Clip.hardEdge,
+                    margin: const EdgeInsets.all(8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          title: Text(AppLocalizations.of(context)!.version),
+                          subtitle: Text('v$appVersion Build: ($appBuild)'),
+                          leading: const Icon(Icons.task_alt_outlined),
+                          tileColor: Theme.of(context).listTileTheme.tileColor,
+                          onTap: () => _showReleaseInfo(context),
                         ),
-                        mode: LaunchMode.inAppBrowserView,
-                      );
-                    },
-                  ),
-                ),
-                // Código Fonte
-                Card(
-                  elevation: 3,
-                  clipBehavior: Clip.hardEdge,
-                  margin: const EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text(AppLocalizations.of(context)!.sourceCode),
-                    subtitle: Text(AppLocalizations.of(context)!.sourceCodeSub),
-                    leading: const Icon(Icons.code_outlined),
-                    onTap: () {
-                      Navigator.pop(context);
-                      launchUrl(
-                        Uri.parse(
-                          'https://github.com/hendrilmendes/Tarefas/',
+                        ListTile(
+                          title: Text(AppLocalizations.of(context)!.privacy),
+                          subtitle:
+                              Text(AppLocalizations.of(context)!.privacySub),
+                          leading: const Icon(Icons.shield_outlined),
+                          tileColor: Theme.of(context).listTileTheme.tileColor,
+                          onTap: () {
+                            launchUrl(
+                              Uri.parse(
+                                'https://br-newsdroid.blogspot.com/p/politica-de-privacidade-tarefas.html',
+                              ),
+                              mode: LaunchMode.inAppBrowserView,
+                            );
+                          },
                         ),
-                        mode: LaunchMode.inAppBrowserView,
-                      );
-                    },
-                  ),
-                ),
-                // Licenças
-                Card(
-                  elevation: 3,
-                  clipBehavior: Clip.hardEdge,
-                  margin: const EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text(AppLocalizations.of(context)!.openSource),
-                    subtitle: Text(AppLocalizations.of(context)!.openSourceSub),
-                    leading: const Icon(Icons.folder_open),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LicensePage(
-                            applicationName:
-                                AppLocalizations.of(context)!.appName,
-                          ),
+                        ListTile(
+                          title: Text(AppLocalizations.of(context)!.sourceCode),
+                          subtitle:
+                              Text(AppLocalizations.of(context)!.sourceCodeSub),
+                          leading: const Icon(Icons.code_outlined),
+                          tileColor: Theme.of(context).listTileTheme.tileColor,
+                          onTap: () {
+                            launchUrl(
+                              Uri.parse(
+                                  'https://github.com/hendrilmendes/Tarefas/'),
+                              mode: LaunchMode.inAppBrowserView,
+                            );
+                          },
                         ),
-                      );
-                    },
+                        ListTile(
+                          title: Text(AppLocalizations.of(context)!.openSource),
+                          subtitle:
+                              Text(AppLocalizations.of(context)!.openSourceSub),
+                          leading: const Icon(Icons.folder_open),
+                          tileColor: Theme.of(context).listTileTheme.tileColor,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LicensePage(
+                                  applicationName:
+                                      AppLocalizations.of(context)!.appName,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                ],
+              ),
+            ]),
       ),
     );
   }

@@ -525,7 +525,6 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        elevation: 0.5,
       ),
       body: _isLoading
           ? const Center(

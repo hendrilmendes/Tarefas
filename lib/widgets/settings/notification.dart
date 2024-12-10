@@ -11,19 +11,14 @@ class NotificationSettings extends StatefulWidget {
 }
 
 class _NotificationSettingsState extends State<NotificationSettings> {
-
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      clipBehavior: Clip.hardEdge,
-      margin: const EdgeInsets.all(8.0),
-      child: ListTile(
-          title: Text(AppLocalizations.of(context)!.notification),
-          subtitle: Text(AppLocalizations.of(context)!.notificationSub),
-          onTap: () {
-            AppSettings.openAppSettings(type: AppSettingsType.notification);
-          }),
-    );
+    return ListTile(
+        title: Text(AppLocalizations.of(context)!.notification),
+        subtitle: Text(AppLocalizations.of(context)!.notificationSub),
+        tileColor: Theme.of(context).listTileTheme.tileColor,
+        onTap: () {
+          AppSettings.openAppSettings(type: AppSettingsType.notification);
+        });
   }
 }
