@@ -98,48 +98,36 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)!.inputNote,
                   labelStyle: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(),
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
                   ),
                   hintStyle: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(),
                   ),
                   filled: true,
                   fillColor: Theme.of(context).colorScheme.surface,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(100),
                     borderSide: BorderSide(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.3),
+                      color:
+                          Theme.of(context).colorScheme.onSurface.withValues(),
                       width: 1.5,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(50),
                     borderSide: BorderSide(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.5),
+                      color:
+                          Theme.of(context).colorScheme.onSurface.withValues(),
                       width: 2,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(50),
                     borderSide: BorderSide(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.5),
+                      color:
+                          Theme.of(context).colorScheme.onSurface.withValues(),
                       width: 1.5,
                     ),
                   ),

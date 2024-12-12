@@ -9,6 +9,7 @@ Changelog Tarefas
 ### Features
 
 - Novo menu de configurações
+- Suporte ao Dynamic Icons
 
 ### Correções
 

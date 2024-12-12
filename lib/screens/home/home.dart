@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withOpacity(0.7),
+                              .withValues(),
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
                         ),
@@ -180,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withOpacity(0.5),
+                              .withValues(),
                         ),
                         filled: true,
                         fillColor: Theme.of(context).colorScheme.surface,
@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(0.3),
+                                .withValues(),
                             width: 1.5,
                           ),
                         ),
@@ -200,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(0.5),
+                                .withValues(),
                             width: 2,
                           ),
                         ),
@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(0.5),
+                                .withValues(),
                             width: 1.5,
                           ),
                         ),
