@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/firebase_options.dart';
@@ -34,29 +33,29 @@ void main() async {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  if (Platform.isAndroid) {
+  if (Platform.isIOS) {
     try {
-      // Solicitar permissão para notificações no Android
+      // Solicitar permissão para notificações no iOS
       flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()!
-          .requestNotificationsPermission();
+              IOSFlutterLocalNotificationsPlugin>()!
+          .requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
     } catch (e) {
       if (kDebugMode) {
-        print("Erro ao desabilitar otimização de bateria: $e");
+        print("Erro ao solicitar permissão de notificação: $e");
       }
     }
   }
-  
-  // Solicitar permissão para notificações no iOS
+
+  // Solicitar permissão para notificações no Android
   flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>()!
-      .requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+          AndroidFlutterLocalNotificationsPlugin>()!
+      .requestNotificationsPermission();
 
   // Desabilitar otimização de bateria
   if (Platform.isAndroid) {
@@ -118,28 +117,8 @@ class MyApp extends StatelessWidget {
               }
 
               return MaterialApp(
-                theme: ThemeData(
-                  brightness: Brightness.light,
-                  colorScheme: lightColorScheme?.copyWith(
-                    primary:
-                        themeModel.isDarkMode ? Colors.black : Colors.black,
-                  ),
-                  useMaterial3: true,
-                  textTheme: Typography()
-                      .black
-                      .apply(fontFamily: GoogleFonts.openSans().fontFamily),
-                ),
-                darkTheme: ThemeData(
-                  brightness: Brightness.dark,
-                  colorScheme: darkColorScheme?.copyWith(
-                    primary:
-                        themeModel.isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  useMaterial3: true,
-                  textTheme: Typography()
-                      .white
-                      .apply(fontFamily: GoogleFonts.openSans().fontFamily),
-                ),
+                theme: themeModel.lightTheme,
+                darkTheme: themeModel.darkTheme,
                 themeMode: _getThemeMode(themeModel.themeMode),
                 debugShowCheckedModeBanner: false,
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -160,12 +139,11 @@ class MyApp extends StatelessWidget {
     return FutureBuilder<User?>(
       future: authService.currentUser(),
       builder: (context, snapshot) {
+        Updater.checkUpdateApp(context);
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
-            Updater.checkUpdateApp(context);
             return const BottomNavigationContainer();
           } else {
-            Updater.checkUpdateApp(context);
             return LoginScreen(authService: authService);
           }
         } else {

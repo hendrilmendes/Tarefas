@@ -44,6 +44,9 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
                   selectedIndex: currentIndex,
                   onDestinationSelected: onTabTapped,
                   labelType: NavigationRailLabelType.all,
+                  indicatorColor: Theme.of(context)
+                      .bottomNavigationBarTheme
+                      .selectedItemColor,
                   destinations: [
                     NavigationRailDestination(
                       icon: const Icon(Icons.task_alt),
@@ -88,6 +91,9 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
                   onDestinationSelected: onTabTapped,
                   selectedIndex: currentIndex,
                   labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                  indicatorColor: Theme.of(context)
+                      .bottomNavigationBarTheme
+                      .selectedItemColor,
                   destinations: [
                     NavigationDestination(
                       icon: const Icon(Icons.task_alt),

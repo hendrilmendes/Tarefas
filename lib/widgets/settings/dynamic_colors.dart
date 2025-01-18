@@ -23,7 +23,6 @@ class _DynamicColorsSettingsState extends State<DynamicColorsSettings> {
       ),
       tileColor: Theme.of(context).listTileTheme.tileColor,
       trailing: Switch(
-        activeColor: Colors.blue,
         value: themeModel.isDynamicColorsEnabled,
         onChanged: (value) {
           themeModel.toggleDynamicColors();
