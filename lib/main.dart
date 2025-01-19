@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:feedback/feedback.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -30,13 +33,41 @@ void main() async {
   // Permissões para notificações
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  if (Platform.isAndroid) {
+    try {
+      // Solicitar permissão para notificações no Android
+      flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()!
+          .requestNotificationsPermission();
+    } catch (e) {
+      if (kDebugMode) {
+        print("Erro ao desabilitar otimização de bateria: $e");
+      }
+    }
+  }
+  
+  // Solicitar permissão para notificações no iOS
   flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()!
-      .requestNotificationsPermission();
+          IOSFlutterLocalNotificationsPlugin>()!
+      .requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
 
   // Desabilitar otimização de bateria
-  await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+  if (Platform.isAndroid) {
+    try {
+      await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+    } catch (e) {
+      if (kDebugMode) {
+        print("Erro ao desabilitar otimização de bateria: $e");
+      }
+    }
+  }
 
   // Inicialização do fuso horário
   tz.initializeTimeZones();

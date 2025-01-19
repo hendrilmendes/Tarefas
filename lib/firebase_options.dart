@@ -58,7 +58,7 @@ class DefaultFirebaseOptions {
     appId: '1:68248536741:android:feab21c748de6d39dfaf4c',
     messagingSenderId: '68248536741',
     projectId: 'tarefas-app-66907',
-    storageBucket: 'tarefas-app-66907.appspot.com',
+    storageBucket: 'tarefas-app-66907.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -66,7 +66,7 @@ class DefaultFirebaseOptions {
     appId: '1:68248536741:ios:f279c58b0e740f7edfaf4c',
     messagingSenderId: '68248536741',
     projectId: 'tarefas-app-66907',
-    storageBucket: 'tarefas-app-66907.appspot.com',
+    storageBucket: 'tarefas-app-66907.firebasestorage.app',
     androidClientId: '68248536741-g65qn8i99vlotlg0lgjqpkf09kveplhv.apps.googleusercontent.com',
     iosClientId: '68248536741-2jof2i0131srcbg2jk6d0fkptasp9l5v.apps.googleusercontent.com',
     iosBundleId: 'com.github.hendrilmendes.tarefas',
