@@ -24,17 +24,17 @@ dependencies:
   dynamic_color: ^1.7.0
 
 # Device Plus
-  device_info_plus: ^11.2.1
+  device_info_plus: ^11.2.2
   
 # Email
   flutter_email_sender: ^6.0.3
 
 # Firebase
-  cloud_firestore: ^5.6.1
-  firebase_auth: ^5.4.0
-  firebase_core: ^3.10.0
-  firebase_crashlytics: ^4.3.0
-  firebase_performance: ^0.10.1
+  cloud_firestore: ^5.6.2
+  firebase_auth: ^5.4.1
+  firebase_core: ^3.10.1
+  firebase_crashlytics: ^4.3.1
+  firebase_performance: ^0.10.1+1
 
 # Flutter Local Notifications
   flutter_local_notifications: ^18.0.1
@@ -51,13 +51,13 @@ dependencies:
   google_sign_in: ^6.2.2
 
 # HTTP
-  http: ^1.2.1
+  http: ^1.3.0
 
 # Intl
   intl: ^0.19.0
 
 # Package Info
-  package_info_plus: ^8.1.3
+  package_info_plus: ^8.1.4
 
 # Path Provider
   path_provider: ^2.1.5
@@ -72,7 +72,7 @@ dependencies:
   share_plus: ^10.1.4
 
 # Shared Preferences
-  shared_preferences: ^2.3.5
+  shared_preferences: ^2.4.0
   
 # Timezone
   timezone: ^0.10.0
