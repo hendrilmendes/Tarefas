@@ -11,7 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/firebase_options.dart';
 import 'package:tarefas/screens/login/login.dart';
@@ -28,6 +30,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  // Shorebird
+  await ShorebirdUpdater().checkForUpdate();
 
   // Permissões para notificações
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -117,8 +122,28 @@ class MyApp extends StatelessWidget {
               }
 
               return MaterialApp(
-                theme: themeModel.lightTheme,
-                darkTheme: themeModel.darkTheme,
+                theme: ThemeData(
+                  brightness: Brightness.light,
+                  colorScheme: lightColorScheme?.copyWith(
+                    primary:
+                        themeModel.isDarkMode ? Colors.black : Colors.black,
+                  ),
+                  useMaterial3: true,
+                  textTheme: Typography()
+                      .black
+                      .apply(fontFamily: GoogleFonts.openSans().fontFamily),
+                ),
+                darkTheme: ThemeData(
+                  brightness: Brightness.dark,
+                  colorScheme: darkColorScheme?.copyWith(
+                    primary:
+                        themeModel.isDarkMode ? Colors.white : Colors.black,
+                  ),
+                  useMaterial3: true,
+                  textTheme: Typography()
+                      .white
+                      .apply(fontFamily: GoogleFonts.openSans().fontFamily),
+                ),
                 themeMode: _getThemeMode(themeModel.themeMode),
                 debugShowCheckedModeBanner: false,
                 localizationsDelegates: AppLocalizations.localizationsDelegates,

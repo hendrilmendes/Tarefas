@@ -2,17 +2,17 @@ Changelog Tarefas
 
 ======================================================
 
-## [2.3.1](https://github.com/hendrilmendes/Tarefas/compare/2.3.0..2.3.1) (**-**-2025)
+## [2.4.0](https://github.com/hendrilmendes/Tarefas/compare/2.3.0..2.3.1) (**-**-2025)
 
 ## Alterações
 
 ### Features
 
-- 
+- Novo visual para a tela de anotações
 
 ### Correções
 
-- Ajuste no Dynamic Colors
+- 
 
 ======================================================
 

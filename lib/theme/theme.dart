@@ -1,116 +1,61 @@
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum ThemeModeType { light, dark, system }
 
 class ThemeModel extends ChangeNotifier {
   bool _isDarkMode = true;
-  bool _useDynamicColors = true;
-  bool get isDynamicColorsEnabled => _useDynamicColors;
-  ThemeModeType _themeMode = ThemeModeType.system;
-  SharedPreferences? _prefs;
-  ColorScheme? _lightDynamicColorScheme;
-  ColorScheme? _darkDynamicColorScheme;
+  bool _isDynamicColorsEnabled = true;
+  ThemeModeType _themeMode = ThemeModeType.light;
+
+  static const String darkModeKey = 'darkModeEnabled';
+  static const String dynamicColorsKey = 'dynamicColorsEnabled';
+  static const String themeModeKey = 'themeMode';
 
   ThemeModel() {
     _loadThemePreference();
-    _loadDynamicColors();
   }
 
   bool get isDarkMode => _isDarkMode;
+  bool get isDynamicColorsEnabled => _isDynamicColorsEnabled;
   ThemeModeType get themeMode => _themeMode;
 
   void toggleDarkMode() {
     _isDarkMode = !_isDarkMode;
-    _saveThemeModePreference(
-        _isDarkMode ? ThemeModeType.dark : ThemeModeType.light);
+    _savePreference(darkModeKey, _isDarkMode);
     notifyListeners();
   }
 
   void toggleDynamicColors() {
-    _useDynamicColors = !_useDynamicColors;
-    _saveDynamicColorPreference(_useDynamicColors);
+    _isDynamicColorsEnabled = !_isDynamicColorsEnabled;
+    _savePreference(dynamicColorsKey, _isDynamicColorsEnabled);
     notifyListeners();
   }
 
   void changeThemeMode(ThemeModeType mode) {
     _themeMode = mode;
-    _saveThemeModePreference(mode);
+    _savePreference(themeModeKey, mode.toString());
     notifyListeners();
-  }
-
-  void setDynamicColors(ColorScheme? light, ColorScheme? dark) {
-    _lightDynamicColorScheme = light;
-    _darkDynamicColorScheme = dark;
-    _useDynamicColors = light != null && dark != null;
-    _saveDynamicColorPreference(_useDynamicColors);
-    notifyListeners();
-  }
-
-  ThemeData get lightTheme {
-    if (_useDynamicColors && _lightDynamicColorScheme != null) {
-      return ThemeData(
-        useMaterial3: true,
-        colorScheme: _lightDynamicColorScheme,
-        textTheme: Typography()
-            .black
-            .apply(fontFamily: GoogleFonts.openSans().fontFamily),
-      );
-    }
-    return ThemeModel.getLightTheme();
-  }
-
-  ThemeData get darkTheme {
-    if (_useDynamicColors && _darkDynamicColorScheme != null) {
-      return ThemeData(
-        useMaterial3: true,
-        colorScheme:
-            _darkDynamicColorScheme!.copyWith(brightness: Brightness.dark),
-        textTheme: Typography()
-            .white
-            .apply(fontFamily: GoogleFonts.openSans().fontFamily),
-      );
-    }
-    return ThemeModel.getDarkTheme();
   }
 
   Future<void> _loadThemePreference() async {
-    _prefs = await SharedPreferences.getInstance();
-    _isDarkMode = _prefs?.getBool('darkModeEnabled') ?? false;
-    _useDynamicColors = _prefs?.getBool('useDynamicColors') ?? false;
-    _themeMode = _getSavedThemeMode(
-        _prefs?.getString('themeMode') ?? ThemeModeType.system.toString());
-
-    // Certifique-se de que os esquemas de cores dinâmicos sejam carregados
-    await _loadDynamicColors();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _isDarkMode = prefs.getBool(darkModeKey) ?? true;
+    _isDynamicColorsEnabled = prefs.getBool(dynamicColorsKey) ?? true;
+    _themeMode = _getSavedThemeMode(prefs.getString(themeModeKey));
     notifyListeners();
   }
 
-  Future<void> _loadDynamicColors() async {
-    final dynamicPalette = await DynamicColorPlugin.getCorePalette();
-
-    if (dynamicPalette != null) {
-      _lightDynamicColorScheme =
-          dynamicPalette.toColorScheme(brightness: Brightness.light);
-      _darkDynamicColorScheme =
-          dynamicPalette.toColorScheme(brightness: Brightness.dark);
+  Future<void> _savePreference(String key, dynamic value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (value is bool) {
+      prefs.setBool(key, value);
+    } else if (value is String) {
+      prefs.setString(key, value);
     }
-
-    notifyListeners();
   }
 
-  Future<void> _saveThemeModePreference(ThemeModeType mode) async {
-    await _prefs?.setString('themeMode', mode.toString());
-    await _prefs?.setBool('darkModeEnabled', mode == ThemeModeType.dark);
-  }
-
-  Future<void> _saveDynamicColorPreference(bool value) async {
-    await _prefs?.setBool('useDynamicColors', value);
-  }
-
-  ThemeModeType _getSavedThemeMode(String mode) {
+  ThemeModeType _getSavedThemeMode(String? mode) {
     switch (mode) {
       case 'ThemeModeType.light':
         return ThemeModeType.light;
@@ -121,36 +66,5 @@ class ThemeModel extends ChangeNotifier {
       default:
         return ThemeModeType.system;
     }
-  }
-
-  static ThemeData getLightTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: const ColorScheme.light(),
-      scaffoldBackgroundColor: Colors.white,
-      textTheme: Typography()
-          .black
-          .apply(fontFamily: GoogleFonts.openSans().fontFamily),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        enableFeedback: true,
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.blue,
-      ),
-    );
-  }
-
-  static ThemeData getDarkTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: const ColorScheme.dark(),
-      scaffoldBackgroundColor: Colors.black,
-      textTheme: Typography()
-          .white
-          .apply(fontFamily: GoogleFonts.openSans().fontFamily),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Colors.black,
-        selectedItemColor: Colors.blue,
-      ),
-    );
   }
 }

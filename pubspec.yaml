@@ -2,7 +2,7 @@ name: tarefas
 description: "Um app para você salvar suas tarefas e anotações do dia a dia"
 publish_to: 'none'
 
-version: 2.3.0+230
+version: 2.4.0+240
 
 environment:
   sdk: ^3.6.0
@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
 
 # App Settings
-  app_settings: ^5.1.1
+  app_settings: ^5.2.0
 
 # Connectivity Plus
   connectivity_plus: ^6.1.2
@@ -30,11 +30,11 @@ dependencies:
   flutter_email_sender: ^6.0.3
 
 # Firebase
-  cloud_firestore: ^5.6.2
-  firebase_auth: ^5.4.1
-  firebase_core: ^3.10.1
-  firebase_crashlytics: ^4.3.1
-  firebase_performance: ^0.10.1+1
+  cloud_firestore: ^5.6.3
+  firebase_auth: ^5.4.2
+  firebase_core: ^3.11.0
+  firebase_crashlytics: ^4.3.2
+  firebase_performance: ^0.10.1+2
 
 # Flutter Local Notifications
   flutter_local_notifications: ^18.0.1
@@ -57,7 +57,7 @@ dependencies:
   intl: ^0.19.0
 
 # Package Info
-  package_info_plus: ^8.1.4
+  package_info_plus: ^8.2.0
 
 # Path Provider
   path_provider: ^2.1.5
@@ -72,13 +72,16 @@ dependencies:
   share_plus: ^10.1.4
 
 # Shared Preferences
-  shared_preferences: ^2.4.0
-  
+  shared_preferences: ^2.5.1
+
+# Shorebird
+  shorebird_code_push: ^2.0.2
+
 # Timezone
   timezone: ^0.10.0
 
 # Toast
-  fluttertoast: ^8.2.10
+  fluttertoast: ^8.2.11
 
 # Url Launcher
   url_launcher: ^6.3.1
@@ -98,3 +101,4 @@ flutter:
 
   assets:
     - assets/img/
+    - shorebird.yaml

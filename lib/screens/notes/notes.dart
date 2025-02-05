@@ -183,7 +183,14 @@ class NotesList extends StatelessWidget {
           );
         } else {
           final notes = snapshot.data!.docs;
-          return ListView.builder(
+          return GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8.0,
+              mainAxisSpacing: 8.0,
+              childAspectRatio: 1.0,
+            ),
+            padding: const EdgeInsets.all(8.0),
             itemCount: notes.length,
             itemBuilder: (context, index) {
               final note =
@@ -192,7 +199,7 @@ class NotesList extends StatelessWidget {
                 elevation: 3,
                 clipBehavior: Clip.hardEdge,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(35),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: NoteCard(note: note),
               );
@@ -222,14 +229,14 @@ class NoteCard extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Fecha o diálogo sem excluir
+                Navigator.of(context).pop();
               },
               child: Text(appLocalizations.cancel),
             ),
             FilledButton.tonal(
               onPressed: () async {
                 confirmed = true;
-                Navigator.of(context).pop(); // Fecha o diálogo
+                Navigator.of(context).pop();
               },
               child: Text(appLocalizations.delete),
             ),
@@ -239,13 +246,11 @@ class NoteCard extends StatelessWidget {
     );
 
     if (confirmed == true) {
-      // Aqui excluímos a nota se a confirmação foi positiva
       await FirebaseFirestore.instance
           .collection('notes')
           .doc(note.id)
           .delete();
 
-      // Mostramos o SnackBar após garantir que o contexto está ativo
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

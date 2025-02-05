@@ -12,7 +12,6 @@ import 'package:tarefas/widgets/settings/notification.dart';
 import 'package:tarefas/widgets/settings/review.dart';
 import 'package:tarefas/widgets/settings/support.dart';
 import 'package:tarefas/widgets/settings/theme.dart';
-import 'package:tarefas/widgets/settings/update.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -44,7 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     final themeModel = Provider.of<ThemeModel>(context);
 
@@ -70,7 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Column(
               children: [
                 ThemeSettings(themeModel: themeModel),
-               if (_isAndroid12) const DynamicColorsSettings(),
+                if (_isAndroid12) const DynamicColorsSettings(),
               ],
             ),
           ),
@@ -79,9 +78,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             context,
             Column(
               children: [
-                buildUpdateSettings(context),
                 buildReviewSettings(context),
                 buildSupportSettings(context),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          _buildSectionCard(
+            context,
+            Column(
+              children: [
                 buildAboutSettings(context),
               ],
             ),
