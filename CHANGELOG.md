@@ -8,7 +8,7 @@ Changelog Tarefas
 
 ### Features
 
-- Novo visual para a tela de anotações
+- O app ganhou uma nova cara, mais fácil e intuitiva
 
 ### Correções
 

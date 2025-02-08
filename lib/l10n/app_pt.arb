@@ -118,7 +118,7 @@
     "@dateTime": {},
     "taskDetails": "Detalhes da Tarefa",
     "@taskDetails": {},
-    "notificationTask": "Opa, tudo bem? Passando pra te lembrar de uma tarefa",
+    "notificationTask": "Opa, tudo bem? Aqui esta o seu lembrete",
     "@notificationTask": {},
     "error": "Erro",
     "@error": {},
@@ -144,8 +144,10 @@
     "@noDate": {},
     "taskTitle": "Título da Tarefa",
     "@taskTitle": {},
-    "noteDeleted": "Anotação Apagada",
-    "@noteDeleted": {},
     "errorUpdate": "Não foi possível verificar atualizações.",
-    "@errorUpdate": {}
+    "@errorUpdate": {},
+    "loading": "Carregando...",
+    "@loading": {},
+    "loginError": "Erro no login",
+    "@loginError": {}
 }

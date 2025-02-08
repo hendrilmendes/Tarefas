@@ -21,10 +21,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final AuthService _authService = AuthService();
   User? _user;
-  List<Task> _pendingTasks = [];
-  List<Task> _completedTasks = [];
-  int _taskIdCounter = 0;
-  String _loadingMessage = '';
+  final List<Task> _pendingTasks = [];
+  final List<Task> _completedTasks = [];
+  String loadingMessage = '';
   bool _isLoading = true;
 
   @override
@@ -35,38 +34,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _checkUser() async {
     final user = await _authService.currentUser();
-    setState(() {
-      _user = user;
-    });
+    setState(() => _user = user);
 
-    if (_user != null) {
-      // Somente carregue as tarefas se ainda não tiverem sido carregadas
-      if (_pendingTasks.isEmpty && _completedTasks.isEmpty) {
-        _loadTasks();
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    if (_user != null && _pendingTasks.isEmpty && _completedTasks.isEmpty) {
+      _loadTasks();
     } else {
-      if (kDebugMode) {
-        print('Usuário nulo ao carregar tarefas.');
-      }
+      setState(() => _isLoading = false);
     }
   }
 
   Future<void> _loadTasks() async {
     try {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() => _isLoading = true);
 
       if (_user != null) {
         final querySnapshot =
             await tasksCollection.where('userId', isEqualTo: _user!.uid).get();
 
-        final pendingTasks = <Task>[];
-        final completedTasks = <Task>[];
+        _pendingTasks.clear();
+        _completedTasks.clear();
 
         for (var doc in querySnapshot.docs) {
           final task = Task(
@@ -76,541 +62,353 @@ class _HomeScreenState extends State<HomeScreen> {
             dateTime: (doc['dateTime'] as Timestamp).toDate(),
           );
 
-          if (task.completed) {
-            completedTasks.add(task);
-          } else {
-            pendingTasks.add(task);
-          }
+          task.completed ? _completedTasks.add(task) : _pendingTasks.add(task);
         }
 
-        setState(() {
-          _pendingTasks = pendingTasks;
-          _completedTasks = completedTasks;
-          _loadingMessage = '';
-        });
-      } else {
-        if (kDebugMode) {
-          print('Usuário nulo ao carregar tarefas.');
-        }
+        setState(() => loadingMessage = '');
       }
     } catch (e) {
-      setState(() {
-        _loadingMessage = 'Erro ao carregar as tarefas.';
-      });
-      if (kDebugMode) {
-        print('Erro ao carregar as tarefas: $e');
-      }
+      setState(() => loadingMessage = 'Erro ao carregar as tarefas.');
+      if (kDebugMode) print('Erro ao carregar as tarefas: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
   Widget buildTaskItem(Task task, bool isPending) {
-    return Dismissible(
-      key: Key(task.title),
-      direction:
-          isPending ? DismissDirection.endToStart : DismissDirection.endToStart,
-      onDismissed: (direction) {
-        _removeTask(task);
-      },
-      background: Container(
-        alignment: isPending ? Alignment.centerRight : Alignment.centerRight,
-        color: Colors.red,
-        child: const Icon(
-          Icons.delete_outline,
-          color: Colors.white,
-        ),
-      ),
-      child: ListTile(
-        title: Text(task.title),
-        onTap: () async {
-          final result = await Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => HomeDetailsScreen(
-                task: task,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+      child: GestureDetector(
+        onLongPress: () => _removeTask(task),
+        child: Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          clipBehavior: Clip.hardEdge,
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+            title: Text(
+              task.title,
+              style: TextStyle(
+                fontSize: 16,
+                decoration: task.completed ? TextDecoration.lineThrough : null,
+                color: task.completed
+                    ? Theme.of(context).colorScheme.onSurface.withValues()
+                    : null,
               ),
             ),
-          );
-          if (result == true) {
-            await _loadTasks();
-          }
-        },
-        trailing: isPending
-            ? Checkbox(
-                value: task.completed,
-                onChanged: (value) {
-                  _updateTaskCompletion(task, value!);
-                },
-              )
-            : null,
+            subtitle: task.dateTime != null
+                ? Text(
+                    DateFormat('dd/MM/yyyy - HH:mm').format(task.dateTime!),
+                    style: TextStyle(
+                      color:
+                          Theme.of(context).colorScheme.onSurface.withValues(),
+                    ),
+                  )
+                : null,
+            leading: isPending
+                ? Checkbox(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    value: task.completed,
+                    onChanged: (value) => _updateTaskCompletion(task, value!),
+                  )
+                : Icon(
+                    Icons.check_circle_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomeDetailsScreen(task: task),
+                ),
+              );
+              if (result == true) await _loadTasks();
+            },
+          ),
+        ),
       ),
     );
   }
 
   Future<bool> _addTask() async {
     final appLocalizations = AppLocalizations.of(context);
-    if (appLocalizations != null) {
-      String newTaskTitle = '';
-      DateTime? taskDateTime;
+    if (appLocalizations == null) return false;
 
-      final bool? result = await showDialog<bool>(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return AlertDialog(
-                title: Text(appLocalizations.newTask),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: appLocalizations.inputTask,
-                        labelStyle: TextStyle(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(),
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(),
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).colorScheme.surface,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(100),
-                          borderSide: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(),
-                            width: 1.5,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50),
-                          borderSide: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(),
-                            width: 2,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50),
-                          borderSide: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(),
-                            width: 1.5,
-                          ),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 16.0),
+    String newTaskTitle = '';
+    DateTime? taskDateTime;
+
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => StatefulBuilder(
+            builder: (context, setState) => AlertDialog(
+              title: Text(appLocalizations.newTask),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.inputTask,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      maxLines: null,
-                      onChanged: (value) {
-                        newTaskTitle = value;
-                      },
                     ),
-                    const SizedBox(height: 20),
-                    GestureDetector(
-                      onTap: () async {
-                        final selectedDate = await showDatePicker(
+                    onChanged: (value) => newTaskTitle = value,
+                  ),
+                  const SizedBox(height: 16),
+                  ListTile(
+                    leading: const Icon(Icons.calendar_today_rounded),
+                    title: Text(taskDateTime != null
+                        ? DateFormat('dd/MM/yyyy - HH:mm').format(taskDateTime!)
+                        : appLocalizations.dateTime),
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2100),
+                      );
+                      if (date != null) {
+                        final time = await showTimePicker(
+                          // ignore: use_build_context_synchronously
                           context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2100),
+                          initialTime: TimeOfDay.now(),
                         );
-                        if (selectedDate != null) {
-                          final selectedTime = await showTimePicker(
-                            // ignore: use_build_context_synchronously
-                            context: context,
-                            initialTime: TimeOfDay.now(),
-                          );
-                          if (selectedTime != null) {
-                            setState(() {
-                              taskDateTime = DateTime(
-                                selectedDate.year,
-                                selectedDate.month,
-                                selectedDate.day,
-                                selectedTime.hour,
-                                selectedTime.minute,
-                              );
-                            });
-                          }
+                        if (time != null) {
+                          setState(() => taskDateTime = DateTime(
+                                date.year,
+                                date.month,
+                                date.day,
+                                time.hour,
+                                time.minute,
+                              ));
                         }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.calendar_today),
-                            const SizedBox(width: 8),
-                            Text(
-                              taskDateTime != null
-                                  ? DateFormat('dd/MM/yyyy - HH:mm')
-                                      .format(taskDateTime!)
-                                  : appLocalizations.dateTime,
-                              style: const TextStyle(fontSize: 16),
+                      }
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(appLocalizations.cancel),
+                ),
+                FilledButton(
+                  onPressed: () async {
+                    if (newTaskTitle.isEmpty) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(appLocalizations.error),
+                          content: Text(appLocalizations.inputTaskError),
+                          actions: [
+                            FilledButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(appLocalizations.ok),
                             ),
                           ],
                         ),
-                      ),
-                    ),
-                  ],
+                      );
+                    } else if (taskDateTime == null) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(appLocalizations.error),
+                          content: Text(appLocalizations.inputDateError),
+                          actions: [
+                            FilledButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(appLocalizations.ok),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      await _createTask(newTaskTitle, taskDateTime!);
+                      // ignore: use_build_context_synchronously
+                      Navigator.pop(context, true);
+                    }
+                  },
+                  child: Text(appLocalizations.save),
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                    child: Text(appLocalizations.cancel),
-                  ),
-                  FilledButton.tonal(
-                    onPressed: () async {
-                      if (newTaskTitle.trim().isEmpty) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text(appLocalizations.error),
-                              content: Text(appLocalizations.inputTaskError),
-                              actions: <Widget>[
-                                FilledButton.tonal(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text(appLocalizations.ok),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      } else if (taskDateTime != null) {
-                        _taskIdCounter++;
-                        final newTaskId = _taskIdCounter.toString();
-
-                        await tasksCollection.add({
-                          'title': newTaskTitle,
-                          'completed': false,
-                          'userId': _user!.uid,
-                          'dateTime': taskDateTime,
-                        });
-
-                        const NotificationDetails notificationDetails =
-                            NotificationDetails(
-                          android: AndroidNotificationDetails(
-                            'notification_id',
-                            'Tarefas',
-                            icon: '@drawable/ic_notification',
-                            channelDescription: 'Canal de notificações',
-                            importance: Importance.max,
-                          ),
-                          iOS: DarwinNotificationDetails(),
-                        );
-
-                        FlutterLocalNotificationsPlugin
-                            flutterLocalNotificationsPlugin =
-                            FlutterLocalNotificationsPlugin();
-
-                        await flutterLocalNotificationsPlugin.zonedSchedule(
-                          int.parse(newTaskId),
-                          newTaskTitle,
-                          '${appLocalizations.notificationTask}: $newTaskTitle',
-                          tz.TZDateTime.from(
-                            taskDateTime!,
-                            tz.getLocation('America/Manaus'),
-                          ),
-                          notificationDetails,
-                          uiLocalNotificationDateInterpretation:
-                              UILocalNotificationDateInterpretation
-                                  .absoluteTime,
-                          androidScheduleMode:
-                              AndroidScheduleMode.inexactAllowWhileIdle,
-                        );
-
-                        if (context.mounted) {
-                          Navigator.pop(context, true);
-                          await _loadTasks(); // Atualiza as tarefas após salvar
-                        }
-                      } else {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text(appLocalizations.error),
-                              content: Text(appLocalizations.inputDateError),
-                              actions: <Widget>[
-                                FilledButton.tonal(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text(appLocalizations.ok),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                    },
-                    child: Text(appLocalizations.save),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
-
-      return result ?? false;
-    }
-    return false;
+              ],
+            ),
+          ),
+        ) ??
+        false;
   }
 
-  void _updateTaskCompletion(Task task, bool completed) async {
-    if (_user == null) {
-      return;
-    }
+  Future<void> _createTask(String title, DateTime dateTime) async {
+    if (_user == null) return;
 
-    final taskId = task.title;
+    final taskRef = await tasksCollection.add({
+      'title': title,
+      'completed': false,
+      'userId': _user!.uid,
+      'dateTime': dateTime,
+    });
+
+    // Configuração de notificação
+    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      taskRef.id.hashCode,
+      title,
+      // ignore: use_build_context_synchronously
+      '${AppLocalizations.of(context)!.notificationTask}: $title',
+      tz.TZDateTime.from(dateTime, tz.getLocation('America/Manaus')),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'notification_id',
+          'Tarefas',
+          icon: '@drawable/ic_notification',
+          channelDescription: 'Canal de notificações',
+          importance: Importance.max,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
+
+    await _loadTasks();
+  }
+
+  Future<void> _updateTaskCompletion(Task task, bool completed) async {
+    if (_user == null) return;
 
     try {
-      final querySnapshot = await tasksCollection
-          .where('userId', isEqualTo: _user!.uid)
-          .where('title', isEqualTo: taskId)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        final docId = querySnapshot.docs.first.id;
-
-        await tasksCollection.doc(docId).update({
-          'completed': completed,
-        });
-
-        setState(() {
-          task.completed = completed;
-          if (completed) {
-            _completedTasks.add(task);
-            _pendingTasks.remove(task);
-          } else {
-            _pendingTasks.add(task);
-            _completedTasks.remove(task);
-          }
-        });
-
-        if (kDebugMode) {
-          print('Estado de conclusão da tarefa atualizado: $taskId');
+      await tasksCollection.doc(task.id).update({'completed': completed});
+      setState(() {
+        task.completed = completed;
+        if (completed) {
+          _pendingTasks.remove(task);
+          _completedTasks.add(task);
+        } else {
+          _completedTasks.remove(task);
+          _pendingTasks.add(task);
         }
-      } else {
-        if (kDebugMode) {
-          print('Tarefa não encontrada Firestore: $taskId');
-        }
-      }
+      });
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao atualizar estado de conclusão da tarefa: $e');
-      }
+      if (kDebugMode) print('Erro ao atualizar tarefa: $e');
     }
   }
 
-  void _removeTask(Task task) async {
-    final appLocalizations = AppLocalizations.of(context);
-    if (appLocalizations != null) {
-      if (_user == null) {
-        return;
-      }
-
-      final taskId = task.title;
-
-      setState(() {
-        if (task.completed) {
-          _completedTasks.remove(task);
-        } else {
-          _pendingTasks.remove(task);
-        }
-      });
-
-      final confirm = await showDialog<bool>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(appLocalizations.confirmDelete),
-            content: Text(appLocalizations.confirmDeleteTask),
-            actions: <Widget>[
+  Future<void> _removeTask(Task task) async {
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(AppLocalizations.of(context)!.confirmDelete),
+            content: Text(AppLocalizations.of(context)!.confirmDeleteTask),
+            actions: [
               TextButton(
-                child: Text(appLocalizations.cancel),
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
-              FilledButton.tonal(
-                child: Text(appLocalizations.delete),
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(AppLocalizations.of(context)!.delete),
               ),
             ],
-          );
-        },
-      );
+          ),
+        ) ??
+        false;
 
-      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-          FlutterLocalNotificationsPlugin();
-      await flutterLocalNotificationsPlugin.cancel(task.id.hashCode);
-
-      if (confirm != true) {
-        // Se o usuário cancelar, readicione a tarefa na lista e recarregue as tarefas
-        setState(() {
-          if (task.completed) {
-            _completedTasks.add(task);
-          } else {
-            _pendingTasks.add(task);
-          }
-        });
-        await _loadTasks();
-        return;
-      }
-
+    if (confirmed) {
       try {
-        if (kDebugMode) {
-          print('Apagando task: $taskId');
-        }
-
-        final querySnapshot = await tasksCollection
-            .where('userId', isEqualTo: _user!.uid)
-            .where('title', isEqualTo: taskId)
-            .get();
-
-        if (querySnapshot.docs.isNotEmpty) {
-          final docId = querySnapshot.docs.first.id;
-
-          await tasksCollection.doc(docId).delete();
-
-          if (kDebugMode) {
-            print('Task removida Firestore: $taskId');
-          }
-        } else {
-          if (kDebugMode) {
-            print('Task nao encontrada Firestore: $taskId');
-          }
-        }
+        await tasksCollection.doc(task.id).delete();
+        final flutterLocalNotificationsPlugin =
+            FlutterLocalNotificationsPlugin();
+        await flutterLocalNotificationsPlugin.cancel(task.id.hashCode);
+        await _loadTasks();
       } catch (e) {
-        if (kDebugMode) {
-          print('Erro ao apagar task: $e');
-        }
+        if (kDebugMode) print('Erro ao deletar tarefa: $e');
       }
-
-      // Recarregar as tarefas após a confirmação e remoção
-      await _loadTasks();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           appLocalizations.appName,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator.adaptive(),
-            )
-          : _loadingMessage.isNotEmpty
-              ? Center(
-                  child: Text(_loadingMessage),
-                )
-              : (_pendingTasks.isEmpty && _completedTasks.isEmpty)
-                  ? Center(
+          ? const Center(child: CircularProgressIndicator())
+          : CustomScrollView(
+              slivers: [
+                if (_pendingTasks.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
                       child: Text(
-                        appLocalizations.noTask,
-                        style: const TextStyle(fontSize: 18),
+                        appLocalizations.pendants.toUpperCase(),
+                        style: TextStyle(
+                          color: colors.primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                        ),
                       ),
-                    )
-                  : ListView(
+                    ),
+                  ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (_, index) => buildTaskItem(_pendingTasks[index], true),
+                    childCount: _pendingTasks.length,
+                  ),
+                ),
+                if (_completedTasks.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+                      child: Text(
+                        appLocalizations.completed.toUpperCase(),
+                        style: TextStyle(
+                          color: colors.primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (_, index) => buildTaskItem(_completedTasks[index], false),
+                    childCount: _completedTasks.length,
+                  ),
+                ),
+                if (_pendingTasks.isEmpty && _completedTasks.isEmpty)
+                  SliverFillRemaining(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (_pendingTasks.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  appLocalizations.pendants,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: _pendingTasks.length,
-                                itemBuilder: (context, index) {
-                                  return Card(
-                                    clipBehavior: Clip.antiAlias,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(100.0),
-                                    ),
-                                    elevation: 3,
-                                    child: buildTaskItem(
-                                        _pendingTasks[index], true),
-                                  );
-                                },
-                              ),
-                            ],
+                        Icon(Icons.task_alt_rounded,
+                            size: 64, color: colors.onSurface.withValues()),
+                        const SizedBox(height: 16),
+                        Text(
+                          appLocalizations.noTask,
+                          style: TextStyle(
+                            color: colors.onSurface.withValues(),
+                            fontSize: 16,
                           ),
-                        if (_completedTasks.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  appLocalizations.completed,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: _completedTasks.length,
-                                itemBuilder: (context, index) {
-                                  return Card(
-                                    clipBehavior: Clip.antiAlias,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(100.0),
-                                    ),
-                                    elevation: 3,
-                                    child: buildTaskItem(
-                                        _completedTasks[index], false),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
+                        ),
                       ],
                     ),
+                  ),
+              ],
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addTask,
         elevation: 3,

@@ -166,13 +166,20 @@ class NotesList extends StatelessWidget {
             child: CircularProgressIndicator.adaptive(),
           );
         } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(
+          return SliverFillRemaining(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Icon(
+                  Icons.notes_rounded,
+                  size: 64,
+                ),
+                const SizedBox(height: 16),
                 Text(
                   AppLocalizations.of(context)!.noNotes,
-                  style: const TextStyle(fontSize: 18),
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
@@ -196,7 +203,6 @@ class NotesList extends StatelessWidget {
               final note =
                   notes[index] as QueryDocumentSnapshot<Map<String, dynamic>>;
               return Card(
-                elevation: 3,
                 clipBehavior: Clip.hardEdge,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -216,11 +222,9 @@ class NoteCard extends StatelessWidget {
 
   const NoteCard({super.key, required this.note});
 
-  Future<bool?> _confirmDelete(BuildContext context) async {
+  Future<void> _confirmDelete(BuildContext context) async {
     final appLocalizations = AppLocalizations.of(context);
-    bool? confirmed = false;
-
-    await showDialog<void>(
+    bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -229,14 +233,13 @@ class NoteCard extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(false);
               },
               child: Text(appLocalizations.cancel),
             ),
-            FilledButton.tonal(
-              onPressed: () async {
-                confirmed = true;
-                Navigator.of(context).pop();
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
               },
               child: Text(appLocalizations.delete),
             ),
@@ -250,47 +253,22 @@ class NoteCard extends StatelessWidget {
           .collection('notes')
           .doc(note.id)
           .delete();
-
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(appLocalizations!.noteDeleted),
-        ),
-      );
     }
-
-    return confirmed;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: Key(note.id),
-      direction: DismissDirection.endToStart,
-      confirmDismiss: (direction) async {
-        return await _confirmDelete(context);
+    return ListTile(
+      title: Text(note['note']),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NoteDetailPage(note: note),
+          ),
+        );
       },
-      background: Container(
-        color: Colors.red,
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: const Icon(
-          Icons.delete_outline,
-          color: Colors.white,
-          size: 32.0,
-        ),
-      ),
-      child: ListTile(
-        title: Text(note['note']),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => NoteDetailPage(note: note),
-            ),
-          );
-        },
-      ),
+      onLongPress: () => _confirmDelete(context),
     );
   }
 }

@@ -17,7 +17,7 @@ class _AboutPageState extends State<AboutPage> {
   String appVersion = '';
   String appBuild = '';
   String releaseNotes = '';
-  String uiVersion = '050225-prod';
+  String uiVersion = '070225-prod';
   bool isLoading = true;
 
   @override

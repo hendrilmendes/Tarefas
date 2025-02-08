@@ -13,7 +13,7 @@ class Task {
     this.completed = false,
   });
 
-  // Converte o objeto Task para um Map (útil para salvar no Firestore)
+  // Converte o objeto Task para um Map
   Map<String, dynamic> toMap() {
     return {
       'title': title,
@@ -22,7 +22,7 @@ class Task {
     };
   }
 
-  // Converte um Map para uma instância de Task (útil para ler do Firestore)
+  // Converte um Map para uma instância de Task
   static Task fromMap(Map<String, dynamic> map, String id) {
     return Task(
       title: map['title'] ?? '',
