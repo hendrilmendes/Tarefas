@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:tarefas/screens/settings/settings.dart';
 import 'package:tarefas/screens/home/home.dart';
 import 'package:tarefas/screens/notes/notes.dart';

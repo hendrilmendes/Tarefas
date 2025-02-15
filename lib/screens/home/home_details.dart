@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
@@ -41,17 +41,18 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
         ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            ModernTextField(
-              controller: _controller,
-              label: AppLocalizations.of(context)!.inputTask,
-            ),
-            const SizedBox(height: 16.0),
-            GestureDetector(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              ModernTextField(
+                controller: _controller,
+                label: AppLocalizations.of(context)!.inputTask,
+              ),
+              const SizedBox(height: 16.0),
+              GestureDetector(
                 onTap: () async {
                   final selectedDate = await showDatePicker(
                     context: context,
@@ -98,15 +99,13 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Icon(
-                          Icons.calendar_today,
-                          color: Colors.grey,
-                        ),
+                        const Icon(Icons.calendar_today, color: Colors.grey),
                         const SizedBox(width: 8),
                         Text(
                           _selectedDateTime != null
-                              ? DateFormat('dd/MM/yyyy - HH:mm')
-                                  .format(_selectedDateTime!)
+                              ? DateFormat(
+                                'dd/MM/yyyy - HH:mm',
+                              ).format(_selectedDateTime!)
                               : AppLocalizations.of(context)!.dateTime,
                           style: TextStyle(
                             fontSize: 16,
@@ -116,8 +115,10 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
                       ],
                     ),
                   ),
-                )),
-          ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Padding(
@@ -207,10 +208,11 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
       try {
         final taskId = widget.task.title;
 
-        final querySnapshot = await tasksCollection
-            .where('userId', isEqualTo: _user!.uid)
-            .where('title', isEqualTo: taskId)
-            .get();
+        final querySnapshot =
+            await tasksCollection
+                .where('userId', isEqualTo: _user!.uid)
+                .where('title', isEqualTo: taskId)
+                .get();
 
         if (querySnapshot.docs.isNotEmpty) {
           final docId = querySnapshot.docs.first.id;
@@ -240,9 +242,10 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
   }
 
   void _shareTask() {
-    final formattedDate = _selectedDateTime != null
-        ? DateFormat('dd/MM/yyyy - HH:mm').format(_selectedDateTime!)
-        : AppLocalizations.of(context)!.noDate;
+    final formattedDate =
+        _selectedDateTime != null
+            ? DateFormat('dd/MM/yyyy - HH:mm').format(_selectedDateTime!)
+            : AppLocalizations.of(context)!.noDate;
 
     Share.share(
       '${AppLocalizations.of(context)!.taskTitle}: ${widget.task.title}\n'
@@ -276,11 +279,14 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
 
         const NotificationDetails notificationDetails = NotificationDetails(
           android: AndroidNotificationDetails(
-            'notification_id',
-            'Tarefas',
+            'task_channel',
+            'Lembretes de Tarefas',
             icon: '@drawable/ic_notification',
-            channelDescription: 'Canal de notificações',
-            importance: Importance.max,
+            channelDescription: 'Alertas de tarefas agendadas',
+            importance: Importance.high,
+            priority: Priority.high,
+            enableVibration: true,
+            fullScreenIntent: true,
           ),
           iOS: DarwinNotificationDetails(),
         );
@@ -293,18 +299,12 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
           updatedTask.title,
           // ignore: use_build_context_synchronously
           '${AppLocalizations.of(context)!.notificationTask}: ${updatedTask.title}',
-          tz.TZDateTime.from(
-            updatedTask.dateTime!,
-            tz.getLocation('America/Manaus'),
-          ),
+          tz.TZDateTime.from(updatedTask.dateTime!, tz.local),
           notificationDetails,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime,
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         );
-
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
 
         // ignore: use_build_context_synchronously
         Navigator.of(context).pop();

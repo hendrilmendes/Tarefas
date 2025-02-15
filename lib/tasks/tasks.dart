@@ -6,12 +6,7 @@ class Task {
   String? id;
   final DateTime? dateTime;
 
-  Task({
-    required this.title,
-    this.id,
-    this.dateTime,
-    this.completed = false,
-  });
+  Task({required this.title, this.id, this.dateTime, this.completed = false});
 
   // Converte o objeto Task para um Map
   Map<String, dynamic> toMap() {
@@ -27,9 +22,10 @@ class Task {
     return Task(
       title: map['title'] ?? '',
       completed: map['completed'] ?? false,
-      dateTime: map['dateTime'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['dateTime'])
-          : null,
+      dateTime:
+          map['dateTime'] != null
+              ? DateTime.fromMillisecondsSinceEpoch(map['dateTime'])
+              : null,
       id: id,
     );
   }
@@ -61,5 +57,5 @@ class Task {
 }
 
 // Referência à coleção de tarefas no Firestore
-final CollectionReference tasksCollection =
-    FirebaseFirestore.instance.collection('tasks');
+final CollectionReference tasksCollection = FirebaseFirestore.instance
+    .collection('tasks');

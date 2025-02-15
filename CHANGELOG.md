@@ -2,6 +2,17 @@ Changelog Tarefas
 
 ======================================================
 
+## [2.4.1](https://github.com/hendrilmendes/Tarefas/compare/2.4.0..2.4.1) (15-02-2025)
+
+## Alterações
+
+### Correções
+
+- Alterado animação entre as telas
+- Correções de bugs
+
+======================================================
+
 ## [2.4.0](https://github.com/hendrilmendes/Tarefas/compare/2.3.0..2.4.0) (10-02-2025)
 
 ## Alterações

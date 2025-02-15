@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:tarefas/theme/theme.dart';
 import 'package:tarefas/widgets/settings/about.dart';

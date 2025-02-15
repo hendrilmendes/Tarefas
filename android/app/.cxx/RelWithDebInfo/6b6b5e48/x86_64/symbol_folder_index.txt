@@ -1,0 +1,1 @@
+/home/Hendril/Documents/GitHub/Tarefas/build/app/intermediates/cxx/RelWithDebInfo/6b6b5e48/obj/x86_64

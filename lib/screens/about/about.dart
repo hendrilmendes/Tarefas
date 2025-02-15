@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -17,7 +17,6 @@ class _AboutPageState extends State<AboutPage> {
   String appVersion = '';
   String appBuild = '';
   String releaseNotes = '';
-  String uiVersion = '070225-prod';
   bool isLoading = true;
 
   @override
@@ -37,8 +36,11 @@ class _AboutPageState extends State<AboutPage> {
   // Função para buscar as informações de release do GitHub
   Future<void> _fetchReleaseInfo() async {
     try {
-      final response = await http.get(Uri.parse(
-          'https://api.github.com/repos/hendrilmendes/Tarefas/releases'));
+      final response = await http.get(
+        Uri.parse(
+          'https://api.github.com/repos/hendrilmendes/Tarefas/releases',
+        ),
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> releases = jsonDecode(response.body);
@@ -53,9 +55,10 @@ class _AboutPageState extends State<AboutPage> {
         }
 
         setState(() {
-          releaseNotes = versionRelease.isNotEmpty
-              ? versionRelease
-              : 'Release para esta versão não encontrada. Verifique se há uma versão correspondente no GitHub.';
+          releaseNotes =
+              versionRelease.isNotEmpty
+                  ? versionRelease
+                  : 'Release para esta versão não encontrada. Verifique se há uma versão correspondente no GitHub.';
           isLoading = false;
         });
       } else {
@@ -81,8 +84,9 @@ class _AboutPageState extends State<AboutPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -95,24 +99,23 @@ class _AboutPageState extends State<AboutPage> {
               ),
             ],
           ),
-          content: isLoading
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircularProgressIndicator.adaptive(),
-                  ],
-                )
-              : SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        releaseNotes,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ],
+          content:
+              isLoading
+                  ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [CircularProgressIndicator.adaptive()],
+                  )
+                  : SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          releaseNotes,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
         );
       },
     );
@@ -133,111 +136,116 @@ class _AboutPageState extends State<AboutPage> {
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  const SizedBox(height: 20),
-                  const Card(
-                    elevation: 15,
-                    shape: CircleBorder(),
-                    clipBehavior: Clip.antiAlias,
-                    child: SizedBox(
-                      width: 80,
-                      child: Image(
-                        image: AssetImage('assets/img/ic_launcher.png'),
-                      ),
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              children: [
+                const SizedBox(height: 20),
+                const Card(
+                  elevation: 15,
+                  shape: CircleBorder(),
+                  clipBehavior: Clip.antiAlias,
+                  child: SizedBox(
+                    width: 80,
+                    child: Image(
+                      image: AssetImage('assets/img/ic_launcher.png'),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: Text(
-                      'Copyright © Hendril Mendes, 2023-$currentYear',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ),
-                  Text(
-                    AppLocalizations.of(context)!.copyright,
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: Text(
+                    'Copyright © Hendril Mendes, 2023-$currentYear',
                     style: const TextStyle(fontSize: 12),
                   ),
-                  const Divider(),
-                  const SizedBox(height: 10),
-                  Text(
-                    AppLocalizations.of(context)!.appDesc,
-                    style: const TextStyle(fontSize: 14.0),
+                ),
+                Text(
+                  AppLocalizations.of(context)!.copyright,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                const Divider(),
+                const SizedBox(height: 10),
+                Text(
+                  AppLocalizations.of(context)!.appDesc,
+                  style: const TextStyle(fontSize: 14.0),
+                ),
+                const SizedBox(height: 10),
+                const Divider(),
+                Card(
+                  clipBehavior: Clip.hardEdge,
+                  margin: const EdgeInsets.all(8.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  const SizedBox(height: 10),
-                  const Divider(),
-                  Card(
-                    clipBehavior: Clip.hardEdge,
-                    margin: const EdgeInsets.all(8.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          title: Text(AppLocalizations.of(context)!.version),
-                          subtitle: Text(
-                              'v$appVersion | Build: $appBuild | UI:$appVersion.$uiVersion'),
-                          leading: const Icon(Icons.task_alt_outlined),
-                          tileColor: Theme.of(context).listTileTheme.tileColor,
-                          onTap: () => _showReleaseInfo(context),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: Text(AppLocalizations.of(context)!.version),
+                        subtitle: Text('v$appVersion | Build: $appBuild'),
+                        leading: const Icon(Icons.task_alt_outlined),
+                        tileColor: Theme.of(context).listTileTheme.tileColor,
+                        onTap: () => _showReleaseInfo(context),
+                      ),
+                      ListTile(
+                        title: Text(AppLocalizations.of(context)!.privacy),
+                        subtitle: Text(
+                          AppLocalizations.of(context)!.privacySub,
                         ),
-                        ListTile(
-                          title: Text(AppLocalizations.of(context)!.privacy),
-                          subtitle:
-                              Text(AppLocalizations.of(context)!.privacySub),
-                          leading: const Icon(Icons.shield_outlined),
-                          tileColor: Theme.of(context).listTileTheme.tileColor,
-                          onTap: () {
-                            launchUrl(
-                              Uri.parse(
-                                'https://br-newsdroid.blogspot.com/p/politica-de-privacidade-tarefas.html',
-                              ),
-                              mode: LaunchMode.inAppBrowserView,
-                            );
-                          },
+                        leading: const Icon(Icons.shield_outlined),
+                        tileColor: Theme.of(context).listTileTheme.tileColor,
+                        onTap: () {
+                          launchUrl(
+                            Uri.parse(
+                              'https://br-newsdroid.blogspot.com/p/politica-de-privacidade-tarefas.html',
+                            ),
+                            mode: LaunchMode.inAppBrowserView,
+                          );
+                        },
+                      ),
+                      ListTile(
+                        title: Text(AppLocalizations.of(context)!.sourceCode),
+                        subtitle: Text(
+                          AppLocalizations.of(context)!.sourceCodeSub,
                         ),
-                        ListTile(
-                          title: Text(AppLocalizations.of(context)!.sourceCode),
-                          subtitle:
-                              Text(AppLocalizations.of(context)!.sourceCodeSub),
-                          leading: const Icon(Icons.code_outlined),
-                          tileColor: Theme.of(context).listTileTheme.tileColor,
-                          onTap: () {
-                            launchUrl(
-                              Uri.parse(
-                                  'https://github.com/hendrilmendes/Tarefas/'),
-                              mode: LaunchMode.inAppBrowserView,
-                            );
-                          },
+                        leading: const Icon(Icons.code_outlined),
+                        tileColor: Theme.of(context).listTileTheme.tileColor,
+                        onTap: () {
+                          launchUrl(
+                            Uri.parse(
+                              'https://github.com/hendrilmendes/Tarefas/',
+                            ),
+                            mode: LaunchMode.inAppBrowserView,
+                          );
+                        },
+                      ),
+                      ListTile(
+                        title: Text(AppLocalizations.of(context)!.openSource),
+                        subtitle: Text(
+                          AppLocalizations.of(context)!.openSourceSub,
                         ),
-                        ListTile(
-                          title: Text(AppLocalizations.of(context)!.openSource),
-                          subtitle:
-                              Text(AppLocalizations.of(context)!.openSourceSub),
-                          leading: const Icon(Icons.folder_open),
-                          tileColor: Theme.of(context).listTileTheme.tileColor,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LicensePage(
-                                  applicationName:
-                                      AppLocalizations.of(context)!.appName,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                        leading: const Icon(Icons.folder_open),
+                        tileColor: Theme.of(context).listTileTheme.tileColor,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => LicensePage(
+                                    applicationName:
+                                        AppLocalizations.of(context)!.appName,
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ]),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

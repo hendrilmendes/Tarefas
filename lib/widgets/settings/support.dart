@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<String> writeImageToStorage(Uint8List feedbackScreenshot) async {

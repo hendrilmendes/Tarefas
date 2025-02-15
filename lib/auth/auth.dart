@@ -33,8 +33,9 @@ class AuthService {
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential authResult =
-          await _auth.signInWithCredential(credential);
+      final UserCredential authResult = await _auth.signInWithCredential(
+        credential,
+      );
       final User? user = authResult.user;
 
       if (user != null) {

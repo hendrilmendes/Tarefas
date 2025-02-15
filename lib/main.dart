@@ -10,7 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shorebird_code_push/shorebird_code_push.dart';
@@ -132,6 +132,13 @@ class MyApp extends StatelessWidget {
                   textTheme: Typography()
                       .black
                       .apply(fontFamily: GoogleFonts.openSans().fontFamily),
+                  pageTransitionsTheme: PageTransitionsTheme(
+                    builders: Map<TargetPlatform,
+                        PageTransitionsBuilder>.fromIterable(
+                      TargetPlatform.values,
+                      value: (_) => const FadeForwardsPageTransitionsBuilder(),
+                    ),
+                  ),
                 ),
                 darkTheme: ThemeData(
                   brightness: Brightness.dark,
@@ -143,6 +150,13 @@ class MyApp extends StatelessWidget {
                   textTheme: Typography()
                       .white
                       .apply(fontFamily: GoogleFonts.openSans().fontFamily),
+                  pageTransitionsTheme: PageTransitionsTheme(
+                    builders: Map<TargetPlatform,
+                        PageTransitionsBuilder>.fromIterable(
+                      TargetPlatform.values,
+                      value: (_) => const FadeForwardsPageTransitionsBuilder(),
+                    ),
+                  ),
                 ),
                 themeMode: _getThemeMode(themeModel.themeMode),
                 debugShowCheckedModeBanner: false,

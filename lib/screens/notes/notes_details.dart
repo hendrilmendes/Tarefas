@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
 class NoteDetailPage extends StatefulWidget {
@@ -23,10 +23,9 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
   }
 
   void _saveNote() {
-    FirebaseFirestore.instance
-        .collection('notes')
-        .doc(widget.note.id)
-        .update({'note': _noteController.text});
+    FirebaseFirestore.instance.collection('notes').doc(widget.note.id).update({
+      'note': _noteController.text,
+    });
     Navigator.pop(context);
   }
 
@@ -131,8 +130,10 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
                       width: 1.5,
                     ),
                   ),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 16.0,
+                  ),
                 ),
                 maxLines: null,
               ),

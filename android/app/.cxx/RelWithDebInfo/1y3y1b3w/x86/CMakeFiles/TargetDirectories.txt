@@ -1,0 +1,2 @@
+/home/Hendril/Documents/GitHub/Tarefas/android/app/.cxx/RelWithDebInfo/1y3y1b3w/x86/CMakeFiles/edit_cache.dir
+/home/Hendril/Documents/GitHub/Tarefas/android/app/.cxx/RelWithDebInfo/1y3y1b3w/x86/CMakeFiles/rebuild_cache.dir

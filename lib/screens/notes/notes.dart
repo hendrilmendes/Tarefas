@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:tarefas/screens/notes/notes_details.dart';
 
 class NotesScreen extends StatefulWidget {
@@ -65,11 +65,7 @@ class _NotesScreenState extends State<NotesScreen> {
       ),
       body: const Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Expanded(
-            child: NotesList(),
-          ),
-        ],
+        children: <Widget>[Expanded(child: NotesList())],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -123,8 +119,10 @@ class _NotesScreenState extends State<NotesScreen> {
                     width: 1.5,
                   ),
                 ),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 16.0,
+                ),
               ),
               maxLines: null,
             ),
@@ -156,30 +154,27 @@ class NotesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('notes')
-          .where('userId', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-          .snapshots(),
+      stream:
+          FirebaseFirestore.instance
+              .collection('notes')
+              .where(
+                'userId',
+                isEqualTo: FirebaseAuth.instance.currentUser?.uid,
+              )
+              .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator.adaptive(),
-          );
+          return const Center(child: CircularProgressIndicator.adaptive());
         } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return SliverFillRemaining(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.notes_rounded,
-                  size: 64,
-                ),
+                const Icon(Icons.notes_rounded, size: 64),
                 const SizedBox(height: 16),
                 Text(
                   AppLocalizations.of(context)!.noNotes,
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ],
             ),
@@ -263,9 +258,7 @@ class NoteCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => NoteDetailPage(note: note),
-          ),
+          MaterialPageRoute(builder: (context) => NoteDetailPage(note: note)),
         );
       },
       onLongPress: () => _confirmDelete(context),
