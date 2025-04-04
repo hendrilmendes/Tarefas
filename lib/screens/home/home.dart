@@ -359,9 +359,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           '${appLocalizations.notificationTask}: $newTaskTitle',
                           tz.TZDateTime.from(taskDateTime!, tz.local),
                           notificationDetails,
-                          uiLocalNotificationDateInterpretation:
-                              UILocalNotificationDateInterpretation
-                                  .absoluteTime,
                           androidScheduleMode:
                               AndroidScheduleMode.exactAllowWhileIdle,
                         );

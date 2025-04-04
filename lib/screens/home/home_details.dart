@@ -301,8 +301,6 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
           '${AppLocalizations.of(context)!.notificationTask}: ${updatedTask.title}',
           tz.TZDateTime.from(updatedTask.dateTime!, tz.local),
           notificationDetails,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         );
 

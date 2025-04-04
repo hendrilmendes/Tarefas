@@ -26,9 +26,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Inicialização do Firebase e Crashlytics
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
   // Shorebird
@@ -43,12 +41,9 @@ void main() async {
       // Solicitar permissão para notificações no iOS
       flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()!
-          .requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
+            IOSFlutterLocalNotificationsPlugin
+          >()!
+          .requestPermissions(alert: true, badge: true, sound: true);
     } catch (e) {
       if (kDebugMode) {
         print("Erro ao solicitar permissão de notificação: $e");
@@ -59,7 +54,8 @@ void main() async {
   // Solicitar permissão para notificações no Android
   flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()!
+        AndroidFlutterLocalNotificationsPlugin
+      >()!
       .requestNotificationsPermission();
 
   // Desabilitar otimização de bateria
@@ -129,12 +125,14 @@ class MyApp extends StatelessWidget {
                         themeModel.isDarkMode ? Colors.black : Colors.black,
                   ),
                   useMaterial3: true,
-                  textTheme: Typography()
-                      .black
-                      .apply(fontFamily: GoogleFonts.openSans().fontFamily),
+                  textTheme: Typography().black.apply(
+                    fontFamily: GoogleFonts.openSans().fontFamily,
+                  ),
                   pageTransitionsTheme: PageTransitionsTheme(
-                    builders: Map<TargetPlatform,
-                        PageTransitionsBuilder>.fromIterable(
+                    builders: Map<
+                      TargetPlatform,
+                      PageTransitionsBuilder
+                    >.fromIterable(
                       TargetPlatform.values,
                       value: (_) => const FadeForwardsPageTransitionsBuilder(),
                     ),
@@ -147,12 +145,14 @@ class MyApp extends StatelessWidget {
                         themeModel.isDarkMode ? Colors.white : Colors.black,
                   ),
                   useMaterial3: true,
-                  textTheme: Typography()
-                      .white
-                      .apply(fontFamily: GoogleFonts.openSans().fontFamily),
+                  textTheme: Typography().white.apply(
+                    fontFamily: GoogleFonts.openSans().fontFamily,
+                  ),
                   pageTransitionsTheme: PageTransitionsTheme(
-                    builders: Map<TargetPlatform,
-                        PageTransitionsBuilder>.fromIterable(
+                    builders: Map<
+                      TargetPlatform,
+                      PageTransitionsBuilder
+                    >.fromIterable(
                       TargetPlatform.values,
                       value: (_) => const FadeForwardsPageTransitionsBuilder(),
                     ),
@@ -187,9 +187,7 @@ class MyApp extends StatelessWidget {
           }
         } else {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator.adaptive(),
-            ),
+            body: Center(child: CircularProgressIndicator.adaptive()),
           );
         }
       },
