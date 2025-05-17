@@ -247,9 +247,12 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
             ? DateFormat('dd/MM/yyyy - HH:mm').format(_selectedDateTime!)
             : AppLocalizations.of(context)!.noDate;
 
-    Share.share(
-      '${AppLocalizations.of(context)!.taskTitle}: ${widget.task.title}\n'
-      '${AppLocalizations.of(context)!.dateTitle}: $formattedDate',
+    SharePlus.instance.share(
+      ShareParams(
+        text:
+            '${AppLocalizations.of(context)!.taskTitle}: ${widget.task.title}\n'
+            '${AppLocalizations.of(context)!.dateTitle}: $formattedDate',
+      ),
     );
   }
 

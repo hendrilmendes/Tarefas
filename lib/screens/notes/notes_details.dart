@@ -69,7 +69,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
   }
 
   void _shareNote() {
-    Share.share(widget.note['note']);
+    SharePlus.instance.share(ShareParams(text: widget.note['note']));
   }
 
   @override
