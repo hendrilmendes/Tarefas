@@ -1,8 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/widgets/bottom_navigation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatelessWidget {
   final AuthService authService;
@@ -12,7 +14,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -21,32 +23,38 @@ class LoginScreen extends StatelessWidget {
               shape: CircleBorder(),
               clipBehavior: Clip.antiAlias,
               child: SizedBox(
-                width: 150,
-                child: Image(
-                  image: AssetImage('assets/img/ic_launcher.png'),
-                ),
+                width: 140,
+                child: Image(image: AssetImage('assets/img/ic_launcher.png')),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             Text(
               AppLocalizations.of(context)!.appName,
-              style: const TextStyle(
-                fontSize: 30,
+              style: TextStyle(
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
+                color:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[100]
+                        : Colors.grey[900],
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 20),
             Center(
               child: Text(
                 AppLocalizations.of(context)!.homeLogin,
-                style: const TextStyle(fontSize: 18),
+                style: TextStyle(
+                  fontSize: 18,
+                  color:
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[100]
+                          : Colors.grey[900],
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
-            const SizedBox(
-              height: 100,
-            ),
-            ElevatedButton(
+            const SizedBox(height: 40),
+            FilledButton(
               onPressed: () async {
                 final user = await authService.signInWithGoogle();
                 if (user != null) {
@@ -67,31 +75,73 @@ class LoginScreen extends StatelessWidget {
                   }
                 }
               },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.blue,
-                backgroundColor: Colors.white,
+
+              style: FilledButton.styleFrom(
+                backgroundColor:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[900]
+                        : Colors.grey[100],
+                foregroundColor:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[100]
+                        : Colors.grey[900],
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(100),
                 ),
               ),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/img/google_logo.png',
+                    width: 20,
+                    height: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(AppLocalizations.of(context)!.googleLogin),
+                ],
+              ),
+            ),
+            const SizedBox(height: 100),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Text.rich(
+                TextSpan(
                   children: [
-                    Image.asset(
-                      'assets/img/google_logo.png',
-                      width: 24,
-                      height: 24,
+                    TextSpan(
+                      text: "Ao continuar, você concorda com a nossa ",
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
-                    const SizedBox(width: 10),
-                    Text(
-                      AppLocalizations.of(context)!.googleLogin,
-                      style: const TextStyle(fontSize: 16),
+                    TextSpan(
+                      text: "Política de Privacidade",
+                      style: TextStyle(
+                        color:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey[100]
+                                : Colors.grey[900],
+                        fontSize: 12,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer:
+                          TapGestureRecognizer()
+                            ..onTap = () async {
+                              const url =
+                                  'https://br-newsdroid.blogspot.com/p/politica-de-privacidade-tarefas.html';
+                              if (await canLaunchUrl(Uri.parse(url))) {
+                                await launchUrl(
+                                  Uri.parse(url),
+                                  mode: LaunchMode.inAppBrowserView,
+                                );
+                              }
+                            },
                     ),
                   ],
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
           ],

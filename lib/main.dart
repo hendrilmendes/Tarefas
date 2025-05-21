@@ -102,10 +102,11 @@ ThemeMode _getThemeMode(ThemeModeType mode) {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  static final AuthService authService = AuthService();
+  static bool _updateChecked = false;
+
   @override
   Widget build(BuildContext context) {
-    final AuthService authService = AuthService();
-
     return ChangeNotifierProvider(
       create: (_) => ThemeModel(),
       child: Consumer<ThemeModel>(
@@ -162,7 +163,7 @@ class MyApp extends StatelessWidget {
                 debugShowCheckedModeBanner: false,
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
                 supportedLocales: AppLocalizations.supportedLocales,
-                home: _buildHome(authService),
+                home: _buildHome(context),
                 routes: {
                   '/login': (context) => LoginScreen(authService: authService),
                 },
@@ -174,16 +175,20 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Widget _buildHome(AuthService authService) {
+  Widget _buildHome(BuildContext context) {
     return FutureBuilder<User?>(
-      future: authService.currentUser(),
+      future: MyApp.authService.currentUser(),
       builder: (context, snapshot) {
-        Updater.checkUpdateApp(context);
         if (snapshot.connectionState == ConnectionState.done) {
+          if (!MyApp._updateChecked) {
+            MyApp._updateChecked = true;
+            Updater.checkUpdateApp(context);
+          }
+
           if (snapshot.hasData) {
             return const BottomNavigationContainer();
           } else {
-            return LoginScreen(authService: authService);
+            return LoginScreen(authService: MyApp.authService);
           }
         } else {
           return const Scaffold(

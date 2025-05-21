@@ -72,7 +72,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get confirmDelete => 'Confirmar exclusão';
 
   @override
-  String get confirmDeleteSub => 'Tem certeza de que deseja excluir esta anotação?';
+  String get confirmDeleteSub =>
+      'Tem certeza de que deseja excluir esta anotação?';
 
   @override
   String get about => 'Sobre';
@@ -102,7 +103,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get openSource => 'Licenças de Código Aberto';
 
   @override
-  String get openSourceSub => 'Softwares de terceiros usados na construção do app';
+  String get openSourceSub =>
+      'Softwares de terceiros usados na construção do app';
 
   @override
   String get interface => 'Interface';
@@ -132,7 +134,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dynamicColors => 'Dynamic Colors';
 
   @override
-  String get dynamicColorsSub => 'Proporciona uma interface agradável de acordo com o seu papel de parede';
+  String get dynamicColorsSub =>
+      'Proporciona uma interface agradável de acordo com o seu papel de parede';
 
   @override
   String get update => 'Atualizações';
@@ -204,7 +207,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get notification => 'Notificações';
 
   @override
-  String get notificationSub => 'Lembretes serão enviadas informando sobre suas tarefas';
+  String get notificationSub =>
+      'Lembretes serão enviadas informando sobre suas tarefas';
 
   @override
   String get confirmDeleteTask => 'Deseja realmente apagar a tarefa?';

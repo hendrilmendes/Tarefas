@@ -1,27 +1,14 @@
-buildscript {
-    ext.agp_version = '8.7.0'
-
-    ext.kotlin_version = '2.0.10'
+allprojects {
     repositories {
         google()
         mavenCentral()
     }
-
-    dependencies {
-        classpath "com.android.tools.build:gradle:$agp_version"
-        classpath 'com.google.gms:google-services:4.4.0'
-        classpath 'com.google.firebase:perf-plugin:1.4.2'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
 }
-
-
 
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-     afterEvaluate {
+    afterEvaluate {
         android {
             compileSdkVersion 34
         }
