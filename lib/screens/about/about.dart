@@ -155,7 +155,7 @@ class _AboutPageState extends State<AboutPage> {
                 const SizedBox(height: 20),
                 Center(
                   child: Text(
-                    'Copyright © Hendril Mendes, 2023-$currentYear',
+                    'Copyright © Hendril Mendes, $currentYear',
                     style: const TextStyle(fontSize: 12),
                   ),
                 ),

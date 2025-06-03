@@ -110,7 +110,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ThemeModel(),
       child: Consumer<ThemeModel>(
-        builder: (_, themeModel, __) {
+        builder: (_, themeModel, _) {
           return DynamicColorBuilder(
             builder: (lightColorScheme, darkColorScheme) {
               if (!themeModel.isDynamicColorsEnabled) {
@@ -129,15 +129,6 @@ class MyApp extends StatelessWidget {
                   textTheme: Typography().black.apply(
                     fontFamily: GoogleFonts.openSans().fontFamily,
                   ),
-                  pageTransitionsTheme: PageTransitionsTheme(
-                    builders: Map<
-                      TargetPlatform,
-                      PageTransitionsBuilder
-                    >.fromIterable(
-                      TargetPlatform.values,
-                      value: (_) => const FadeForwardsPageTransitionsBuilder(),
-                    ),
-                  ),
                 ),
                 darkTheme: ThemeData(
                   brightness: Brightness.dark,
@@ -148,15 +139,6 @@ class MyApp extends StatelessWidget {
                   useMaterial3: true,
                   textTheme: Typography().white.apply(
                     fontFamily: GoogleFonts.openSans().fontFamily,
-                  ),
-                  pageTransitionsTheme: PageTransitionsTheme(
-                    builders: Map<
-                      TargetPlatform,
-                      PageTransitionsBuilder
-                    >.fromIterable(
-                      TargetPlatform.values,
-                      value: (_) => const FadeForwardsPageTransitionsBuilder(),
-                    ),
                   ),
                 ),
                 themeMode: _getThemeMode(themeModel.themeMode),
