@@ -112,19 +112,29 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeModel>(
         builder: (_, themeModel, _) {
           return DynamicColorBuilder(
-            builder: (lightColorScheme, darkColorScheme) {
-              if (!themeModel.isDynamicColorsEnabled) {
-                lightColorScheme = null;
-                darkColorScheme = null;
-              }
+            builder: (lightDynamic, darkDynamic) {
+              ColorScheme lightColorScheme;
+              ColorScheme darkColorScheme;
 
+              if (themeModel.isDynamicColorsEnabled &&
+                  lightDynamic != null &&
+                  darkDynamic != null) {
+                lightColorScheme = lightDynamic;
+                darkColorScheme = darkDynamic;
+              } else {
+                lightColorScheme = ColorScheme.fromSeed(
+                  seedColor: themeModel.primaryColor,
+                  brightness: Brightness.light,
+                );
+                darkColorScheme = ColorScheme.fromSeed(
+                  seedColor: themeModel.primaryColor,
+                  brightness: Brightness.dark,
+                );
+              }
               return MaterialApp(
                 theme: ThemeData(
                   brightness: Brightness.light,
-                  colorScheme: lightColorScheme?.copyWith(
-                    primary:
-                        themeModel.isDarkMode ? Colors.black : Colors.black,
-                  ),
+                  colorScheme: lightColorScheme,
                   useMaterial3: true,
                   textTheme: Typography().black.apply(
                     fontFamily: GoogleFonts.openSans().fontFamily,
@@ -132,15 +142,13 @@ class MyApp extends StatelessWidget {
                 ),
                 darkTheme: ThemeData(
                   brightness: Brightness.dark,
-                  colorScheme: darkColorScheme?.copyWith(
-                    primary:
-                        themeModel.isDarkMode ? Colors.white : Colors.black,
-                  ),
+                  colorScheme: darkColorScheme,
                   useMaterial3: true,
                   textTheme: Typography().white.apply(
                     fontFamily: GoogleFonts.openSans().fontFamily,
                   ),
                 ),
+
                 themeMode: _getThemeMode(themeModel.themeMode),
                 debugShowCheckedModeBanner: false,
                 localizationsDelegates: AppLocalizations.localizationsDelegates,

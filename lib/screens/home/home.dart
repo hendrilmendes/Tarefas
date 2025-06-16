@@ -1,5 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
+import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tarefas/l10n/app_localizations.dart';
@@ -8,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/tasks/tasks.dart';
 import 'package:tarefas/screens/home/home_details.dart';
+import 'package:tarefas/widgets/home/task_dialog.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class HomeScreen extends StatefulWidget {
@@ -18,19 +23,80 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   final AuthService _authService = AuthService();
   User? _user;
   List<Task> _pendingTasks = [];
   List<Task> _completedTasks = [];
-  int _taskIdCounter = 0;
   String loadingMessage = '';
   bool _isLoading = true;
+
+  late ScrollController _scrollController;
+  late AnimationController _fabAnimationController;
+  late Animation<double> _fabAnimation;
+  bool _isFabVisible = true;
+  double _lastScrollPosition = 0;
 
   @override
   void initState() {
     super.initState();
+
+    _scrollController = ScrollController();
+    _fabAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _fabAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fabAnimationController, curve: Curves.easeInOut),
+    );
+
+    _scrollController.addListener(_onScroll);
+    _fabAnimationController.forward();
+
     _checkUser();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    _fabAnimationController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final currentScrollPosition = _scrollController.position.pixels;
+    final scrollDelta = currentScrollPosition - _lastScrollPosition;
+
+    if (scrollDelta.abs() > 5) {
+      if (scrollDelta > 0 && _isFabVisible) {
+        _hideFab();
+      } else if (scrollDelta < 0 && !_isFabVisible) {
+        _showFab();
+      }
+    }
+
+    _lastScrollPosition = currentScrollPosition;
+  }
+
+  void _showFab() {
+    if (!_isFabVisible) {
+      setState(() {
+        _isFabVisible = true;
+      });
+      _fabAnimationController.forward();
+    }
+  }
+
+  void _hideFab() {
+    if (_isFabVisible) {
+      setState(() {
+        _isFabVisible = false;
+      });
+      _fabAnimationController.reverse();
+    }
   }
 
   void _checkUser() async {
@@ -62,8 +128,9 @@ class _HomeScreenState extends State<HomeScreen> {
       });
 
       if (_user != null) {
-        final querySnapshot =
-            await tasksCollection.where('userId', isEqualTo: _user!.uid).get();
+        final querySnapshot = await tasksCollection
+            .where('userId', isEqualTo: _user!.uid)
+            .get();
 
         final pendingTasks = <Task>[];
         final completedTasks = <Task>[];
@@ -108,297 +175,201 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildTaskItem(Task task, bool isPending) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
       child: GestureDetector(
         onLongPress: () => _removeTask(task),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          clipBehavior: Clip.hardEdge,
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-            title: Text(
-              task.title,
-              style: TextStyle(
-                fontSize: 16,
-                decoration: task.completed ? TextDecoration.lineThrough : null,
-                color:
-                    task.completed
-                        ? Theme.of(context).colorScheme.onSurface.withValues()
-                        : null,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.15),
+                  width: 0.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomeDetailsScreen(task: task),
+                      ),
+                    );
+                    if (result == true) await _loadTasks();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () =>
+                              _updateTaskCompletion(task, !task.completed),
+                          child: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isPending
+                                    ? Theme.of(
+                                        context,
+                                      ).colorScheme.primary.withOpacity(0.6)
+                                    : Theme.of(context).colorScheme.primary,
+                                width: 2,
+                              ),
+                              color: task.completed
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.transparent,
+                            ),
+                            // Animação sutil para o checkmark
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              transitionBuilder: (child, animation) {
+                                return ScaleTransition(
+                                  scale: animation,
+                                  child: child,
+                                );
+                              },
+                              child: task.completed
+                                  ? Icon(
+                                      Icons.check,
+                                      size: 16,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimary,
+                                      key: const ValueKey('checked'),
+                                    )
+                                  : const SizedBox.shrink(
+                                      key: ValueKey('unchecked'),
+                                    ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                task.title,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  decoration: task.completed
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                                  color: task.completed
+                                      ? Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface.withOpacity(0.6)
+                                      : Theme.of(context).colorScheme.onSurface,
+                                  height: 1.3,
+                                ),
+                              ),
+                              if (task.dateTime != null) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  DateFormat(
+                                    'dd/MM/yyyy • HH:mm',
+                                  ).format(task.dateTime!),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withOpacity(0.5),
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                       
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
-            subtitle:
-                task.dateTime != null
-                    ? Text(
-                      DateFormat('dd/MM/yyyy - HH:mm').format(task.dateTime!),
-                      style: TextStyle(
-                        color:
-                            Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(),
-                      ),
-                    )
-                    : null,
-            leading:
-                isPending
-                    ? Checkbox(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      value: task.completed,
-                      onChanged: (value) => _updateTaskCompletion(task, value!),
-                    )
-                    : Icon(
-                      Icons.check_circle_rounded,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomeDetailsScreen(task: task),
-                ),
-              );
-              if (result == true) await _loadTasks();
-            },
           ),
         ),
       ),
     );
   }
 
-  Future<bool> _addTask() async {
+  Future<void> _addTask() async {
     final appLocalizations = AppLocalizations.of(context);
-    if (appLocalizations != null) {
-      String newTaskTitle = '';
-      DateTime? taskDateTime;
+    if (appLocalizations == null || _user == null) return;
 
-      final bool? result = await showDialog<bool>(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return AlertDialog(
-                title: Text(appLocalizations.newTask),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: appLocalizations.inputTask,
-                        labelStyle: TextStyle(
-                          color:
-                              Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(),
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                        hintStyle: TextStyle(
-                          color:
-                              Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(),
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).colorScheme.surface,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(100),
-                          borderSide: BorderSide(
-                            color:
-                                Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(),
-                            width: 1.5,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50),
-                          borderSide: BorderSide(
-                            color:
-                                Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(),
-                            width: 2,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50),
-                          borderSide: BorderSide(
-                            color:
-                                Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(),
-                            width: 1.5,
-                          ),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 20.0,
-                          vertical: 16.0,
-                        ),
-                      ),
-                      maxLines: null,
-                      onChanged: (value) {
-                        newTaskTitle = value;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    GestureDetector(
-                      onTap: () async {
-                        final selectedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2100),
-                        );
-                        if (selectedDate != null) {
-                          final selectedTime = await showTimePicker(
-                            // ignore: use_build_context_synchronously
-                            context: context,
-                            initialTime: TimeOfDay.now(),
-                          );
-                          if (selectedTime != null) {
-                            setState(() {
-                              taskDateTime = DateTime(
-                                selectedDate.year,
-                                selectedDate.month,
-                                selectedDate.day,
-                                selectedTime.hour,
-                                selectedTime.minute,
-                              );
-                            });
-                          }
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.calendar_today),
-                            const SizedBox(width: 8),
-                            Text(
-                              taskDateTime != null
-                                  ? DateFormat(
-                                    'dd/MM/yyyy - HH:mm',
-                                  ).format(taskDateTime!)
-                                  : appLocalizations.dateTime,
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                    child: Text(appLocalizations.cancel),
-                  ),
-                  FilledButton.tonal(
-                    onPressed: () async {
-                      if (newTaskTitle.trim().isEmpty) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text(appLocalizations.error),
-                              content: Text(appLocalizations.inputTaskError),
-                              actions: <Widget>[
-                                FilledButton.tonal(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text(appLocalizations.ok),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      } else if (taskDateTime != null) {
-                        _taskIdCounter++;
-                        final newTaskId = _taskIdCounter.toString();
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.4),
+      builder: (context) => const TaskDialog(),
+    );
 
-                        await tasksCollection.add({
-                          'title': newTaskTitle,
-                          'completed': false,
-                          'userId': _user!.uid,
-                          'dateTime': taskDateTime,
-                        });
+    if (result != null) {
+      final String newTaskTitle = result['title'];
+      final DateTime taskDateTime = result['dateTime'];
 
-                        const NotificationDetails notificationDetails =
-                            NotificationDetails(
-                              android: AndroidNotificationDetails(
-                                'task_channel',
-                                'Lembretes de Tarefas',
-                                icon: '@drawable/ic_notification',
-                                channelDescription:
-                                    'Alertas de tarefas agendadas',
-                                importance: Importance.high,
-                                priority: Priority.high,
-                                enableVibration: true,
-                                fullScreenIntent: true,
-                                 category: AndroidNotificationCategory.reminder,
-                              ),
-                              iOS: DarwinNotificationDetails(),
-                            );
+      try {
+        final newDocRef = await tasksCollection.add({
+          'title': newTaskTitle,
+          'completed': false,
+          'userId': _user!.uid,
+          'dateTime': taskDateTime,
+        });
 
-                        FlutterLocalNotificationsPlugin
-                        flutterLocalNotificationsPlugin =
-                            FlutterLocalNotificationsPlugin();
+        final notificationId = newDocRef.id.hashCode;
+        const NotificationDetails notificationDetails = NotificationDetails(
+          android: AndroidNotificationDetails(
+            'task_channel',
+            'Lembretes de Tarefas',
+            icon: '@drawable/ic_notification',
+            channelDescription: 'Alertas de tarefas agendadas',
+            importance: Importance.high,
+            priority: Priority.high,
+            enableVibration: true,
+            fullScreenIntent: true,
+            category: AndroidNotificationCategory.reminder,
+          ),
+          iOS: DarwinNotificationDetails(),
+        );
 
-                        await flutterLocalNotificationsPlugin.zonedSchedule(
-                          int.parse(newTaskId),
-                          newTaskTitle,
-                          '${appLocalizations.notificationTask}: $newTaskTitle',
-                          tz.TZDateTime.from(taskDateTime!, tz.local),
-                          notificationDetails,
-                          androidScheduleMode:
-                              AndroidScheduleMode.exactAllowWhileIdle,
-                        );
+        FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+            FlutterLocalNotificationsPlugin();
+        await flutterLocalNotificationsPlugin.zonedSchedule(
+          notificationId,
+          newTaskTitle,
+          appLocalizations.notificationTask,
+          tz.TZDateTime.from(taskDateTime, tz.local),
+          notificationDetails,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        );
 
-                        if (context.mounted) {
-                          Navigator.pop(context, true);
-                          await _loadTasks(); // Atualiza as tarefas após salvar
-                        }
-                      } else {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text(appLocalizations.error),
-                              content: Text(appLocalizations.inputDateError),
-                              actions: <Widget>[
-                                FilledButton.tonal(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text(appLocalizations.ok),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                    },
-                    child: Text(appLocalizations.save),
-                  ),
-                ],
-              );
-            },
+        await _loadTasks();
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Erro ao salvar a tarefa: $e")),
           );
-        },
-      );
-
-      return result ?? false;
+        }
+      }
     }
-    return false;
   }
 
   void _updateTaskCompletion(Task task, bool completed) async {
@@ -406,136 +377,201 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    final taskId = task.title;
+    setState(() {
+      task.completed = completed;
+      if (completed) {
+        _pendingTasks.removeWhere((t) => t.id == task.id);
+        _completedTasks.add(task);
+      } else {
+        _completedTasks.removeWhere((t) => t.id == task.id);
+        _pendingTasks.add(task);
+      }
+    });
 
     try {
-      final querySnapshot =
-          await tasksCollection
-              .where('userId', isEqualTo: _user!.uid)
-              .where('title', isEqualTo: taskId)
-              .get();
+      await tasksCollection.doc(task.id).update({'completed': completed});
 
-      if (querySnapshot.docs.isNotEmpty) {
-        final docId = querySnapshot.docs.first.id;
-
-        await tasksCollection.doc(docId).update({'completed': completed});
-
-        setState(() {
-          task.completed = completed;
-          if (completed) {
-            _completedTasks.add(task);
-            _pendingTasks.remove(task);
-          } else {
-            _pendingTasks.add(task);
-            _completedTasks.remove(task);
-          }
-        });
-
-        if (kDebugMode) {
-          print('Estado de conclusão da tarefa atualizado: $taskId');
-        }
-      } else {
-        if (kDebugMode) {
-          print('Tarefa não encontrada Firestore: $taskId');
-        }
+      if (kDebugMode) {
+        print(
+          'Estado de conclusão da tarefa ${task.id} atualizado com sucesso.',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
         print('Erro ao atualizar estado de conclusão da tarefa: $e');
+      }
+
+      setState(() {
+        task.completed = !completed;
+        if (!completed) {
+          _pendingTasks.add(task);
+          _completedTasks.removeWhere((t) => t.id == task.id);
+        } else {
+          _completedTasks.add(task);
+          _pendingTasks.removeWhere((t) => t.id == task.id);
+        }
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Falha ao atualizar a tarefa. Tente novamente.'),
+          ),
+        );
       }
     }
   }
 
   void _removeTask(Task task) async {
     final appLocalizations = AppLocalizations.of(context);
-    if (appLocalizations != null) {
-      if (_user == null) {
-        return;
-      }
-
-      final taskId = task.title;
-
-      setState(() {
-        if (task.completed) {
-          _completedTasks.remove(task);
-        } else {
-          _pendingTasks.remove(task);
-        }
-      });
-
-      final confirmed =
-          await showDialog<bool>(
-            context: context,
-            builder:
-                (context) => AlertDialog(
-                  title: Text(AppLocalizations.of(context)!.confirmDelete),
-                  content: Text(
-                    AppLocalizations.of(context)!.confirmDeleteTask,
+    if (appLocalizations == null || _user == null) {
+      return;
+    }
+    final confirmed =
+        await showDialog<bool>(
+          context: context,
+          barrierColor: Colors.black.withOpacity(0.4),
+          builder: (BuildContext context) {
+            return BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Dialog(
+                backgroundColor: Colors.transparent,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surface.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.error.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              CupertinoIcons.delete,
+                              size: 32,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            appLocalizations.confirmDelete,
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            appLocalizations.confirmDeleteTask,
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.7),
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 32),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: Text(appLocalizations.cancel),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.error,
+                                    foregroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.onError,
+                                  ),
+                                  child: Text(appLocalizations.delete),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: Text(AppLocalizations.of(context)!.cancel),
-                    ),
-                    FilledButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: Text(AppLocalizations.of(context)!.delete),
-                    ),
-                  ],
                 ),
-          ) ??
-          false;
+              ),
+            );
+          },
+        ) ??
+        false;
 
+    if (confirmed == true) {
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
           FlutterLocalNotificationsPlugin();
       await flutterLocalNotificationsPlugin.cancel(task.id.hashCode);
 
-      if (confirmed != true) {
-        // Se o usuário cancelar, readicione a tarefa na lista e recarregue as tarefas
+      try {
+        await tasksCollection.doc(task.id).delete();
+
         setState(() {
           if (task.completed) {
-            _completedTasks.add(task);
+            _completedTasks.removeWhere((t) => t.id == task.id);
           } else {
-            _pendingTasks.add(task);
+            _pendingTasks.removeWhere((t) => t.id == task.id);
           }
         });
-        await _loadTasks();
-        return;
-      }
 
-      try {
         if (kDebugMode) {
-          print('Apagando task: $taskId');
-        }
-
-        final querySnapshot =
-            await tasksCollection
-                .where('userId', isEqualTo: _user!.uid)
-                .where('title', isEqualTo: taskId)
-                .get();
-
-        if (querySnapshot.docs.isNotEmpty) {
-          final docId = querySnapshot.docs.first.id;
-
-          await tasksCollection.doc(docId).delete();
-
-          if (kDebugMode) {
-            print('Task removida Firestore: $taskId');
-          }
-        } else {
-          if (kDebugMode) {
-            print('Task nao encontrada Firestore: $taskId');
-          }
+          print('Tarefa removida do Firestore: ${task.id}');
         }
       } catch (e) {
         if (kDebugMode) {
-          print('Erro ao apagar task: $e');
+          print('Erro ao apagar tarefa: $e');
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro ao remover a tarefa: $e')),
+          );
         }
       }
-
-      // Recarregar as tarefas após a confirmação e remoção
-      await _loadTasks();
     }
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 32, 20, 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.primary,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
   }
 
   @override
@@ -544,88 +580,212 @@ class _HomeScreenState extends State<HomeScreen> {
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          appLocalizations.appName,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+      backgroundColor: colors.surface,
+      extendBodyBehindAppBar: true,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+            child: AppBar(
+              backgroundColor: colors.surface.withOpacity(0.8),
+              elevation: 0,
+              surfaceTintColor: Colors.transparent,
+              title: Text(
+                appLocalizations.home,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              centerTitle: true,
+            ),
+          ),
         ),
-        centerTitle: true,
       ),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : CustomScrollView(
-                slivers: [
-                  if (_pendingTasks.isNotEmpty)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-                        child: Text(
-                          appLocalizations.pendants.toUpperCase(),
-                          style: TextStyle(
-                            color: colors.primary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1,
-                          ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [colors.surface, colors.surface.withOpacity(0.95)],
+          ),
+        ),
+        child: Stack(
+          children: [
+            _isLoading
+                ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
+                : CustomScrollView(
+                    controller: _scrollController,
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height:
+                              kToolbarHeight +
+                              MediaQuery.of(context).padding.top,
                         ),
                       ),
-                    ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (_, index) => buildTaskItem(_pendingTasks[index], true),
-                      childCount: _pendingTasks.length,
-                    ),
-                  ),
-                  if (_completedTasks.isNotEmpty)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-                        child: Text(
-                          appLocalizations.completed.toUpperCase(),
-                          style: TextStyle(
-                            color: colors.primary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1,
-                          ),
+                      if (_pendingTasks.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: _buildSectionHeader(appLocalizations.pendants),
+                        ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (_, index) =>
+                              buildTaskItem(_pendingTasks[index], true),
+                          childCount: _pendingTasks.length,
                         ),
                       ),
-                    ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (_, index) =>
-                          buildTaskItem(_completedTasks[index], false),
-                      childCount: _completedTasks.length,
-                    ),
-                  ),
-                  if (_pendingTasks.isEmpty && _completedTasks.isEmpty)
-                    SliverFillRemaining(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.task_alt_rounded,
-                            size: 64,
-                            color: colors.onSurface.withValues(),
+                      if (_completedTasks.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: _buildSectionHeader(
+                            appLocalizations.completed,
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            appLocalizations.noTask,
-                            style: TextStyle(
-                              color: colors.onSurface.withValues(),
-                              fontSize: 16,
+                        ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (_, index) =>
+                              buildTaskItem(_completedTasks[index], false),
+                          childCount: _completedTasks.length,
+                        ),
+                      ),
+                      if (_pendingTasks.isEmpty && _completedTasks.isEmpty)
+                        SliverFillRemaining(
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(32.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(32),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          colors.primary.withOpacity(0.1),
+                                          colors.primary.withOpacity(0.05),
+                                        ],
+                                      ),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: colors.primary.withOpacity(0.2),
+                                        width: 2,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: colors.primary.withOpacity(
+                                            0.1,
+                                          ),
+                                          blurRadius: 20,
+                                          offset: const Offset(0, 8),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Icon(
+                                      Icons.task_alt_outlined,
+                                      size: 64,
+                                      color: colors.primary.withOpacity(0.7),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 32),
+                                  Text(
+                                    AppLocalizations.of(context)!.noTask,
+                                    style: TextStyle(
+                                      color: colors.onSurface.withOpacity(0.8),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    AppLocalizations.of(context)!.addTasks,
+                                    style: TextStyle(
+                                      color: colors.onSurface.withOpacity(0.5),
+                                      fontSize: 16,
+                                      height: 1.4,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ],
+                        ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 140)),
+                    ],
+                  ),
+
+            AnimatedBuilder(
+              animation: _fabAnimation,
+              builder: (context, child) {
+                return Positioned(
+                  right: 24,
+                  bottom: 120 + (50 * (1 - _fabAnimation.value)),
+                  child: Opacity(
+                    opacity: _fabAnimation.value,
+                    child: Transform.scale(
+                      scale: 0.8 + (0.2 * _fabAnimation.value),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: colors.primary.withOpacity(
+                                0.3 * _fabAnimation.value,
+                              ),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(
+                                0.1 * _fabAnimation.value,
+                              ),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                            child: Container(
+                              width: 56,
+                              height: 56,
+                              decoration: BoxDecoration(
+                                color: colors.primary.withOpacity(0.9),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.2),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(16),
+                                  onTap: _addTask,
+                                  child: Icon(
+                                    CupertinoIcons.add,
+                                    color: colors.onPrimary,
+                                    size: 28,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                ],
-              ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addTask,
-        elevation: 3,
-        child: Icon(Icons.add_outlined),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -2,6 +2,22 @@ Changelog Tarefas
 
 ======================================================
 
+## [3.0.0](https://github.com/hendrilmendes/Tarefas/compare/2.4.2..3.0.0) (**-**-2025)
+
+## Alterações
+
+- O app agora esta de cara nova, mais moderno e estiloso
+
+### Features
+
+- Escolha a cor que mais combina com você as configurações do app
+
+### Correções
+
+- Corrigido todos os bugs identificados
+
+======================================================
+
 ## [2.4.2](https://github.com/hendrilmendes/Tarefas/compare/2.4.1..2.4.2) (04-04-2025)
 
 ## Alterações

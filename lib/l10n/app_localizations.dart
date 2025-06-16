@@ -97,8 +97,14 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In pt, this message translates to:
-  /// **'Tarefas'**
+  /// **'Tá na Lista'**
   String get appName;
+
+  /// No description provided for @home.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tarefas'**
+  String get home;
 
   /// No description provided for @notes.
   ///
@@ -111,18 +117,6 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Ajustes'**
   String get settings;
-
-  /// No description provided for @desconect.
-  ///
-  /// In pt, this message translates to:
-  /// **'Desconectar'**
-  String get desconect;
-
-  /// No description provided for @homeLogin.
-  ///
-  /// In pt, this message translates to:
-  /// **'Bem vindo ao nosso app, aproveite 😁'**
-  String get homeLogin;
 
   /// No description provided for @googleLogin.
   ///
@@ -205,13 +199,13 @@ abstract class AppLocalizations {
   /// No description provided for @noTask.
   ///
   /// In pt, this message translates to:
-  /// **'Nenhuma tarefa encontrada 😅'**
+  /// **'Nenhuma tarefa encontrada'**
   String get noTask;
 
   /// No description provided for @noNotes.
   ///
   /// In pt, this message translates to:
-  /// **'Nenhuma anotação encontrada 😅'**
+  /// **'Nenhuma anotação encontrada'**
   String get noNotes;
 
   /// No description provided for @confirmDelete.
@@ -220,11 +214,11 @@ abstract class AppLocalizations {
   /// **'Confirmar exclusão'**
   String get confirmDelete;
 
-  /// No description provided for @confirmDeleteSub.
+  /// No description provided for @confirmDeleteNote.
   ///
   /// In pt, this message translates to:
   /// **'Tem certeza de que deseja excluir esta anotação?'**
-  String get confirmDeleteSub;
+  String get confirmDeleteNote;
 
   /// No description provided for @about.
   ///
@@ -304,12 +298,6 @@ abstract class AppLocalizations {
   /// **'Tema'**
   String get theme;
 
-  /// No description provided for @themeSub.
-  ///
-  /// In pt, this message translates to:
-  /// **'Escolha o tema que mais combina com você'**
-  String get themeSub;
-
   /// No description provided for @themeSelect.
   ///
   /// In pt, this message translates to:
@@ -319,19 +307,19 @@ abstract class AppLocalizations {
   /// No description provided for @darkMode.
   ///
   /// In pt, this message translates to:
-  /// **'Modo Escuro'**
+  /// **'Escuro'**
   String get darkMode;
 
   /// No description provided for @lightMode.
   ///
   /// In pt, this message translates to:
-  /// **'Modo Claro'**
+  /// **'Claro'**
   String get lightMode;
 
   /// No description provided for @systemMode.
   ///
   /// In pt, this message translates to:
-  /// **'Padrão do Sistema'**
+  /// **'Sistema'**
   String get systemMode;
 
   /// No description provided for @dynamicColors.
@@ -421,7 +409,7 @@ abstract class AppLocalizations {
   /// No description provided for @noUpdateSub.
   ///
   /// In pt, this message translates to:
-  /// **'Tudo em dias parceiro 🤠'**
+  /// **'Você já está com a última versão do app'**
   String get noUpdateSub;
 
   /// No description provided for @pendants.
@@ -451,7 +439,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationTask.
   ///
   /// In pt, this message translates to:
-  /// **'Opa, tudo bem? Aqui esta o seu lembrete'**
+  /// **'Não se esqueça'**
   String get notificationTask;
 
   /// No description provided for @error.
@@ -487,7 +475,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationSub.
   ///
   /// In pt, this message translates to:
-  /// **'Lembretes serão enviadas informando sobre suas tarefas'**
+  /// **'Serão enviadas notificações sobre suas tarefas'**
   String get notificationSub;
 
   /// No description provided for @confirmDeleteTask.
@@ -543,6 +531,96 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Erro no login'**
   String get loginError;
+
+  /// No description provided for @personalization.
+  ///
+  /// In pt, this message translates to:
+  /// **'Personalização'**
+  String get personalization;
+
+  /// No description provided for @personalizationSub.
+  ///
+  /// In pt, this message translates to:
+  /// **'Personalize o app da forma que quiser'**
+  String get personalizationSub;
+
+  /// No description provided for @color.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cor'**
+  String get color;
+
+  /// No description provided for @accentColor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cor de Destaque'**
+  String get accentColor;
+
+  /// No description provided for @dynamicColorsEnabledWarning.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Dynamic Colors esta ativado'**
+  String get dynamicColorsEnabledWarning;
+
+  /// No description provided for @information.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informações'**
+  String get information;
+
+  /// No description provided for @displayMode.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo de Exibição'**
+  String get displayMode;
+
+  /// No description provided for @addTasks.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque no botão + para criar sua primeira tarefa'**
+  String get addTasks;
+
+  /// No description provided for @addNotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque no botão + para criar sua primeira nota'**
+  String get addNotes;
+
+  /// No description provided for @acceptTerms.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ao continuar, você concorda com a nossa '**
+  String get acceptTerms;
+
+  /// No description provided for @welcomeMessageTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Organize seu dia,'**
+  String get welcomeMessageTitle;
+
+  /// No description provided for @welcomeMessageSub.
+  ///
+  /// In pt, this message translates to:
+  /// **'alcance seus objetivos.'**
+  String get welcomeMessageSub;
+
+  /// No description provided for @logout.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sair'**
+  String get logout;
+
+  /// No description provided for @logoutConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desconectar'**
+  String get logoutConfirm;
+
+  /// No description provided for @logoutConfirmSub.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você tem certeza que quer desconectar do app?'**
+  String get logoutConfirmSub;
 }
 
 class _AppLocalizationsDelegate

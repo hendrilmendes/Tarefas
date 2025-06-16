@@ -8,17 +8,38 @@ class ThemeModel extends ChangeNotifier {
   bool _isDynamicColorsEnabled = true;
   ThemeModeType _themeMode = ThemeModeType.light;
 
+  final List<MaterialColor> availableAccentColors = [
+    Colors.amber,
+    Colors.blue,
+    Colors.brown,
+    Colors.green,
+    Colors.grey,
+    Colors.indigo,
+    Colors.orange,
+    Colors.pink,
+    Colors.purple,
+    Colors.red,
+    Colors.teal,
+    Colors.yellow,
+  ];
+  late MaterialColor _primaryColor;
+
   static const String darkModeKey = 'darkModeEnabled';
   static const String dynamicColorsKey = 'dynamicColorsEnabled';
   static const String themeModeKey = 'themeMode';
 
+  static const String primaryColorKey = 'primaryColorIndex';
+
   ThemeModel() {
+    _primaryColor = availableAccentColors[1];
     _loadThemePreference();
   }
 
   bool get isDarkMode => _isDarkMode;
   bool get isDynamicColorsEnabled => _isDynamicColorsEnabled;
   ThemeModeType get themeMode => _themeMode;
+
+  MaterialColor get primaryColor => _primaryColor;
 
   void toggleDarkMode() {
     _isDarkMode = !_isDarkMode;
@@ -38,20 +59,36 @@ class ThemeModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setPrimaryColor(MaterialColor color) {
+    _primaryColor = color;
+    int colorIndex = availableAccentColors.indexOf(color);
+    _savePreference(primaryColorKey, colorIndex);
+    notifyListeners();
+  }
+
   Future<void> _loadThemePreference() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     _isDarkMode = prefs.getBool(darkModeKey) ?? true;
     _isDynamicColorsEnabled = prefs.getBool(dynamicColorsKey) ?? true;
     _themeMode = _getSavedThemeMode(prefs.getString(themeModeKey));
+
+    int colorIndex = prefs.getInt(primaryColorKey) ?? 1;
+    if (colorIndex >= 0 && colorIndex < availableAccentColors.length) {
+      _primaryColor = availableAccentColors[colorIndex];
+    }
+
     notifyListeners();
   }
 
   Future<void> _savePreference(String key, dynamic value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (value is bool) {
-      prefs.setBool(key, value);
+      await prefs.setBool(key, value);
     } else if (value is String) {
-      prefs.setString(key, value);
+      await prefs.setString(key, value);
+    } else if (value is int) {
+      await prefs.setInt(key, value);
     }
   }
 

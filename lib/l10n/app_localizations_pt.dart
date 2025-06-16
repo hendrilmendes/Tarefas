@@ -9,19 +9,16 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
-  String get appName => 'Tarefas';
+  String get appName => 'Tá na Lista';
+
+  @override
+  String get home => 'Tarefas';
 
   @override
   String get notes => 'Anotações';
 
   @override
   String get settings => 'Ajustes';
-
-  @override
-  String get desconect => 'Desconectar';
-
-  @override
-  String get homeLogin => 'Bem vindo ao nosso app, aproveite 😁';
 
   @override
   String get googleLogin => 'Login com Google';
@@ -63,16 +60,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get errorLoadNotes => 'Erro ao carregar anotações';
 
   @override
-  String get noTask => 'Nenhuma tarefa encontrada 😅';
+  String get noTask => 'Nenhuma tarefa encontrada';
 
   @override
-  String get noNotes => 'Nenhuma anotação encontrada 😅';
+  String get noNotes => 'Nenhuma anotação encontrada';
 
   @override
   String get confirmDelete => 'Confirmar exclusão';
 
   @override
-  String get confirmDeleteSub =>
+  String get confirmDeleteNote =>
       'Tem certeza de que deseja excluir esta anotação?';
 
   @override
@@ -116,19 +113,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get theme => 'Tema';
 
   @override
-  String get themeSub => 'Escolha o tema que mais combina com você';
-
-  @override
   String get themeSelect => 'Escolha o Tema';
 
   @override
-  String get darkMode => 'Modo Escuro';
+  String get darkMode => 'Escuro';
 
   @override
-  String get lightMode => 'Modo Claro';
+  String get lightMode => 'Claro';
 
   @override
-  String get systemMode => 'Padrão do Sistema';
+  String get systemMode => 'Sistema';
 
   @override
   String get dynamicColors => 'Dynamic Colors';
@@ -174,7 +168,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get noUpdate => 'Nenhuma atualização disponível';
 
   @override
-  String get noUpdateSub => 'Tudo em dias parceiro 🤠';
+  String get noUpdateSub => 'Você já está com a última versão do app';
 
   @override
   String get pendants => 'Pendentes';
@@ -189,7 +183,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get taskDetails => 'Detalhes da Tarefa';
 
   @override
-  String get notificationTask => 'Opa, tudo bem? Aqui esta o seu lembrete';
+  String get notificationTask => 'Não se esqueça';
 
   @override
   String get error => 'Erro';
@@ -208,7 +202,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get notificationSub =>
-      'Lembretes serão enviadas informando sobre suas tarefas';
+      'Serão enviadas notificações sobre suas tarefas';
 
   @override
   String get confirmDeleteTask => 'Deseja realmente apagar a tarefa?';
@@ -236,4 +230,50 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get loginError => 'Erro no login';
+
+  @override
+  String get personalization => 'Personalização';
+
+  @override
+  String get personalizationSub => 'Personalize o app da forma que quiser';
+
+  @override
+  String get color => 'Cor';
+
+  @override
+  String get accentColor => 'Cor de Destaque';
+
+  @override
+  String get dynamicColorsEnabledWarning => 'O Dynamic Colors esta ativado';
+
+  @override
+  String get information => 'Informações';
+
+  @override
+  String get displayMode => 'Modo de Exibição';
+
+  @override
+  String get addTasks => 'Toque no botão + para criar sua primeira tarefa';
+
+  @override
+  String get addNotes => 'Toque no botão + para criar sua primeira nota';
+
+  @override
+  String get acceptTerms => 'Ao continuar, você concorda com a nossa ';
+
+  @override
+  String get welcomeMessageTitle => 'Organize seu dia,';
+
+  @override
+  String get welcomeMessageSub => 'alcance seus objetivos.';
+
+  @override
+  String get logout => 'Sair';
+
+  @override
+  String get logoutConfirm => 'Desconectar';
+
+  @override
+  String get logoutConfirmSub =>
+      'Você tem certeza que quer desconectar do app?';
 }

@@ -22,10 +22,9 @@ class Task {
     return Task(
       title: map['title'] ?? '',
       completed: map['completed'] ?? false,
-      dateTime:
-          map['dateTime'] != null
-              ? DateTime.fromMillisecondsSinceEpoch(map['dateTime'])
-              : null,
+      dateTime: map['dateTime'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['dateTime'])
+          : null,
       id: id,
     );
   }

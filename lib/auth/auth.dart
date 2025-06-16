@@ -18,8 +18,8 @@ class AuthService {
       }
 
       // Realizar login com Google
-      final GoogleSignInAccount? googleSignInAccount =
-          await _googleSignIn.signIn();
+      final GoogleSignInAccount? googleSignInAccount = await _googleSignIn
+          .signIn();
       if (googleSignInAccount == null) {
         if (kDebugMode) print("Login cancelado pelo usuário.");
         return null;
