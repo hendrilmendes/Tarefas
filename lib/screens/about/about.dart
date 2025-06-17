@@ -88,40 +88,78 @@ class _AboutPageState extends State<AboutPage> {
   void _showReleaseInfo(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.3),
       builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('${AppLocalizations.of(context)!.version} - v$appVersion'),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-          content: isLoading
-              ? const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(height: 20),
-                    CircularProgressIndicator.adaptive(),
-                    SizedBox(height: 20),
-                  ],
-                )
-              : SingleChildScrollView(
-                  child: Text(
-                    releaseNotes,
-                    style: const TextStyle(fontSize: 14),
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            insetPadding: const EdgeInsets.all(24),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surface.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.15),
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 8, 8, 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${AppLocalizations.of(context)!.version} - $appVersion',
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close_rounded),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 1, thickness: 0.5),
+
+                      Flexible(
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 150,
+                                child: Center(
+                                  child: CircularProgressIndicator.adaptive(),
+                                ),
+                              )
+                            : SingleChildScrollView(
+                                padding: const EdgeInsets.all(20),
+                                child: Text(
+                                  releaseNotes,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ],
                   ),
                 ),
+              ),
+            ),
+          ),
         );
       },
     );
@@ -188,7 +226,7 @@ class _AboutPageState extends State<AboutPage> {
               child: Column(
                 children: [
                   _buildAppInfoCard(context),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
                   _buildInfoList(context),
                 ],
               ),
@@ -225,7 +263,7 @@ class _AboutPageState extends State<AboutPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Text(
                   appName,
                   style: TextStyle(
@@ -242,6 +280,7 @@ class _AboutPageState extends State<AboutPage> {
                     color: colors.onSurface.withOpacity(0.7),
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
                   AppLocalizations.of(context)!.copyright,
                   style: TextStyle(

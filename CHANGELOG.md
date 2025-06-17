@@ -6,11 +6,13 @@ Changelog Tarefas
 
 ## Alterações
 
-- O app agora esta de cara nova, mais moderno e estiloso
+- O app esta de cara nova, mais moderno e estiloso
 
 ### Features
 
 - Escolha a cor que mais combina com você as configurações do app
+- Deslize sob para alterar entre as telas
+- Novo sistema de feedbacks
 
 ### Correções
 

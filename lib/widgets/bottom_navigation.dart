@@ -20,6 +20,7 @@ class BottomNavigationContainer extends StatefulWidget {
 
 class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
   int _currentIndex = 0;
+  late final PageController _pageController;
 
   final List<Widget> _screens = const [
     HomeScreen(),
@@ -27,9 +28,26 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
     SettingsScreen(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   void _onTabTapped(int index) {
     if (_currentIndex == index) return;
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
+  void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
     });
@@ -38,44 +56,79 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Remove o scaffold extra aqui, se o body já for o OrientationBuilder
       body: OrientationBuilder(
         builder: (context, orientation) {
+          if (orientation == Orientation.portrait) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted &&
+                  _pageController.hasClients &&
+                  _pageController.page?.round() != _currentIndex) {
+                _pageController.jumpToPage(_currentIndex);
+              }
+            });
+          }
+
+          if (orientation == Orientation.portrait &&
+              _pageController.hasClients &&
+              _pageController.page?.round() != _currentIndex) {
+            _pageController.animateToPage(
+              _currentIndex,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOut,
+            );
+          }
+
           if (orientation == Orientation.landscape) {
-            // Seu código existente para orientação paisagem (NavigationRail)
             return Row(
               children: [
-                NavigationRail(
-                  groupAlignment: 0.0,
-                  selectedIndex: _currentIndex,
-                  onDestinationSelected: _onTabTapped,
-                  labelType: NavigationRailLabelType.all,
-                  indicatorColor: Theme.of(context)
-                      .bottomNavigationBarTheme
-                      .selectedItemColor,
-                  destinations: [
-                    NavigationRailDestination(
-                      icon: const Icon(Icons.task_alt),
-                      selectedIcon: const Icon(Icons.task_alt_outlined),
-                      label: Text(AppLocalizations.of(context)!.home),
+                ClipRRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor.withOpacity(0.2),
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                      child: NavigationRail(
+                        backgroundColor: Colors.transparent,
+                        groupAlignment: 0.0,
+                        selectedIndex: _currentIndex,
+                        onDestinationSelected: _onTabTapped,
+                        labelType: NavigationRailLabelType.all,
+                        indicatorColor: Theme.of(context)
+                            .bottomNavigationBarTheme
+                            .selectedItemColor
+                            ?.withOpacity(0.3),
+                        destinations: [
+                          NavigationRailDestination(
+                            icon: const Icon(CupertinoIcons.checkmark_alt),
+                            label: Text(AppLocalizations.of(context)!.home),
+                          ),
+                          NavigationRailDestination(
+                            icon: const Icon(CupertinoIcons.news),
+                            label: Text(AppLocalizations.of(context)!.notes),
+                          ),
+                          NavigationRailDestination(
+                            icon: const Icon(CupertinoIcons.settings),
+                            label: Text(AppLocalizations.of(context)!.settings),
+                          ),
+                        ],
+                      ),
                     ),
-                    NavigationRailDestination(
-                      icon: const Icon(Icons.notes),
-                      selectedIcon: const Icon(Icons.notes_outlined),
-                      label: Text(AppLocalizations.of(context)!.notes),
-                    ),
-                    NavigationRailDestination(
-                      icon: const Icon(Icons.settings),
-                      selectedIcon: const Icon(Icons.settings_outlined),
-                      label: Text(AppLocalizations.of(context)!.settings),
-                    ),
-                  ],
+                  ),
                 ),
-                const VerticalDivider(thickness: 1, width: 1),
                 Expanded(
                   child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: _screens[_currentIndex],
+                    duration: const Duration(milliseconds: 30),
+                    child: Container(
+                      key: ValueKey<int>(_currentIndex),
+                      child: _screens[_currentIndex],
+                    ),
                   ),
                 ),
               ],
@@ -83,9 +136,10 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
           } else {
             return Scaffold(
               extendBody: true,
-              body: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: _screens[_currentIndex],
+              body: PageView(
+                controller: _pageController,
+                onPageChanged: _onPageChanged,
+                children: _screens,
               ),
               bottomNavigationBar: GlassNavBar(
                 selectedIndex: _currentIndex,
@@ -137,7 +191,7 @@ class GlassNavBar extends StatefulWidget {
 }
 
 class _GlassNavBarState extends State<GlassNavBar> {
-  final Duration _animationDuration = const Duration(milliseconds: 200);
+  final Duration _animationDuration = const Duration(milliseconds: 30);
   final Curve _animationCurve = Curves.easeInOutQuart;
 
   @override
@@ -153,7 +207,10 @@ class _GlassNavBarState extends State<GlassNavBar> {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 10.0,
+            ),
             decoration: BoxDecoration(
               color: theme.cardColor.withOpacity(0.2),
               borderRadius: BorderRadius.circular(100.0),
@@ -189,12 +246,16 @@ class _GlassNavBarState extends State<GlassNavBar> {
                     duration: _animationDuration,
                     curve: _animationCurve,
                     padding: EdgeInsets.symmetric(
-                      horizontal: isSelected ? 20.0 : 12.0, // Aumenta o padding horizontal ao selecionar
+                      horizontal: isSelected
+                          ? 20.0
+                          : 12.0, // Aumenta o padding horizontal ao selecionar
                       vertical: 8.0,
                     ),
                     decoration: isSelected
                         ? BoxDecoration(
-                            color: selectedColor.withOpacity(0.2), // Fundo suave para o item selecionado
+                            color: selectedColor.withOpacity(
+                              0.2,
+                            ), // Fundo suave para o item selecionado
                             borderRadius: BorderRadius.circular(100.0),
                             boxShadow: [
                               BoxShadow(
@@ -211,7 +272,9 @@ class _GlassNavBarState extends State<GlassNavBar> {
                         Icon(
                           item.icon,
                           color: isSelected ? selectedColor : unselectedColor,
-                          size: isSelected ? 28.0 : 24.0, // Animação de tamanho do ícone
+                          size: isSelected
+                              ? 28.0
+                              : 24.0, // Animação de tamanho do ícone
                         ),
                         // Animação de Fade e Escala para o texto
                         AnimatedOpacity(

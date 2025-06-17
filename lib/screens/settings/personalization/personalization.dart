@@ -269,12 +269,12 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                                     ? null
                                     : () => themeModel.setPrimaryColor(color),
                                 child: AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 300),
+                                  duration: const Duration(milliseconds: 200),
                                   opacity: themeModel.isDynamicColorsEnabled
                                       ? 0.6
                                       : 1.0,
                                   child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
+                                    duration: const Duration(milliseconds: 200),
                                     width: 48,
                                     height: 48,
                                     decoration: BoxDecoration(

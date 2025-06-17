@@ -4,11 +4,9 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:app_settings/app_settings.dart';
-import 'package:feedback/feedback.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,6 +18,7 @@ import 'package:tarefas/screens/about/about.dart';
 import 'package:tarefas/screens/login/login.dart';
 import 'package:tarefas/screens/settings/personalization/personalization.dart';
 import 'package:tarefas/theme/theme.dart';
+import 'package:wiredash/wiredash.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -64,86 +63,76 @@ class _SettingsScreenState extends State<SettingsScreen>
 
     return Scaffold(
       backgroundColor: colors.surface,
-      extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-            child: AppBar(
-              backgroundColor: colors.surface.withOpacity(0.8),
-              elevation: 0,
-              surfaceTintColor: Colors.transparent,
-              title: Text(
-                AppLocalizations.of(context)!.settings,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              centerTitle: true,
-              actions: [
-                IconButton(
-                  icon: Icon(
-                    CupertinoIcons.square_arrow_right,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  tooltip: AppLocalizations.of(context)!.logout,
-                  onPressed: () async {
-                    final confirmed = await _showLogoutConfirmationDialog(
-                      context,
-                    );
-                    if (confirmed == true) {
-                      await _authService.signOut();
-                      if (mounted) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                LoginScreen(authService: _authService),
-                          ),
-                          (Route<dynamic> route) => false,
-                        );
-                      }
-                    }
-                  },
-                ),
-                const SizedBox(width: 8),
-              ],
-            ),
-          ),
-        ),
-      ),
       body: CustomScrollView(
         controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: kToolbarHeight + MediaQuery.of(context).padding.top,
+          SliverAppBar(
+            backgroundColor: colors.surface.withOpacity(0.8),
+            elevation: 0,
+            surfaceTintColor: Colors.transparent,
+            floating: true,
+            snap: true,
+            pinned: true,
+            title: Text(
+              AppLocalizations.of(context)!.settings,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.5,
+              ),
             ),
-          ),
-
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(24, 20, 24, bottomNavHeight + 20),
-              child: Column(
-                children: [
-                  _buildProfileCard(context),
-
-                  const SizedBox(height: 24),
-
-                  _buildQuickActionsGrid(context, themeModel),
-
-                  const SizedBox(height: 32),
-
-                  _buildSettingsCategories(context, themeModel),
-
-                  const SizedBox(height: 20),
-                ],
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: Icon(
+                  CupertinoIcons.square_arrow_right,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                tooltip: AppLocalizations.of(context)!.logout,
+                onPressed: () async {
+                  final confirmed = await _showLogoutConfirmationDialog(
+                    context,
+                  );
+                  if (confirmed == true) {
+                    await _authService.signOut();
+                    if (mounted) {
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              LoginScreen(authService: _authService),
+                        ),
+                        (Route<dynamic> route) => false,
+                      );
+                    }
+                  }
+                },
+              ),
+              const SizedBox(width: 8),
+            ],
+            flexibleSpace: ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                child: Container(color: Colors.transparent),
               ),
             ),
           ),
+
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                const SizedBox(height: 20),
+                _buildProfileCard(context),
+                const SizedBox(height: 24),
+                _buildQuickActionsGrid(context, themeModel),
+                const SizedBox(height: 32),
+                _buildSettingsCategories(context, themeModel),
+                const SizedBox(height: 20),
+              ]),
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: bottomNavHeight)),
         ],
       ),
     );
@@ -448,7 +437,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               title: AppLocalizations.of(context)!.support,
               subtitle: AppLocalizations.of(context)!.supportSub,
               onTap: () {
-                _showSupport(context);
+                Wiredash.of(context).show(inheritMaterialTheme: true);
               },
             ),
             SettingsItem(
@@ -706,22 +695,6 @@ class _SettingsScreenState extends State<SettingsScreen>
         await markReviewed();
       }
     }
-  }
-
-  void _showSupport(BuildContext context) {
-    BetterFeedback.of(context).show((feedback) async {
-      final screenshotFilePath = await writeImageToStorage(feedback.screenshot);
-
-      final Email email = Email(
-        body: feedback.text,
-        // ignore: use_build_context_synchronously
-        subject: AppLocalizations.of(context)!.appName,
-        recipients: ['hendrilmendes2015@gmail.com'],
-        attachmentPaths: [screenshotFilePath],
-        isHTML: false,
-      );
-      await FlutterEmailSender.send(email);
-    });
   }
 
   void _showAbout(BuildContext context) {

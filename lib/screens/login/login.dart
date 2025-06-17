@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'dart:ui';
 import 'package:flutter/gestures.dart';
@@ -9,10 +9,8 @@ import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/widgets/bottom_navigation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// Convertido para StatefulWidget para gerenciar animações e estado de loading
 class LoginScreen extends StatefulWidget {
   final AuthService authService;
-
   const LoginScreen({required this.authService, super.key});
 
   @override
@@ -20,54 +18,37 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen>
-    with SingleTickerProviderStateMixin {
-  // Adicionando estado para o loading e animações
+    with TickerProviderStateMixin {
   bool _isLoading = false;
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+  late AnimationController _introAnimationController;
+  late AnimationController _backgroundAnimationController;
 
   @override
   void initState() {
     super.initState();
-    // Controlador de animação
-    _animationController = AnimationController(
+    _introAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1300),
     );
-
-    // Definindo as animações
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
-      ),
+    _backgroundAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 40),
     );
-
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: const Interval(0.0, 1.0, curve: Curves.easeOutCubic),
-          ),
-        );
-
-    // Inicia as animações
-    _animationController.forward();
+    _introAnimationController.forward();
+    _backgroundAnimationController.repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _introAnimationController.dispose();
+    _backgroundAnimationController.dispose();
     super.dispose();
   }
 
-  // Lógica de login agora com gerenciamento de estado
   Future<void> _handleSignIn() async {
     if (_isLoading) return;
-
     setState(() => _isLoading = true);
-    HapticFeedback.lightImpact(); // Feedback tátil
+    HapticFeedback.lightImpact();
 
     try {
       final user = await widget.authService.signInWithGoogle();
@@ -80,7 +61,6 @@ class _LoginScreenState extends State<LoginScreen>
         );
       }
     } catch (e) {
-      // Opcional: Mostrar um SnackBar de erro
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Falha ao fazer login: ${e.toString()}")),
@@ -93,21 +73,48 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
+  Animation<T> _createAnimation<T>(
+    T begin,
+    T end,
+    double start,
+    double duration,
+  ) {
+    return Tween<T>(begin: begin, end: end).animate(
+      CurvedAnimation(
+        parent: _introAnimationController,
+        curve: Interval(start, start + duration, curve: Curves.easeOutCubic),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: Stack(
         children: [
-          SizedBox(
-            height: screenHeight,
-            width: screenWidth,
-            child: Image.asset(
-              'assets/img/login_background.png',
-              fit: BoxFit.cover,
+          AnimatedBuilder(
+            animation: _backgroundAnimationController,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: 1.0 + (_backgroundAnimationController.value * 0.1),
+                child: Transform.translate(
+                  offset: Offset(_backgroundAnimationController.value * -20, 0),
+                  child: child,
+                ),
+              );
+            },
+            child: SizedBox(
+              height: screenHeight,
+              width: screenWidth,
+              child: Image.asset(
+                'assets/img/login_background.png',
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           Container(
@@ -117,10 +124,10 @@ class _LoginScreenState extends State<LoginScreen>
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.black.withOpacity(0.1),
-                  Colors.black.withOpacity(0.3),
-                  Colors.black.withOpacity(0.8),
+                  Colors.black.withOpacity(0.4),
+                  Colors.black.withOpacity(0.9),
                 ],
-                stops: const [0.0, 0.5, 1.0],
+                stops: const [0.0, 0.4, 1.0],
               ),
             ),
           ),
@@ -128,79 +135,90 @@ class _LoginScreenState extends State<LoginScreen>
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Spacer(flex: 3),
-                  // Widget de animação para o texto
                   FadeTransition(
-                    opacity: _fadeAnimation,
+                    opacity: _createAnimation(0.0, 1.0, 0.2, 0.4),
                     child: SlideTransition(
-                      position: _slideAnimation,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            localizations.welcomeMessageTitle,
-                            style: const TextStyle(
-                              fontSize: 42,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              height: 1.2,
-                              letterSpacing: -1,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black38,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            localizations.welcomeMessageSub,
-                            style: TextStyle(
-                              fontSize: 42,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.white.withOpacity(0.9),
-                              height: 1.2,
-                              letterSpacing: -1,
-                              shadows: const [
-                                Shadow(
-                                  color: Colors.black38,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      position: _createAnimation(
+                        const Offset(0, 0.5),
+                        Offset.zero,
+                        0.2,
+                        0.5,
+                      ),
+                      child: Text(
+                        localizations.appName,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          letterSpacing: 2,
+                        ),
                       ),
                     ),
                   ),
-                  const Spacer(flex: 2),
+                  const SizedBox(height: 12),
+                  FadeTransition(
+                    opacity: _createAnimation(0.0, 1.0, 0.3, 0.5),
+                    child: SlideTransition(
+                      position: _createAnimation(
+                        const Offset(0, 0.5),
+                        Offset.zero,
+                        0.3,
+                        0.6,
+                      ),
+                      child: Text(
+                        localizations.welcomeMessageTitle,
+                        style: const TextStyle(
+                          fontSize: 42,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          height: 1.2,
+                          letterSpacing: -1,
+                          shadows: [
+                            Shadow(color: Colors.black38, blurRadius: 10),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  FadeTransition(
+                    opacity: _createAnimation(0.0, 1.0, 0.4, 0.6),
+                    child: SlideTransition(
+                      position: _createAnimation(
+                        const Offset(0, 0.5),
+                        Offset.zero,
+                        0.4,
+                        0.7,
+                      ),
+                      child: Text(
+                        localizations.welcomeMessageSub,
+                        style: TextStyle(
+                          fontSize: 42,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.white.withOpacity(0.9),
+                          height: 1.2,
+                          letterSpacing: -1,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.1),
+                  FadeTransition(
+                    opacity: _createAnimation(0.0, 1.0, 0.5, 0.5),
+                    child: SlideTransition(
+                      position: _createAnimation(
+                        const Offset(0, 0.5),
+                        Offset.zero,
+                        0.5,
+                        0.5,
+                      ),
+                      child: _buildActionSheet(context, colors),
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ),
-          // Widget de animação para o painel de ação
-          FadeTransition(
-            opacity: _fadeAnimation,
-            child: SlideTransition(
-              position:
-                  Tween<Offset>(
-                    begin: const Offset(0, 0.2),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: _animationController,
-                      curve: const Interval(
-                        0.5,
-                        1.0,
-                        curve: Curves.easeOutCubic,
-                      ),
-                    ),
-                  ),
-              child: _buildActionSheet(context),
             ),
           ),
         ],
@@ -208,32 +226,35 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildActionSheet(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: ClipRRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              border: Border(
-                top: BorderSide(
-                  color: Colors.white.withOpacity(0.2),
-                  width: 1.5,
-                ),
-              ),
+  Widget _buildActionSheet(BuildContext context, ColorScheme colors) {
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(24),
+        topRight: Radius.circular(24),
+      ),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: EdgeInsets.fromLTRB(
+            24,
+            32,
+            24,
+            MediaQuery.of(context).padding.bottom + 24,
+          ),
+          decoration: BoxDecoration(
+            color: colors.surface.withOpacity(0.1),
+            border: Border(
+              top: BorderSide(color: Colors.white.withOpacity(0.2), width: 1.0),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildGoogleSignInButton(context),
-                const SizedBox(height: 16),
-                _buildPrivacyPolicyLink(context),
-              ],
-            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildGoogleSignInButton(context),
+              const SizedBox(height: 20),
+              _buildPrivacyPolicyLink(context),
+            ],
           ),
         ),
       ),
@@ -247,19 +268,18 @@ class _LoginScreenState extends State<LoginScreen>
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
         elevation: 0,
         minimumSize: const Size(double.infinity, 54),
       ),
       child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 200),
         child: _isLoading
             ? const SizedBox(
                 width: 24,
                 height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                  color: Colors.black87,
+                child: CircularProgressIndicator.adaptive(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black54),
                 ),
               )
             : Row(
@@ -305,13 +325,8 @@ class _LoginScreenState extends State<LoginScreen>
                   'https://br-newsdroid.blogspot.com/p/politica-de-privacidade-tarefas.html',
                 );
                 try {
-                  await launchUrl(
-                    url,
-                    mode: LaunchMode
-                        .inAppBrowserView,
-                  );
+                  await launchUrl(url, mode: LaunchMode.inAppBrowserView);
                 } catch (e) {
-                  // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Não foi possível abrir o link: $e'),

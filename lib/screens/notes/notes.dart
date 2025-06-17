@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:tarefas/screens/notes/notes_details.dart';
 
@@ -24,14 +25,12 @@ class _NotesScreenState extends State<NotesScreen>
   late Animation<double> _fabAnimation;
   late Animation<Offset> _fabSlideAnimation;
 
-  bool _isFabVisible = true;
-
   @override
   void initState() {
     super.initState();
 
     _fabAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
 
@@ -40,10 +39,10 @@ class _NotesScreenState extends State<NotesScreen>
     );
 
     _fabSlideAnimation =
-        Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0, 2), end: Offset.zero).animate(
           CurvedAnimation(
             parent: _fabAnimationController,
-            curve: Curves.easeOutBack,
+            curve: Curves.easeOutCubic,
           ),
         );
 
@@ -59,22 +58,16 @@ class _NotesScreenState extends State<NotesScreen>
   }
 
   bool _onScrollNotification(ScrollNotification notification) {
-    if (notification is ScrollUpdateNotification) {
-      final scrollDelta = notification.scrollDelta ?? 0;
+    if (notification is UserScrollNotification) {
+      final ScrollDirection direction = notification.direction;
 
-      if (scrollDelta.abs() > 15) {
-        final shouldShowFab = scrollDelta < 0;
-
-        if (shouldShowFab != _isFabVisible) {
-          setState(() {
-            _isFabVisible = shouldShowFab;
-          });
-
-          if (_isFabVisible) {
-            _fabAnimationController.forward();
-          } else {
-            _fabAnimationController.reverse();
-          }
+      if (direction == ScrollDirection.reverse) {
+        if (_fabAnimationController.isCompleted) {
+          _fabAnimationController.reverse();
+        }
+      } else if (direction == ScrollDirection.forward) {
+        if (_fabAnimationController.isDismissed) {
+          _fabAnimationController.forward();
         }
       }
     }
@@ -195,7 +188,7 @@ class _NotesScreenState extends State<NotesScreen>
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: CircularProgressIndicator.adaptive(),
                   );
                 }
                 if (snapshot.hasError) {

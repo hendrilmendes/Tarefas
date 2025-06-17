@@ -439,10 +439,8 @@ class GlassNavBar extends StatefulWidget {
 }
 
 class _GlassNavBarState extends State<GlassNavBar> {
-  // Constantes de animação
-  final Duration _animationDuration = const Duration(milliseconds: 300);
-  final Curve _animationCurve =
-      Curves.easeInOutQuart; // Curva de animação mais dinâmica
+  final Duration _animationDuration = const Duration(milliseconds: 200);
+  final Curve _animationCurve = Curves.easeInOutQuart;
 
   @override
   Widget build(BuildContext context) {

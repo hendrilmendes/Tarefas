@@ -14,7 +14,6 @@ class TaskDialog extends StatefulWidget {
 }
 
 class TaskDialogState extends State<TaskDialog> {
-  // O estado do diálogo (título e data) agora vive aqui dentro.
   final _titleController = TextEditingController();
   DateTime? _taskDateTime;
 
@@ -51,7 +50,6 @@ class TaskDialogState extends State<TaskDialog> {
     final enteredTitle = _titleController.text.trim();
 
     if (enteredTitle.isEmpty) {
-      // Mostra diálogo de erro de título
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -69,7 +67,6 @@ class TaskDialogState extends State<TaskDialog> {
     }
 
     if (_taskDateTime == null) {
-      // Mostra diálogo de erro de data
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -86,7 +83,6 @@ class TaskDialogState extends State<TaskDialog> {
       return;
     }
 
-    // Se tudo for válido, retorna os dados para o método _addTask
     Navigator.of(
       context,
     ).pop({'title': enteredTitle, 'dateTime': _taskDateTime});

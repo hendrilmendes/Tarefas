@@ -2,7 +2,7 @@ name: tarefas
 description: "Um app para você salvar suas tarefas e anotações do dia a dia"
 publish_to: 'none'
 
-version: 3.0.0+20250616
+version: 3.0.0+20250617
 
 environment:
   sdk: ^3.8.0
@@ -32,25 +32,16 @@ dependencies:
 # Dynamic Colors
   dynamic_color: ^1.7.0
   
-# Email
-  flutter_email_sender: ^7.0.0
 
 # Firebase
   cloud_firestore: ^5.6.9
-  firebase_auth: ^5.5.4
+  firebase_auth: ^5.6.0
   firebase_core: ^3.14.0
   firebase_crashlytics: ^4.3.7
   firebase_performance: ^0.10.1+7
 
 # Flutter Local Notifications
   flutter_local_notifications: ^19.2.1
-
-# Feedback
-  feedback:
-      git:
-        url: https://github.com/hendrilmendes/feedback.git
-        path: feedback
-        ref: 5b2c7ae
 
 # Google
   google_fonts: ^6.2.1
@@ -91,6 +82,9 @@ dependencies:
 
 # Url Launcher
   url_launcher: ^6.3.1
+
+# Wiredash
+  wiredash: ^2.5.0
 
   flutter_localizations:
     sdk: flutter

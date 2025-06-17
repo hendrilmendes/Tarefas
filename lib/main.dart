@@ -2,14 +2,12 @@ import 'dart:io';
 
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:feedback/feedback.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +19,7 @@ import 'package:tarefas/theme/theme.dart';
 import 'package:tarefas/updater/updater.dart';
 import 'package:tarefas/widgets/bottom_navigation.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:wiredash/wiredash.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,20 +71,7 @@ void main() async {
   // Inicialização do fuso horário
   tz.initializeTimeZones();
 
-  runApp(
-    BetterFeedback(
-      theme: FeedbackThemeData.light(),
-      darkTheme: FeedbackThemeData.dark(),
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalFeedbackLocalizationsDelegate(),
-      ],
-      localeOverride: const Locale('pt'),
-      child: const MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 ThemeMode _getThemeMode(ThemeModeType mode) {
@@ -131,32 +117,38 @@ class MyApp extends StatelessWidget {
                   brightness: Brightness.dark,
                 );
               }
-              return MaterialApp(
-                theme: ThemeData(
-                  brightness: Brightness.light,
-                  colorScheme: lightColorScheme,
-                  useMaterial3: true,
-                  textTheme: Typography().black.apply(
-                    fontFamily: GoogleFonts.openSans().fontFamily,
+              return Wiredash(
+                projectId: 't-na-lista-1ey23re',
+                secret: 'nOYpdMFquNhBifLf9oChh5whMDcSG8y9',
+                child: MaterialApp(
+                  theme: ThemeData(
+                    brightness: Brightness.light,
+                    colorScheme: lightColorScheme,
+                    useMaterial3: true,
+                    textTheme: Typography().black.apply(
+                      fontFamily: GoogleFonts.openSans().fontFamily,
+                    ),
                   ),
-                ),
-                darkTheme: ThemeData(
-                  brightness: Brightness.dark,
-                  colorScheme: darkColorScheme,
-                  useMaterial3: true,
-                  textTheme: Typography().white.apply(
-                    fontFamily: GoogleFonts.openSans().fontFamily,
+                  darkTheme: ThemeData(
+                    brightness: Brightness.dark,
+                    colorScheme: darkColorScheme,
+                    useMaterial3: true,
+                    textTheme: Typography().white.apply(
+                      fontFamily: GoogleFonts.openSans().fontFamily,
+                    ),
                   ),
-                ),
 
-                themeMode: _getThemeMode(themeModel.themeMode),
-                debugShowCheckedModeBanner: false,
-                localizationsDelegates: AppLocalizations.localizationsDelegates,
-                supportedLocales: AppLocalizations.supportedLocales,
-                home: _buildHome(context),
-                routes: {
-                  '/login': (context) => LoginScreen(authService: authService),
-                },
+                  themeMode: _getThemeMode(themeModel.themeMode),
+                  debugShowCheckedModeBanner: false,
+                  localizationsDelegates:
+                      AppLocalizations.localizationsDelegates,
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  home: _buildHome(context),
+                  routes: {
+                    '/login': (context) =>
+                        LoginScreen(authService: authService),
+                  },
+                ),
               );
             },
           );

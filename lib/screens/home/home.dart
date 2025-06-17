@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen>
   late ScrollController _scrollController;
   late AnimationController _fabAnimationController;
   late Animation<double> _fabAnimation;
+  late Animation<Offset> _fabSlideAnimation;
   bool _isFabVisible = true;
   double _lastScrollPosition = 0;
 
@@ -43,8 +44,11 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
 
     _scrollController = ScrollController();
+
+    _scrollController.addListener(_onScroll);
+
     _fabAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
 
@@ -52,7 +56,14 @@ class _HomeScreenState extends State<HomeScreen>
       CurvedAnimation(parent: _fabAnimationController, curve: Curves.easeInOut),
     );
 
-    _scrollController.addListener(_onScroll);
+    _fabSlideAnimation =
+        Tween<Offset>(begin: const Offset(0, 2), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _fabAnimationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
+
     _fabAnimationController.forward();
 
     _checkUser();
@@ -83,45 +94,62 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _showFab() {
     if (!_isFabVisible) {
-      setState(() {
-        _isFabVisible = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isFabVisible = true;
+        });
+      }
       _fabAnimationController.forward();
     }
   }
 
   void _hideFab() {
     if (_isFabVisible) {
-      setState(() {
-        _isFabVisible = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isFabVisible = false;
+        });
+      }
       _fabAnimationController.reverse();
     }
   }
 
   void _checkUser() async {
     final user = await _authService.currentUser();
+    if (!mounted) return;
+
     setState(() {
       _user = user;
     });
 
     if (_user != null) {
-      // Somente carregue as tarefas se ainda não tiverem sido carregadas
       if (_pendingTasks.isEmpty && _completedTasks.isEmpty) {
-        _loadTasks();
+        await _loadTasks();
       } else {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     } else {
       if (kDebugMode) {
         print('Usuário nulo ao carregar tarefas.');
       }
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _loadTasks() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
     try {
       setState(() {
         _isLoading = true;
@@ -131,6 +159,8 @@ class _HomeScreenState extends State<HomeScreen>
         final querySnapshot = await tasksCollection
             .where('userId', isEqualTo: _user!.uid)
             .get();
+
+        if (!mounted) return;
 
         final pendingTasks = <Task>[];
         final completedTasks = <Task>[];
@@ -150,14 +180,18 @@ class _HomeScreenState extends State<HomeScreen>
           }
         }
 
-        setState(() {
-          _pendingTasks = pendingTasks;
-          _completedTasks = completedTasks;
-          loadingMessage = '';
-        });
+        if (mounted) {
+          setState(() {
+            _pendingTasks = pendingTasks;
+            _completedTasks = completedTasks;
+            loadingMessage = '';
+          });
+        }
       } else {
-        if (kDebugMode) {
-          print('Usuário nulo ao carregar tarefas.');
+        if (mounted) {
+          setState(() {
+            loadingMessage = 'Erro ao carregar as tarefas.';
+          });
         }
       }
     } catch (e) {
@@ -168,9 +202,11 @@ class _HomeScreenState extends State<HomeScreen>
         print('Erro ao carregar as tarefas: $e');
       }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -236,7 +272,6 @@ class _HomeScreenState extends State<HomeScreen>
                                   ? Theme.of(context).colorScheme.primary
                                   : Colors.transparent,
                             ),
-                            // Animação sutil para o checkmark
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 200),
                               transitionBuilder: (child, animation) {
@@ -299,7 +334,6 @@ class _HomeScreenState extends State<HomeScreen>
                             ],
                           ),
                         ),
-                       
                       ],
                     ),
                   ),
@@ -401,16 +435,23 @@ class _HomeScreenState extends State<HomeScreen>
         print('Erro ao atualizar estado de conclusão da tarefa: $e');
       }
 
-      setState(() {
-        task.completed = !completed;
-        if (!completed) {
-          _pendingTasks.add(task);
-          _completedTasks.removeWhere((t) => t.id == task.id);
-        } else {
-          _completedTasks.add(task);
-          _pendingTasks.removeWhere((t) => t.id == task.id);
-        }
-      });
+      if (mounted) {
+        setState(() {
+          task.completed = !completed;
+          if (!completed) {
+            _pendingTasks.add(task);
+            _completedTasks.removeWhere((t) => t.id == task.id);
+          } else {
+            _completedTasks.add(task);
+            _pendingTasks.removeWhere((t) => t.id == task.id);
+          }
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Falha ao atualizar a tarefa. Tente novamente.'),
+          ),
+        );
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -534,13 +575,15 @@ class _HomeScreenState extends State<HomeScreen>
       try {
         await tasksCollection.doc(task.id).delete();
 
-        setState(() {
-          if (task.completed) {
-            _completedTasks.removeWhere((t) => t.id == task.id);
-          } else {
-            _pendingTasks.removeWhere((t) => t.id == task.id);
-          }
-        });
+        if (mounted) {
+          setState(() {
+            if (task.completed) {
+              _completedTasks.removeWhere((t) => t.id == task.id);
+            } else {
+              _pendingTasks.removeWhere((t) => t.id == task.id);
+            }
+          });
+        }
 
         if (kDebugMode) {
           print('Tarefa removida do Firestore: ${task.id}');
@@ -560,7 +603,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildSectionHeader(String title) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(20, 32, 20, 12),
+      margin: const EdgeInsets.fromLTRB(20, 10, 20, 12),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Text(
         title.toUpperCase(),
@@ -578,6 +621,8 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
+    const double bottomNavHeight = 80.0;
+    final double fabBottomMargin = bottomNavHeight + 40.0;
 
     return Scaffold(
       backgroundColor: colors.surface,
@@ -614,7 +659,7 @@ class _HomeScreenState extends State<HomeScreen>
         child: Stack(
           children: [
             _isLoading
-                ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
+                ? const Center(child: CircularProgressIndicator.adaptive())
                 : CustomScrollView(
                     controller: _scrollController,
                     slivers: [
@@ -717,34 +762,25 @@ class _HomeScreenState extends State<HomeScreen>
                       const SliverToBoxAdapter(child: SizedBox(height: 140)),
                     ],
                   ),
-
-            AnimatedBuilder(
-              animation: _fabAnimation,
-              builder: (context, child) {
-                return Positioned(
-                  right: 24,
-                  bottom: 120 + (50 * (1 - _fabAnimation.value)),
-                  child: Opacity(
-                    opacity: _fabAnimation.value,
-                    child: Transform.scale(
-                      scale: 0.8 + (0.2 * _fabAnimation.value),
+            Positioned(
+              right: 20,
+              bottom: fabBottomMargin,
+              child: SlideTransition(
+                position: _fabSlideAnimation,
+                child: AnimatedBuilder(
+                  animation: _fabAnimation,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _fabAnimation.value,
                       child: Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: colors.primary.withOpacity(
-                                0.3 * _fabAnimation.value,
-                              ),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withOpacity(
-                                0.1 * _fabAnimation.value,
-                              ),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
+                              color: colors.primary.withOpacity(0.4),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                              spreadRadius: 2,
                             ),
                           ],
                         ),
@@ -779,10 +815,10 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+              ),
             ),
           ],
         ),

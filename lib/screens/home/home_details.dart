@@ -560,43 +560,31 @@ class GlassNavBar extends StatefulWidget {
 }
 
 class _GlassNavBarState extends State<GlassNavBar> {
-  // Constantes de animação
-  final Duration _animationDuration = const Duration(milliseconds: 300);
-  final Curve _animationCurve =
-      Curves.easeInOutQuart; // Curva de animação mais dinâmica
+  final Duration _animationDuration = const Duration(milliseconds: 200);
+  final Curve _animationCurve = Curves.easeInOutQuart;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final selectedColor =
-        theme.colorScheme.secondary; // Cor de destaque moderna
-    final unselectedColor = theme.colorScheme.onSurface.withOpacity(
-      0.7,
-    ); // Cor suave para não selecionados
+    final selectedColor = theme.colorScheme.secondary;
+    final unselectedColor = theme.colorScheme.onSurface.withOpacity(0.7);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(100.0), // Bordas bem arredondadas
+        borderRadius: BorderRadius.circular(100.0),
         child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 10.0,
-            sigmaY: 10.0,
-          ), // Efeito de desfoque
+          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
           child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 16.0,
               vertical: 10.0,
             ),
             decoration: BoxDecoration(
-              color: theme.cardColor.withOpacity(
-                0.2,
-              ), // Fundo translúcido para o vidro
+              color: theme.cardColor.withOpacity(0.2),
               borderRadius: BorderRadius.circular(100.0),
               border: Border.all(
-                color: Colors.white.withOpacity(
-                  0.1,
-                ), // Borda sutil para o efeito de vidro
+                color: Colors.white.withOpacity(0.1),
                 width: 1.0,
               ),
               boxShadow: [
@@ -604,12 +592,10 @@ class _GlassNavBarState extends State<GlassNavBar> {
                   color: Colors.black.withOpacity(0.1),
                   blurRadius: 15.0,
                   spreadRadius: 2.0,
-                  offset: const Offset(0, 8), // Sombra para dar profundidade
+                  offset: const Offset(0, 8),
                 ),
                 BoxShadow(
-                  color: Colors.white.withOpacity(
-                    0.05,
-                  ), // Luz sutil para efeito glassmorphism
+                  color: Colors.white.withOpacity(0.05),
                   blurRadius: 5.0,
                   spreadRadius: 1.0,
                   offset: const Offset(0, -2),
@@ -629,16 +615,12 @@ class _GlassNavBarState extends State<GlassNavBar> {
                     duration: _animationDuration,
                     curve: _animationCurve,
                     padding: EdgeInsets.symmetric(
-                      horizontal: isSelected
-                          ? 20.0
-                          : 12.0, // Aumenta o padding horizontal ao selecionar
+                      horizontal: isSelected ? 20.0 : 12.0,
                       vertical: 8.0,
                     ),
                     decoration: isSelected
                         ? BoxDecoration(
-                            color: selectedColor.withOpacity(
-                              0.2,
-                            ), // Fundo suave para o item selecionado
+                            color: selectedColor.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(100.0),
                             boxShadow: [
                               BoxShadow(
@@ -648,18 +630,15 @@ class _GlassNavBarState extends State<GlassNavBar> {
                               ),
                             ],
                           )
-                        : null, // Sem decoração quando não selecionado
+                        : null,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           item.icon,
                           color: isSelected ? selectedColor : unselectedColor,
-                          size: isSelected
-                              ? 28.0
-                              : 24.0, // Animação de tamanho do ícone
+                          size: isSelected ? 28.0 : 24.0,
                         ),
-                        // Animação de Fade e Escala para o texto
                         AnimatedOpacity(
                           opacity: isSelected ? 1.0 : 0.0,
                           duration: _animationDuration,
@@ -680,7 +659,7 @@ class _GlassNavBarState extends State<GlassNavBar> {
                                       ),
                                     ),
                                   )
-                                : const SizedBox.shrink(), // Oculta o texto quando não selecionado
+                                : const SizedBox.shrink(),
                           ),
                         ),
                       ],
