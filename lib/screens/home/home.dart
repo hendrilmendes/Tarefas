@@ -27,10 +27,6 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   final AuthService _authService = AuthService();
   User? _user;
-  List<Task> _pendingTasks = [];
-  List<Task> _completedTasks = [];
-  String loadingMessage = '';
-  bool _isLoading = true;
 
   late ScrollController _scrollController;
   late AnimationController _fabAnimationController;
@@ -116,97 +112,10 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _checkUser() async {
     final user = await _authService.currentUser();
-    if (!mounted) return;
-
-    setState(() {
-      _user = user;
-    });
-
-    if (_user != null) {
-      if (_pendingTasks.isEmpty && _completedTasks.isEmpty) {
-        await _loadTasks();
-      } else {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    } else {
-      if (kDebugMode) {
-        print('Usuário nulo ao carregar tarefas.');
-      }
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _loadTasks() async {
     if (mounted) {
       setState(() {
-        _isLoading = true;
+        _user = user;
       });
-    }
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      if (_user != null) {
-        final querySnapshot = await tasksCollection
-            .where('userId', isEqualTo: _user!.uid)
-            .get();
-
-        if (!mounted) return;
-
-        final pendingTasks = <Task>[];
-        final completedTasks = <Task>[];
-
-        for (var doc in querySnapshot.docs) {
-          final task = Task(
-            title: doc['title'],
-            completed: doc['completed'],
-            id: doc.id,
-            dateTime: (doc['dateTime'] as Timestamp).toDate(),
-          );
-
-          if (task.completed) {
-            completedTasks.add(task);
-          } else {
-            pendingTasks.add(task);
-          }
-        }
-
-        if (mounted) {
-          setState(() {
-            _pendingTasks = pendingTasks;
-            _completedTasks = completedTasks;
-            loadingMessage = '';
-          });
-        }
-      } else {
-        if (mounted) {
-          setState(() {
-            loadingMessage = 'Erro ao carregar as tarefas.';
-          });
-        }
-      }
-    } catch (e) {
-      setState(() {
-        loadingMessage = 'Erro ao carregar as tarefas.';
-      });
-      if (kDebugMode) {
-        print('Erro ao carregar as tarefas: $e');
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
     }
   }
 
@@ -240,13 +149,12 @@ class _HomeScreenState extends State<HomeScreen>
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
                   onTap: () async {
-                    final result = await Navigator.push(
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => HomeDetailsScreen(task: task),
                       ),
                     );
-                    if (result == true) await _loadTasks();
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -394,8 +302,6 @@ class _HomeScreenState extends State<HomeScreen>
           notificationDetails,
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         );
-
-        await _loadTasks();
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -411,17 +317,6 @@ class _HomeScreenState extends State<HomeScreen>
       return;
     }
 
-    setState(() {
-      task.completed = completed;
-      if (completed) {
-        _pendingTasks.removeWhere((t) => t.id == task.id);
-        _completedTasks.add(task);
-      } else {
-        _completedTasks.removeWhere((t) => t.id == task.id);
-        _pendingTasks.add(task);
-      }
-    });
-
     try {
       await tasksCollection.doc(task.id).update({'completed': completed});
 
@@ -436,16 +331,6 @@ class _HomeScreenState extends State<HomeScreen>
       }
 
       if (mounted) {
-        setState(() {
-          task.completed = !completed;
-          if (!completed) {
-            _pendingTasks.add(task);
-            _completedTasks.removeWhere((t) => t.id == task.id);
-          } else {
-            _completedTasks.add(task);
-            _pendingTasks.removeWhere((t) => t.id == task.id);
-          }
-        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Falha ao atualizar a tarefa. Tente novamente.'),
@@ -575,16 +460,6 @@ class _HomeScreenState extends State<HomeScreen>
       try {
         await tasksCollection.doc(task.id).delete();
 
-        if (mounted) {
-          setState(() {
-            if (task.completed) {
-              _completedTasks.removeWhere((t) => t.id == task.id);
-            } else {
-              _pendingTasks.removeWhere((t) => t.id == task.id);
-            }
-          });
-        }
-
         if (kDebugMode) {
           print('Tarefa removida do Firestore: ${task.id}');
         }
@@ -658,110 +533,152 @@ class _HomeScreenState extends State<HomeScreen>
         ),
         child: Stack(
           children: [
-            _isLoading
-                ? const Center(child: CircularProgressIndicator.adaptive())
-                : CustomScrollView(
-                    controller: _scrollController,
+            StreamBuilder<QuerySnapshot>(
+              stream: _user != null
+                  ? tasksCollection
+                        .where('userId', isEqualTo: _user!.uid)
+                        .snapshots()
+                  : null,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator.adaptive(),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Erro ao carregar tarefas: ${snapshot.error}'),
+                  );
+                }
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return CustomScrollView(
                     slivers: [
-                      SliverToBoxAdapter(
-                        child: SizedBox(
-                          height:
-                              kToolbarHeight +
-                              MediaQuery.of(context).padding.top,
-                        ),
-                      ),
-                      if (_pendingTasks.isNotEmpty)
-                        SliverToBoxAdapter(
-                          child: _buildSectionHeader(appLocalizations.pendants),
-                        ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (_, index) =>
-                              buildTaskItem(_pendingTasks[index], true),
-                          childCount: _pendingTasks.length,
-                        ),
-                      ),
-                      if (_completedTasks.isNotEmpty)
-                        SliverToBoxAdapter(
-                          child: _buildSectionHeader(
-                            appLocalizations.completed,
-                          ),
-                        ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (_, index) =>
-                              buildTaskItem(_completedTasks[index], false),
-                          childCount: _completedTasks.length,
-                        ),
-                      ),
-                      if (_pendingTasks.isEmpty && _completedTasks.isEmpty)
-                        SliverFillRemaining(
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(32.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(32),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          colors.primary.withOpacity(0.1),
-                                          colors.primary.withOpacity(0.05),
-                                        ],
-                                      ),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: colors.primary.withOpacity(0.2),
-                                        width: 2,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: colors.primary.withOpacity(
-                                            0.1,
-                                          ),
-                                          blurRadius: 20,
-                                          offset: const Offset(0, 8),
-                                        ),
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32.0,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(32),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        colors.primary.withOpacity(0.1),
+                                        colors.primary.withOpacity(0.05),
                                       ],
                                     ),
-                                    child: Icon(
-                                      Icons.task_alt_outlined,
-                                      size: 64,
-                                      color: colors.primary.withOpacity(0.7),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: colors.primary.withOpacity(0.2),
+                                      width: 2,
                                     ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: colors.primary.withOpacity(0.1),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 32),
-                                  Text(
-                                    AppLocalizations.of(context)!.noTask,
-                                    style: TextStyle(
-                                      color: colors.onSurface.withOpacity(0.8),
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    textAlign: TextAlign.center,
+                                  child: Icon(
+                                    Icons.task_alt_outlined,
+                                    size: 64,
+                                    color: colors.primary.withOpacity(0.7),
                                   ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    AppLocalizations.of(context)!.addTasks,
-                                    style: TextStyle(
-                                      color: colors.onSurface.withOpacity(0.5),
-                                      fontSize: 16,
-                                      height: 1.4,
-                                    ),
-                                    textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 32),
+                                Text(
+                                  AppLocalizations.of(context)!.noTask,
+                                  style: TextStyle(
+                                    color: colors.onSurface.withOpacity(0.8),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                ],
-                              ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  AppLocalizations.of(context)!.addTasks,
+                                  style: TextStyle(
+                                    color: colors.onSurface.withOpacity(0.5),
+                                    fontSize: 16,
+                                    height: 1.4,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 140)),
+                      ),
                     ],
-                  ),
+                  );
+                }
+
+                final docs = snapshot.data!.docs;
+                final pendingTasks = <Task>[];
+                final completedTasks = <Task>[];
+
+                for (var doc in docs) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final task = Task(
+                    id: doc.id,
+                    title: data['title'] ?? 'Tarefa sem título',
+                    completed: data['completed'] ?? false,
+                    dateTime: (data['dateTime'] as Timestamp).toDate(),
+                  );
+                  if (task.completed) {
+                    completedTasks.add(task);
+                  } else {
+                    pendingTasks.add(task);
+                  }
+                }
+                pendingTasks.sort((a, b) => a.dateTime!.compareTo(b.dateTime!));
+                completedTasks.sort(
+                  (a, b) => b.dateTime!.compareTo(a.dateTime!),
+                );
+
+                return CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: SizedBox(height: kToolbarHeight + 40),
+                    ),
+                    if (pendingTasks.isNotEmpty)
+                      SliverToBoxAdapter(
+                        child: _buildSectionHeader(appLocalizations.pendants),
+                      ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (_, index) => buildTaskItem(pendingTasks[index], true),
+                        childCount: pendingTasks.length,
+                      ),
+                    ),
+                    if (completedTasks.isNotEmpty)
+                      SliverToBoxAdapter(
+                        child: _buildSectionHeader(appLocalizations.completed),
+                      ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (_, index) =>
+                            buildTaskItem(completedTasks[index], false),
+                        childCount: completedTasks.length,
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 140)),
+                  ],
+                );
+              },
+            ),
             Positioned(
               right: 20,
               bottom: fabBottomMargin,

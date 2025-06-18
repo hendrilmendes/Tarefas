@@ -144,8 +144,8 @@ class _LoginScreenState extends State<LoginScreen>
                       position: _createAnimation(
                         const Offset(0, 0.5),
                         Offset.zero,
-                        0.2,
-                        0.5,
+                        0.4,
+                        0.6,
                       ),
                       child: Text(
                         localizations.appName,
@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen>
                       position: _createAnimation(
                         const Offset(0, 0.5),
                         Offset.zero,
-                        0.3,
+                        0.4,
                         0.6,
                       ),
                       child: Text(
@@ -190,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen>
                         const Offset(0, 0.5),
                         Offset.zero,
                         0.4,
-                        0.7,
+                        0.6,
                       ),
                       child: Text(
                         localizations.welcomeMessageSub,
@@ -211,8 +211,8 @@ class _LoginScreenState extends State<LoginScreen>
                       position: _createAnimation(
                         const Offset(0, 0.5),
                         Offset.zero,
-                        0.5,
-                        0.5,
+                        0.4,
+                        0.6,
                       ),
                       child: _buildActionSheet(context, colors),
                     ),
@@ -228,10 +228,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   Widget _buildActionSheet(BuildContext context, ColorScheme colors) {
     return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(24),
-        topRight: Radius.circular(24),
-      ),
+      borderRadius: BorderRadius.circular(20.0),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(

@@ -124,7 +124,7 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
                 ),
                 Expanded(
                   child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 30),
+                    duration: const Duration(milliseconds: 50),
                     child: Container(
                       key: ValueKey<int>(_currentIndex),
                       child: _screens[_currentIndex],
@@ -191,7 +191,7 @@ class GlassNavBar extends StatefulWidget {
 }
 
 class _GlassNavBarState extends State<GlassNavBar> {
-  final Duration _animationDuration = const Duration(milliseconds: 30);
+  final Duration _animationDuration = const Duration(milliseconds: 50);
   final Curve _animationCurve = Curves.easeInOutQuart;
 
   @override
@@ -201,7 +201,7 @@ class _GlassNavBarState extends State<GlassNavBar> {
     final unselectedColor = theme.colorScheme.onSurface.withOpacity(0.7);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100.0),
         child: BackdropFilter(
@@ -209,7 +209,7 @@ class _GlassNavBarState extends State<GlassNavBar> {
           child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 16.0,
-              vertical: 10.0,
+              vertical: 4.0,
             ),
             decoration: BoxDecoration(
               color: theme.cardColor.withOpacity(0.2),
@@ -246,16 +246,12 @@ class _GlassNavBarState extends State<GlassNavBar> {
                     duration: _animationDuration,
                     curve: _animationCurve,
                     padding: EdgeInsets.symmetric(
-                      horizontal: isSelected
-                          ? 20.0
-                          : 12.0, // Aumenta o padding horizontal ao selecionar
+                      horizontal: isSelected ? 20.0 : 12.0,
                       vertical: 8.0,
                     ),
                     decoration: isSelected
                         ? BoxDecoration(
-                            color: selectedColor.withOpacity(
-                              0.2,
-                            ), // Fundo suave para o item selecionado
+                            color: selectedColor.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(100.0),
                             boxShadow: [
                               BoxShadow(
@@ -265,18 +261,15 @@ class _GlassNavBarState extends State<GlassNavBar> {
                               ),
                             ],
                           )
-                        : null, // Sem decoração quando não selecionado
+                        : null,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           item.icon,
                           color: isSelected ? selectedColor : unselectedColor,
-                          size: isSelected
-                              ? 28.0
-                              : 24.0, // Animação de tamanho do ícone
+                          size: isSelected ? 28.0 : 24.0,
                         ),
-                        // Animação de Fade e Escala para o texto
                         AnimatedOpacity(
                           opacity: isSelected ? 1.0 : 0.0,
                           duration: _animationDuration,
@@ -297,7 +290,7 @@ class _GlassNavBarState extends State<GlassNavBar> {
                                       ),
                                     ),
                                   )
-                                : const SizedBox.shrink(), // Oculta o texto quando não selecionado
+                                : const SizedBox.shrink(),
                           ),
                         ),
                       ],

@@ -258,13 +258,11 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
         child: SafeArea(
           child: Stack(
             children: [
-              // Main Content
               SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 120.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    // Note Content Section
                     Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       child: Text(
@@ -362,27 +360,30 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
                   ],
                 ),
               ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: GlassNavBar(
+                  selectedIndex: _selectedAction,
+                  onItemSelected: _onActionSelected,
+                  items: [
+                    GlassNavBarItem(
+                      icon: CupertinoIcons.delete,
+                      label: AppLocalizations.of(context)!.delete,
+                    ),
+                    GlassNavBarItem(
+                      icon: CupertinoIcons.checkmark_alt_circle,
+                      label: AppLocalizations.of(context)!.save,
+                    ),
+                    GlassNavBarItem(
+                      icon: CupertinoIcons.share,
+                      label: AppLocalizations.of(context)!.share,
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: GlassNavBar(
-        selectedIndex: _selectedAction,
-        onItemSelected: _onActionSelected,
-        items: [
-          GlassNavBarItem(
-            icon: CupertinoIcons.delete,
-            label: AppLocalizations.of(context)!.delete,
-          ),
-          GlassNavBarItem(
-            icon: CupertinoIcons.checkmark_alt_circle,
-            label: AppLocalizations.of(context)!.save,
-          ),
-          GlassNavBarItem(
-            icon: CupertinoIcons.share,
-            label: AppLocalizations.of(context)!.share,
-          ),
-        ],
       ),
     );
   }
@@ -421,7 +422,6 @@ class GlassNavBarItem {
   GlassNavBarItem({required this.icon, required this.label});
 }
 
-// Widget da Barra de Navegação Flutuante com Efeito de Vidro e Animação
 class GlassNavBar extends StatefulWidget {
   final int selectedIndex;
   final Function(int) onItemSelected;

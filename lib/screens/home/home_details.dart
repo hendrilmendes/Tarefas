@@ -332,205 +332,211 @@ class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 120),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                const SizedBox(height: 20),
-
-                // Task Title Section
-                Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    AppLocalizations.of(context)!.inputTask,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: colors.onSurface.withOpacity(0.7),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.15),
-                          width: 0.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        controller: _controller,
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 120.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        AppLocalizations.of(context)!.inputTask,
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: colors.onSurface,
-                          height: 1.4,
-                        ),
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(20),
-                          hintText: AppLocalizations.of(context)!.inputTask,
-                          hintStyle: TextStyle(
-                            color: colors.onSurface.withOpacity(0.5),
-                            fontWeight: FontWeight.w400,
-                          ),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: colors.onSurface.withOpacity(0.7),
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Date Time Section
-                Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    AppLocalizations.of(context)!.dateTime,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: colors.onSurface.withOpacity(0.7),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.15),
-                          width: 0.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.15),
+                              width: 0.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () async {
-                            final selectedDate = await showDatePicker(
-                              context: context,
-                              initialDate: _selectedDateTime ?? DateTime.now(),
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime(2100),
-                            );
-                            if (selectedDate != null) {
-                              if (!mounted) return;
-                              final selectedTime = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.fromDateTime(
-                                  _selectedDateTime ?? DateTime.now(),
-                                ),
-                              );
-                              if (selectedTime != null) {
-                                setState(() {
-                                  _selectedDateTime = DateTime(
-                                    selectedDate.year,
-                                    selectedDate.month,
-                                    selectedDate.day,
-                                    selectedTime.hour,
-                                    selectedTime.minute,
-                                  );
-                                });
-                              }
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: colors.primary.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Icon(
-                                    Icons.schedule_outlined,
-                                    size: 20,
-                                    color: colors.primary,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Text(
-                                    _selectedDateTime != null
-                                        ? DateFormat(
-                                            'dd/MM/yyyy • HH:mm',
-                                          ).format(_selectedDateTime!)
-                                        : AppLocalizations.of(
-                                            context,
-                                          )!.dateTime,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: _selectedDateTime != null
-                                          ? colors.onSurface
-                                          : colors.onSurface.withOpacity(0.6),
-                                    ),
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: colors.onSurface.withOpacity(0.4),
-                                ),
-                              ],
+                          child: TextField(
+                            controller: _controller,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: colors.onSurface,
+                              height: 1.4,
+                            ),
+                            maxLines: null,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.all(20),
+                              hintText: AppLocalizations.of(context)!.inputTask,
+                              hintStyle: TextStyle(
+                                color: colors.onSurface.withOpacity(0.5),
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+
+                    const SizedBox(height: 24),
+
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        AppLocalizations.of(context)!.dateTime,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: colors.onSurface.withOpacity(0.7),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.15),
+                              width: 0.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () async {
+                                final selectedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate:
+                                      _selectedDateTime ?? DateTime.now(),
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime(2100),
+                                );
+                                if (selectedDate != null) {
+                                  if (!mounted) return;
+                                  final selectedTime = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.fromDateTime(
+                                      _selectedDateTime ?? DateTime.now(),
+                                    ),
+                                  );
+                                  if (selectedTime != null) {
+                                    setState(() {
+                                      _selectedDateTime = DateTime(
+                                        selectedDate.year,
+                                        selectedDate.month,
+                                        selectedDate.day,
+                                        selectedTime.hour,
+                                        selectedTime.minute,
+                                      );
+                                    });
+                                  }
+                                }
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: colors.primary.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        Icons.schedule_outlined,
+                                        size: 20,
+                                        color: colors.primary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Text(
+                                        _selectedDateTime != null
+                                            ? DateFormat(
+                                                'dd/MM/yyyy • HH:mm',
+                                              ).format(_selectedDateTime!)
+                                            : AppLocalizations.of(
+                                                context,
+                                              )!.dateTime,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: _selectedDateTime != null
+                                              ? colors.onSurface
+                                              : colors.onSurface.withOpacity(
+                                                  0.6,
+                                                ),
+                                        ),
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.chevron_right,
+                                      color: colors.onSurface.withOpacity(0.4),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: GlassNavBar(
+                  selectedIndex: _selectedAction,
+                  onItemSelected: _onActionSelected,
+                  items: [
+                    GlassNavBarItem(
+                      icon: CupertinoIcons.delete,
+                      label: AppLocalizations.of(context)!.delete,
+                    ),
+                    GlassNavBarItem(
+                      icon: CupertinoIcons.checkmark_alt_circle,
+                      label: AppLocalizations.of(context)!.save,
+                    ),
+                    GlassNavBarItem(
+                      icon: CupertinoIcons.share,
+                      label: AppLocalizations.of(context)!.share,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-      ),
-      bottomNavigationBar: GlassNavBar(
-        selectedIndex: _selectedAction,
-        onItemSelected: _onActionSelected,
-        items: [
-          GlassNavBarItem(
-            icon: CupertinoIcons.delete,
-            label: AppLocalizations.of(context)!.delete,
-          ),
-          GlassNavBarItem(
-            icon: CupertinoIcons.checkmark_alt_circle,
-            label: AppLocalizations.of(context)!.save,
-          ),
-          GlassNavBarItem(
-            icon: CupertinoIcons.share,
-            label: AppLocalizations.of(context)!.share,
-          ),
-        ],
       ),
     );
   }
