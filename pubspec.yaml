@@ -2,7 +2,7 @@ name: tarefas
 description: "Um app para você salvar suas tarefas e anotações do dia a dia"
 publish_to: 'none'
 
-version: 3.0.0+20250618
+version: 3.0.0+20250619
 
 environment:
   sdk: ^3.8.0
