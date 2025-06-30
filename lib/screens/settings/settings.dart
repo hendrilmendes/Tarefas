@@ -443,7 +443,6 @@ class _SettingsScreenState extends State<SettingsScreen>
             SettingsItem(
               icon: CupertinoIcons.info_circle_fill,
               title: AppLocalizations.of(context)!.about,
-              subtitle: AppLocalizations.of(context)!.supportSub,
               onTap: () {
                 _showAbout(context);
               },
