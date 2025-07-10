@@ -170,10 +170,10 @@
     "@welcomeMessageTitle": {},
     "welcomeMessageSub": "alcance seus objetivos.",
     "@welcomeMessageSub": {},
-     "logout": "Sair",
+    "logout": "Sair",
     "@logout": {},
     "logoutConfirm": "Desconectar",
     "@logoutConfirm": {},
-     "logoutConfirmSub": "Você tem certeza que quer desconectar do app?",
+    "logoutConfirmSub": "Você tem certeza que quer desconectar do app?",
     "@logoutConfirmSub": {}
 }
