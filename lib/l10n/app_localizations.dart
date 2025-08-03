@@ -475,7 +475,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationSub.
   ///
   /// In pt, this message translates to:
-  /// **'Serão enviadas notificações sobre suas tarefas'**
+  /// **'Notificações sobre suas tarefas'**
   String get notificationSub;
 
   /// No description provided for @confirmDeleteTask.

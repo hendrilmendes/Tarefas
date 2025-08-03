@@ -1,58 +1,54 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  bool _isGoogleSignInInitialized = false;
+
+  Future<void> _initializeGoogleSignIn() async {
+    try {
+      await _googleSignIn.initialize();
+      _isGoogleSignInInitialized = true;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Falha ao inicializar o Google Sign-In: $e');
+      }
+    }
+  }
+
+  Future<void> _ensureGoogleSignInInitialized() async {
+    if (!_isGoogleSignInInitialized) {
+      await _initializeGoogleSignIn();
+    }
+  }
 
   // Função para autenticação com Google
-  Future<User?> signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle() async {
+    await _ensureGoogleSignInInitialized();
     try {
-      // Verificação de conectividade
-      final connectivityResults = await Connectivity().checkConnectivity();
-      if (connectivityResults.contains(ConnectivityResult.none)) {
-        if (kDebugMode) print("Sem conexão com a internet");
-        return null;
-      }
+      final GoogleSignInAccount googleSignInAccount = await _googleSignIn
+          .authenticate();
 
-      // Realizar login com Google
-      final GoogleSignInAccount? googleSignInAccount = await _googleSignIn
-          .signIn();
-      if (googleSignInAccount == null) {
-        if (kDebugMode) print("Login cancelado pelo usuário.");
-        return null;
-      }
-
-      // Autenticação no Firebase com as credenciais do Google
       final GoogleSignInAuthentication googleAuth =
-          await googleSignInAccount.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+          googleSignInAccount.authentication;
+      final idToken = googleAuth.idToken;
 
-      final UserCredential authResult = await _auth.signInWithCredential(
-        credential,
-      );
-      final User? user = authResult.user;
-
-      if (user != null) {
-        if (kDebugMode) {
-          print('Usuário autenticado com sucesso: ${user.displayName}');
-        }
-      } else {
-        if (kDebugMode) print('Erro: Autenticação retornou usuário nulo.');
+      if (idToken == null) {
+        throw Exception('Não foi possível obter o token de ID do Google.');
       }
 
-      return user;
-    } on FirebaseAuthException catch (e) {
-      if (kDebugMode) print('Erro do Firebase na autenticação: ${e.message}');
-      return null;
-    } on Exception catch (e) {
-      if (kDebugMode) print('Erro desconhecido na autenticação: $e');
-      return null;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.idToken,
+        idToken: idToken,
+      );
+
+      return await _auth.signInWithCredential(credential);
+    } catch (e) {
+      if (kDebugMode) print('Erro na autenticação com Google: $e');
+      await signOut();
+      rethrow;
     }
   }
 

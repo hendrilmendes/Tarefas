@@ -157,7 +157,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                               CupertinoSlidingSegmentedControl<ThemeModeType>(
                                 backgroundColor: colors.surface.withOpacity(
                                   0.4,
-                                ), // Cor de fundo mais integrada
+                                ),
                                 thumbColor: colors.primary,
                                 groupValue: themeModel.themeMode,
                                 onValueChanged: (ThemeModeType? newValue) {

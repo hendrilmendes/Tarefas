@@ -292,7 +292,6 @@ class _SettingsScreenState extends State<SettingsScreen>
                 context,
                 icon: CupertinoIcons.bell_fill,
                 title: AppLocalizations.of(context)!.notification,
-                subtitle: AppLocalizations.of(context)!.notificationSub,
                 color: Theme.of(context).colorScheme.secondary,
                 onTap: () {
                   AppSettings.openAppSettings(
@@ -311,7 +310,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     BuildContext context, {
     required IconData icon,
     required String title,
-    required String subtitle,
+    String? subtitle,
     required Color color,
     required VoidCallback onTap,
   }) {
@@ -366,20 +365,22 @@ class _SettingsScreenState extends State<SettingsScreen>
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 1),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withOpacity(0.6),
-                      fontWeight: FontWeight.w500,
-                      height: 1.2,
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 1),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
+                        fontWeight: FontWeight.w500,
+                        height: 1.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  ],
                 ],
               ),
             ),

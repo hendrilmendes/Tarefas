@@ -201,8 +201,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get notification => 'Notificações';
 
   @override
-  String get notificationSub =>
-      'Serão enviadas notificações sobre suas tarefas';
+  String get notificationSub => 'Notificações sobre suas tarefas';
 
   @override
   String get confirmDeleteTask => 'Deseja realmente apagar a tarefa?';

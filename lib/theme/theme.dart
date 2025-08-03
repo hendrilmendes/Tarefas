@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -5,8 +7,10 @@ enum ThemeModeType { light, dark, system }
 
 class ThemeModel extends ChangeNotifier {
   bool _isDarkMode = true;
-  bool _isDynamicColorsEnabled = true;
-  ThemeModeType _themeMode = ThemeModeType.light;
+  bool _isDynamicColorsEnabled = false;
+  ThemeModeType _themeMode = ThemeModeType.system;
+
+  bool _isAndroid12OrHigher = false;
 
   final List<MaterialColor> availableAccentColors = [
     Colors.amber,
@@ -27,18 +31,15 @@ class ThemeModel extends ChangeNotifier {
   static const String darkModeKey = 'darkModeEnabled';
   static const String dynamicColorsKey = 'dynamicColorsEnabled';
   static const String themeModeKey = 'themeMode';
-
   static const String primaryColorKey = 'primaryColorIndex';
 
   ThemeModel() {
     _primaryColor = availableAccentColors[1];
-    _loadThemePreference();
   }
 
   bool get isDarkMode => _isDarkMode;
   bool get isDynamicColorsEnabled => _isDynamicColorsEnabled;
   ThemeModeType get themeMode => _themeMode;
-
   MaterialColor get primaryColor => _primaryColor;
 
   void toggleDarkMode() {
@@ -48,9 +49,11 @@ class ThemeModel extends ChangeNotifier {
   }
 
   void toggleDynamicColors() {
-    _isDynamicColorsEnabled = !_isDynamicColorsEnabled;
-    _savePreference(dynamicColorsKey, _isDynamicColorsEnabled);
-    notifyListeners();
+    if (_isAndroid12OrHigher) {
+      _isDynamicColorsEnabled = !_isDynamicColorsEnabled;
+      _savePreference(dynamicColorsKey, _isDynamicColorsEnabled);
+      notifyListeners();
+    }
   }
 
   void changeThemeMode(ThemeModeType mode) {
@@ -66,11 +69,18 @@ class ThemeModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _loadThemePreference() async {
+  Future<void> initialize() async {
+    if (Platform.isAndroid) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      _isAndroid12OrHigher = androidInfo.version.sdkInt >= 31;
+    }
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    final userPrefersDynamic = prefs.getBool(dynamicColorsKey) ?? false;
+    _isDynamicColorsEnabled = userPrefersDynamic && _isAndroid12OrHigher;
+
     _isDarkMode = prefs.getBool(darkModeKey) ?? true;
-    _isDynamicColorsEnabled = prefs.getBool(dynamicColorsKey) ?? true;
     _themeMode = _getSavedThemeMode(prefs.getString(themeModeKey));
 
     int colorIndex = prefs.getInt(primaryColorKey) ?? 1;

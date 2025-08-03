@@ -126,7 +126,7 @@
     "@inputNoteError": {},
     "notification": "Notificações",
     "@notification": {},
-    "notificationSub": "Serão enviadas notificações sobre suas tarefas",
+    "notificationSub": "Notificações sobre suas tarefas",
     "@notificationSub": {},
     "confirmDeleteTask": "Deseja realmente apagar a tarefa?",
     "@confirmDeleteTask": {},
