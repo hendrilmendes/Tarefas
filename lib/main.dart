@@ -24,6 +24,9 @@ import 'package:wiredash/wiredash.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final themeModel = ThemeModel();
+  await themeModel.initialize();
+
   // Inicialização do Firebase e Crashlytics
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -71,7 +74,7 @@ void main() async {
   // Inicialização do fuso horário
   tz.initializeTimeZones();
 
-  runApp(MyApp());
+  runApp(MyApp(themeModel: themeModel));
 }
 
 ThemeMode _getThemeMode(ThemeModeType mode) {
@@ -86,34 +89,35 @@ ThemeMode _getThemeMode(ThemeModeType mode) {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeModel themeModel;
+  const MyApp({super.key, required this.themeModel});
 
   static final AuthService authService = AuthService();
   static bool _updateChecked = false;
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ThemeModel(),
+    return ChangeNotifierProvider.value(
+      value: themeModel,
       child: Consumer<ThemeModel>(
-        builder: (_, themeModel, _) {
+        builder: (_, currentThemeModel, _) {
           return DynamicColorBuilder(
             builder: (lightDynamic, darkDynamic) {
               ColorScheme lightColorScheme;
               ColorScheme darkColorScheme;
 
-              if (themeModel.isDynamicColorsEnabled &&
+              if (currentThemeModel.isDynamicColorsEnabled &&
                   lightDynamic != null &&
                   darkDynamic != null) {
                 lightColorScheme = lightDynamic;
                 darkColorScheme = darkDynamic;
               } else {
                 lightColorScheme = ColorScheme.fromSeed(
-                  seedColor: themeModel.primaryColor,
+                  seedColor: currentThemeModel.primaryColor,
                   brightness: Brightness.light,
                 );
                 darkColorScheme = ColorScheme.fromSeed(
-                  seedColor: themeModel.primaryColor,
+                  seedColor: currentThemeModel.primaryColor,
                   brightness: Brightness.dark,
                 );
               }
@@ -138,7 +142,7 @@ class MyApp extends StatelessWidget {
                     ),
                   ),
 
-                  themeMode: _getThemeMode(themeModel.themeMode),
+                  themeMode: _getThemeMode(currentThemeModel.themeMode),
                   debugShowCheckedModeBanner: false,
                   localizationsDelegates:
                       AppLocalizations.localizationsDelegates,

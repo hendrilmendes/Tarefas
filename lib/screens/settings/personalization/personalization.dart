@@ -1,8 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:io';
 import 'dart:ui';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
@@ -17,33 +15,6 @@ class PersonalizationScreen extends StatefulWidget {
 }
 
 class _PersonalizationScreenState extends State<PersonalizationScreen> {
-  bool _isAndroid12 = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkAndroidVersion();
-  }
-
-  Future<void> _checkAndroidVersion() async {
-    if (Platform.isAndroid) {
-      try {
-        final deviceInfo = DeviceInfoPlugin();
-        final androidInfo = await deviceInfo.androidInfo;
-        if (mounted) {
-          setState(() {
-            _isAndroid12 = androidInfo.version.sdkInt >= 31;
-          });
-        }
-      } catch (e) {
-        if (mounted) {
-          setState(() {
-            _isAndroid12 = false;
-          });
-        }
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +169,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                     context,
                     child: Column(
                       children: [
-                        if (_isAndroid12)
+                       if (themeModel.supportsDynamicColor)
                           SwitchListTile(
                             title: Text(
                               localizations.dynamicColors,
@@ -230,7 +201,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                               8,
                             ),
                           ),
-                        if (_isAndroid12)
+                       if (themeModel.supportsDynamicColor)
                           const Divider(height: 1, indent: 16, endIndent: 16),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),

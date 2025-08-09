@@ -12,6 +12,8 @@ class ThemeModel extends ChangeNotifier {
 
   bool _isAndroid12OrHigher = false;
 
+  bool get supportsDynamicColor => _isAndroid12OrHigher;
+
   final List<MaterialColor> availableAccentColors = [
     Colors.amber,
     Colors.blue,
