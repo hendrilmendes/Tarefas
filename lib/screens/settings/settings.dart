@@ -7,8 +7,6 @@ import 'package:app_settings/app_settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:in_app_review/in_app_review.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tarefas/auth/auth.dart';
@@ -426,14 +424,6 @@ class _SettingsScreenState extends State<SettingsScreen>
           title: AppLocalizations.of(context)!.support,
           items: [
             SettingsItem(
-              icon: CupertinoIcons.star_fill,
-              title: AppLocalizations.of(context)!.review,
-              subtitle: AppLocalizations.of(context)!.reviewSub,
-              onTap: () {
-                _showRateApp(context);
-              },
-            ),
-            SettingsItem(
               icon: CupertinoIcons.chat_bubble_2_fill,
               title: AppLocalizations.of(context)!.support,
               subtitle: AppLocalizations.of(context)!.supportSub,
@@ -673,28 +663,6 @@ class _SettingsScreenState extends State<SettingsScreen>
       context,
       MaterialPageRoute(builder: (context) => const PersonalizationScreen()),
     );
-  }
-
-  Future<void> _showRateApp(BuildContext context) async {
-    final InAppReview inAppReview = InAppReview.instance;
-
-    if (await inAppReview.isAvailable()) {
-      final hasReviewed = await checkReviewed();
-      if (hasReviewed) {
-        Fluttertoast.showToast(
-          // ignore: use_build_context_synchronously
-          msg: AppLocalizations.of(context)!.alreadyReviewed,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.grey[700],
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      } else {
-        inAppReview.requestReview();
-        await markReviewed();
-      }
-    }
   }
 
   void _showAbout(BuildContext context) {
