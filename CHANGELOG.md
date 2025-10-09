@@ -7,6 +7,7 @@ Changelog Tarefas
 ### Correções
 
 - Correções no código
+- Corrigido bug na rolagem na tela de tarefas
 
 ======================================================
 

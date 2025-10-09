@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -32,16 +33,12 @@ class _HomeScreenState extends State<HomeScreen>
   late AnimationController _fabAnimationController;
   late Animation<double> _fabAnimation;
   late Animation<Offset> _fabSlideAnimation;
-  bool _isFabVisible = true;
-  double _lastScrollPosition = 0;
 
   @override
   void initState() {
     super.initState();
 
     _scrollController = ScrollController();
-
-    _scrollController.addListener(_onScroll);
 
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 200),
@@ -67,47 +64,25 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _fabAnimationController.dispose();
     super.dispose();
   }
 
-  void _onScroll() {
-    final currentScrollPosition = _scrollController.position.pixels;
-    final scrollDelta = currentScrollPosition - _lastScrollPosition;
-
-    if (scrollDelta.abs() > 5) {
-      if (scrollDelta > 0 && _isFabVisible) {
-        _hideFab();
-      } else if (scrollDelta < 0 && !_isFabVisible) {
-        _showFab();
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification is UserScrollNotification) {
+      final ScrollDirection direction = notification.direction;
+      if (direction == ScrollDirection.reverse) {
+        if (_fabAnimationController.isCompleted) {
+          _fabAnimationController.reverse();
+        }
+      } else if (direction == ScrollDirection.forward) {
+        if (_fabAnimationController.isDismissed) {
+          _fabAnimationController.forward();
+        }
       }
     }
-
-    _lastScrollPosition = currentScrollPosition;
-  }
-
-  void _showFab() {
-    if (!_isFabVisible) {
-      if (mounted) {
-        setState(() {
-          _isFabVisible = true;
-        });
-      }
-      _fabAnimationController.forward();
-    }
-  }
-
-  void _hideFab() {
-    if (_isFabVisible) {
-      if (mounted) {
-        setState(() {
-          _isFabVisible = false;
-        });
-      }
-      _fabAnimationController.reverse();
-    }
+    return false;
   }
 
   void _checkUser() async {
@@ -333,14 +308,6 @@ class _HomeScreenState extends State<HomeScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Falha ao atualizar a tarefa. Tente novamente.'),
-          ),
-        );
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
             content: Text('Falha ao atualizar a tarefa. Tente novamente.'),
           ),
         );
@@ -647,35 +614,41 @@ class _HomeScreenState extends State<HomeScreen>
                   (a, b) => b.dateTime!.compareTo(a.dateTime!),
                 );
 
-                return CustomScrollView(
-                  controller: _scrollController,
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: SizedBox(height: kToolbarHeight + 40),
-                    ),
-                    if (pendingTasks.isNotEmpty)
+                return NotificationListener<ScrollNotification>(
+                  onNotification: _onScrollNotification,
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    slivers: [
                       SliverToBoxAdapter(
-                        child: _buildSectionHeader(appLocalizations.pendants),
+                        child: SizedBox(height: kToolbarHeight + 40),
                       ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (_, index) => buildTaskItem(pendingTasks[index], true),
-                        childCount: pendingTasks.length,
+                      if (pendingTasks.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: _buildSectionHeader(appLocalizations.pendants),
+                        ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (_, index) =>
+                              buildTaskItem(pendingTasks[index], true),
+                          childCount: pendingTasks.length,
+                        ),
                       ),
-                    ),
-                    if (completedTasks.isNotEmpty)
-                      SliverToBoxAdapter(
-                        child: _buildSectionHeader(appLocalizations.completed),
+                      if (completedTasks.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: _buildSectionHeader(
+                            appLocalizations.completed,
+                          ),
+                        ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (_, index) =>
+                              buildTaskItem(completedTasks[index], false),
+                          childCount: completedTasks.length,
+                        ),
                       ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (_, index) =>
-                            buildTaskItem(completedTasks[index], false),
-                        childCount: completedTasks.length,
-                      ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 140)),
-                  ],
+                      const SliverToBoxAdapter(child: SizedBox(height: 140)),
+                    ],
+                  ),
                 );
               },
             ),
