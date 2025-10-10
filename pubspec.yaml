@@ -2,7 +2,7 @@ name: tarefas
 description: "Um app para você salvar suas tarefas e anotações do dia a dia"
 publish_to: 'none'
 
-version: 3.0.2+20250827
+version: 3.0.4+20251010
 
 environment:
   sdk: ^3.8.0
@@ -15,7 +15,7 @@ dependencies:
   app_settings: ^6.1.1
 
 # Connectivity Plus
-  connectivity_plus: ^6.1.4
+  connectivity_plus: ^7.0.0
 
 # Cupertino Icons  
   cupertino_icons: ^1.0.8
@@ -24,27 +24,24 @@ dependencies:
   device_info_plus: ^11.5.0
 
 # Disable Battery Optimization
-  disable_battery_optimization:
-      git:
-        url: https://github.com/adeeteya/Disable-Battery-Optimizations.git
-        ref: fe575d9
+  disable_battery_optimization: ^1.1.2
 
 # Dynamic Colors
   dynamic_color: ^1.8.1
   
 # Firebase
-  cloud_firestore: ^6.0.0
-  firebase_auth: ^6.0.0
-  firebase_core: ^4.0.0
-  firebase_crashlytics: ^5.0.0
-  firebase_performance: ^0.11.0
+  cloud_firestore: ^6.0.2
+  firebase_auth: ^6.1.0
+  firebase_core: ^4.1.1
+  firebase_crashlytics: ^5.0.2
+  firebase_performance: ^0.11.1
 
 # Flutter Local Notifications
-  flutter_local_notifications: ^19.3.0
+  flutter_local_notifications: ^19.4.2
 
 # Google
-  google_fonts: ^6.3.0
-  google_sign_in: ^7.1.1
+  google_fonts: ^6.3.2
+  google_sign_in: ^7.2.0
 
 # HTTP
   http: ^1.4.0
@@ -62,13 +59,13 @@ dependencies:
   provider: ^6.1.5
 
 # Share Plus
-  share_plus: ^11.0.0
+  share_plus: ^12.0.0
 
 # Shared Preferences
   shared_preferences: ^2.5.3
 
 # Shorebird
-  shorebird_code_push: ^2.0.4
+  shorebird_code_push: ^2.0.5
 
 # Timezone
   timezone: ^0.10.1

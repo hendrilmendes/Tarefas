@@ -277,7 +277,7 @@ abstract class AppLocalizations {
   /// No description provided for @openSourceSub.
   ///
   /// In pt, this message translates to:
-  /// **'Softwares de terceiros usados na construção do app'**
+  /// **'Softwares de terceiros usados no app'**
   String get openSourceSub;
 
   /// No description provided for @interface.

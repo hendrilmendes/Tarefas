@@ -100,8 +100,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get openSource => 'Licenças de Código Aberto';
 
   @override
-  String get openSourceSub =>
-      'Softwares de terceiros usados na construção do app';
+  String get openSourceSub => 'Softwares de terceiros usados no app';
 
   @override
   String get interface => 'Interface';
