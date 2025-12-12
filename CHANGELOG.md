@@ -1,5 +1,11 @@
 Changelog Tarefas
 
+## [3.0.6](https://github.com/hendrilmendes/Tarefas/compare/3.0.2..3.0.6) (12-12-2025)
+
+### Correções
+
+- Atualizado dependencias
+
 ======================================================
 
 ## [3.0.4](https://github.com/hendrilmendes/Tarefas/compare/3.0.1..3.0.2) (10-10-2025)
