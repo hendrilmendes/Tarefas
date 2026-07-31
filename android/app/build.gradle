@@ -33,7 +33,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace "com.github.hendrilmendes.tarefas"
     compileSdk 36
-    ndkVersion = "29.0.14033849"
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -51,7 +51,7 @@ android {
 
     defaultConfig {
         applicationId "com.github.hendrilmendes.tarefas"
-        minSdkVersion 26
+        minSdkVersion flutter.minSdkVersion
         targetSdk 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
