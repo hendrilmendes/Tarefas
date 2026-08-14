@@ -2,7 +2,7 @@ name: tarefas
 description: "Um app para você salvar suas tarefas e anotações do dia a dia"
 publish_to: 'none'
 
-version: 3.0.10+20260731
+version: 3.0.20+20260814
 
 environment:
   sdk: ^3.12.0
@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
 
 # App Settings
-  app_settings: ^7.0.0
+  app_settings: ^8.0.3
 
 # Connectivity Plus
   connectivity_plus: ^7.0.0
@@ -21,7 +21,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
 # Device Plus
-  device_info_plus: ^12.3.0
+  device_info_plus: ^13.2.0
 
 # Disable Battery Optimization
   disable_battery_optimization: ^1.1.2
@@ -50,7 +50,7 @@ dependencies:
   intl: ^0.20.0
 
 # Package Info
-  package_info_plus: ^9.0.0
+  package_info_plus: ^10.2.1
 
 # Path Provider
   path_provider: ^2.1.5
@@ -59,7 +59,7 @@ dependencies:
   provider: ^6.1.5
 
 # Share Plus
-  share_plus: ^12.0.0
+  share_plus: ^13.3.0
 
 # Shared Preferences
   shared_preferences: ^2.5.3
