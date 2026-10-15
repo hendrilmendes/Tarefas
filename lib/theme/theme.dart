@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum ThemeModeType { light, dark, system }
@@ -11,6 +11,7 @@ class ThemeModel extends ChangeNotifier {
   ThemeModeType _themeMode = ThemeModeType.system;
 
   bool _isAndroid12OrHigher = false;
+  Locale? _locale;
 
   bool get supportsDynamicColor => _isAndroid12OrHigher;
 
@@ -34,6 +35,7 @@ class ThemeModel extends ChangeNotifier {
   static const String dynamicColorsKey = 'dynamicColorsEnabled';
   static const String themeModeKey = 'themeMode';
   static const String primaryColorKey = 'primaryColorIndex';
+  static const String localeKey = 'appLocale';
 
   ThemeModel() {
     _primaryColor = availableAccentColors[1];
@@ -42,6 +44,7 @@ class ThemeModel extends ChangeNotifier {
   bool get isDarkMode => _isDarkMode;
   bool get isDynamicColorsEnabled => _isDynamicColorsEnabled;
   ThemeModeType get themeMode => _themeMode;
+  Locale? get locale => _locale;
   MaterialColor get primaryColor => _primaryColor;
 
   void toggleDarkMode() {
@@ -64,6 +67,17 @@ class ThemeModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setLocale(Locale? locale) async {
+    _locale = locale;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (locale == null) {
+      await prefs.remove(localeKey);
+    } else {
+      await prefs.setString(localeKey, locale.languageCode);
+    }
+  }
+
   void setPrimaryColor(MaterialColor color) {
     _primaryColor = color;
     int colorIndex = availableAccentColors.indexOf(color);
@@ -84,6 +98,9 @@ class ThemeModel extends ChangeNotifier {
 
     _isDarkMode = prefs.getBool(darkModeKey) ?? true;
     _themeMode = _getSavedThemeMode(prefs.getString(themeModeKey));
+
+    final savedLocale = prefs.getString(localeKey);
+    _locale = savedLocale != null ? Locale(savedLocale) : null;
 
     int colorIndex = prefs.getInt(primaryColorKey) ?? 1;
     if (colorIndex >= 0 && colorIndex < availableAccentColors.length) {

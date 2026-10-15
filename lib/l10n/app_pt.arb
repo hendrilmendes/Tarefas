@@ -175,5 +175,459 @@
     "logoutConfirm": "Desconectar",
     "@logoutConfirm": {},
     "logoutConfirmSub": "Você tem certeza que quer desconectar do app?",
-    "@logoutConfirmSub": {}
+    "@logoutConfirmSub": {},
+    "greetingNight": "Boa madrugada",
+    "@greetingNight": {},
+    "greetingMorning": "Bom dia",
+    "@greetingMorning": {},
+    "greetingAfternoon": "Boa tarde",
+    "@greetingAfternoon": {},
+    "greetingEvening": "Boa noite",
+    "@greetingEvening": {},
+    "greetingWithName": "{greeting}, {name} 👋",
+    "@greetingWithName": {
+        "placeholders": {
+            "greeting": {
+                "type": "String"
+            },
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "you": "você",
+    "@you": {},
+    "briefingEmpty": "Você está com a agenda livre. Que tal planejar o dia em 3 metas?",
+    "@briefingEmpty": {},
+    "briefingOverdueToday": "Você tem {overdue, plural, =1{1 atrasada} other{{overdue} atrasadas}} e {today} para hoje. Vamos limpar as atrasadas primeiro.",
+    "@briefingOverdueToday": {
+        "placeholders": {
+            "overdue": {
+                "type": "int"
+            },
+            "today": {
+                "type": "int"
+            }
+        }
+    },
+    "briefingOverdue": "Você tem {overdue, plural, =1{1 tarefa atrasada} other{{overdue} tarefas atrasadas}}. Recomendo reagendar ou concluir agora.",
+    "@briefingOverdue": {
+        "placeholders": {
+            "overdue": {
+                "type": "int"
+            }
+        }
+    },
+    "briefingToday": "Hoje você tem {today, plural, =1{1 tarefa} other{{today} tarefas}}. Bom ritmo — foque na primeira abaixo.",
+    "@briefingToday": {
+        "placeholders": {
+            "today": {
+                "type": "int"
+            }
+        }
+    },
+    "briefingPending": "Nada para hoje, mas há {count, plural, =1{1 pendente} other{{count} pendentes}} à frente. Que tal adiantar uma?",
+    "@briefingPending": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "briefingAllDone": "Tudo concluído. Dia limpo — aproveite para revisar as notas.",
+    "@briefingAllDone": {},
+    "suggestionFocus": "Sugestão: comece por \"{title}\" ({when}). Divida em passos de 10 min se travar.",
+    "@suggestionFocus": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            },
+            "when": {
+                "type": "String"
+            }
+        }
+    },
+    "suggestionCreate": "Sugestão: crie 3 tarefas com horário — ex.: \"Amanhã 9h academia #saude\".",
+    "@suggestionCreate": {},
+    "whenNoTime": "sem horário",
+    "@whenNoTime": {},
+    "whenOverdue": "atrasada",
+    "@whenOverdue": {},
+    "whenToday": "hoje às {time}",
+    "@whenToday": {
+        "placeholders": {
+            "time": {
+                "type": "String"
+            }
+        }
+    },
+    "whenTomorrow": "amanhã",
+    "@whenTomorrow": {},
+    "whenInDays": "em {days} dias",
+    "@whenInDays": {
+        "placeholders": {
+            "days": {
+                "type": "int"
+            }
+        }
+    },
+    "stepsTravel": "Definir datas e orçamento|Reservar transporte e hospedagem|Fazer checklist de malas|Confirmar documentos",
+    "@stepsTravel": {},
+    "stepsStudy": "Separar material em 3 blocos|Estudar bloco 1 (25 min foco)|Revisar com resumos|Fazer questões/exercícios",
+    "@stepsStudy": {},
+    "stepsClean": "Escolher 1 cômodo|Separar o que sai / fica|Limpar em 15 min|Guardar e fotografar o resultado",
+    "@stepsClean": {},
+    "stepsProject": "Definir objetivo em 1 frase|Rascunhar estrutura|Preencher conteúdo|Revisar e enviar",
+    "@stepsProject": {},
+    "stepsWorkout": "Separar roupa + água|Aquecer 5 min|Treino principal 20 min|Alongar e registrar",
+    "@stepsWorkout": {},
+    "stepsBill": "Conferir valor e vencimento|Pagar no app/banco|Salvar comprovante",
+    "@stepsBill": {},
+    "stepsGeneric": "Definir o primeiro passo de 5 min|Executar sem interrupção|Revisar e marcar como feito",
+    "@stepsGeneric": {},
+    "slotToday": "Hoje às {time} parece livre",
+    "@slotToday": {
+        "placeholders": {
+            "time": {
+                "type": "String"
+            }
+        }
+    },
+    "slotTomorrow": "Amanhã às 09:00 parece ideal",
+    "@slotTomorrow": {},
+    "priorityUrgent": "Urgente",
+    "@priorityUrgent": {},
+    "priorityHigh": "Alta",
+    "@priorityHigh": {},
+    "priorityMedium": "Média",
+    "@priorityMedium": {},
+    "priorityNormal": "Normal",
+    "@priorityNormal": {},
+    "priority": "Prioridade",
+    "@priority": {},
+    "overdue": "Atrasadas",
+    "@overdue": {},
+    "today": "Hoje",
+    "@today": {},
+    "tomorrow": "Amanhã",
+    "@tomorrow": {},
+    "noDateGroup": "Sem data",
+    "@noDateGroup": {},
+    "agenda": "Agenda",
+    "@agenda": {},
+    "agendaFreeTitle": "Agenda livre por aqui",
+    "@agendaFreeTitle": {},
+    "agendaFreeBody": "Nada nos próximos 14 dias.\n{tip}.",
+    "@agendaFreeBody": {
+        "placeholders": {
+            "tip": {
+                "type": "String"
+            }
+        }
+    },
+    "agendaCount": "{count} na agenda",
+    "@agendaCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "focus": "Foco",
+    "@focus": {},
+    "focusDone": "Foco concluído! Hora da pausa ☕",
+    "@focusDone": {},
+    "breakDone": "Pausa concluída. Bora pro próximo ciclo?",
+    "@breakDone": {},
+    "breakLabel": "PAUSA",
+    "@breakLabel": {},
+    "focusCycles": "FOCO • {cycles} ciclos",
+    "@focusCycles": {
+        "placeholders": {
+            "cycles": {
+                "type": "int"
+            }
+        }
+    },
+    "breakTip": "Respire, alongue, beba água.",
+    "@breakTip": {},
+    "focusTip": "Dica da IA: 1 tarefa, celular longe, 25 min direto.",
+    "@focusTip": {},
+    "pause": "Pausar",
+    "@pause": {},
+    "start": "Começar",
+    "@start": {},
+    "reset": "Resetar",
+    "@reset": {},
+    "taskCreatedByAi": "Criada: \"{title}\" • {steps, plural, =1{1 passo sugerido} other{{steps} passos sugeridos}} pela IA",
+    "@taskCreatedByAi": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            },
+            "steps": {
+                "type": "int"
+            }
+        }
+    },
+    "errorSaving": "Erro ao salvar: {error}",
+    "@errorSaving": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "errorRemoving": "Erro ao remover: {error}",
+    "@errorRemoving": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "errorDeleting": "Erro ao apagar: {error}",
+    "@errorDeleting": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "errorUpdatingTask": "Erro ao atualizar tarefa: {error}",
+    "@errorUpdatingTask": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "notificationChannelName": "Lembretes de Tarefas",
+    "@notificationChannelName": {},
+    "notificationChannelDesc": "Alertas de tarefas agendadas",
+    "@notificationChannelDesc": {},
+    "updateFailed": "Falha ao atualizar. Tente de novo.",
+    "@updateFailed": {},
+    "searchTasksHint": "Buscar tarefa ou #projeto…",
+    "@searchTasksHint": {},
+    "filterAll": "Todas",
+    "@filterAll": {},
+    "filterMyDay": "Meu Dia",
+    "@filterMyDay": {},
+    "filterUpcoming": "Próximas",
+    "@filterUpcoming": {},
+    "filterDone": "Feitas",
+    "@filterDone": {},
+    "emptyDone": "Nada concluído ainda — complete a primeira e volte aqui.",
+    "@emptyDone": {},
+    "emptyTasks": "Nenhuma tarefa aqui.\nToque no botão abaixo para adicionar com linguagem natural.",
+    "@emptyTasks": {},
+    "completedLabel": "Concluída",
+    "@completedLabel": {},
+    "markAsCompleted": "Marcar como concluída",
+    "@markAsCompleted": {},
+    "projectOptional": "Projeto (opcional)",
+    "@projectOptional": {},
+    "projectHint": "#projeto — casa, trabalho…",
+    "@projectHint": {},
+    "aiSuggestedSteps": "Passos sugeridos pela IA local",
+    "@aiSuggestedSteps": {},
+    "signInFailed": "Não foi possível entrar. Tente novamente.",
+    "@signInFailed": {},
+    "loginToday": "Hoje",
+    "@loginToday": {},
+    "loginSample1": "Pagar conta de luz",
+    "@loginSample1": {},
+    "loginSample2": "Reunião 9h",
+    "@loginSample2": {},
+    "loginSample3": "Academia 18h",
+    "@loginSample3": {},
+    "loginProgress": "2 de 3 concluídas",
+    "@loginProgress": {},
+    "loginBadgeTime": "Seg 9:00",
+    "@loginBadgeTime": {},
+    "loginBadgeMeeting": "Reunião",
+    "@loginBadgeMeeting": {},
+    "loginBadgeReminder": "Lembrete",
+    "@loginBadgeReminder": {},
+    "loginBadgeGym": "Academia 18h",
+    "@loginBadgeGym": {},
+    "welcomeBack": "Bem-vindo de volta 👋",
+    "@welcomeBack": {},
+    "signInToSee": "Entre para ver suas tarefas de hoje.",
+    "@signInToSee": {},
+    "notesTitle": "Anotações",
+    "@notesTitle": {},
+    "searchNotesHint": "Buscar nas notas…",
+    "@searchNotesHint": {},
+    "noNotesFor": "Nenhuma nota para \"{query}\".",
+    "@noNotesFor": {
+        "placeholders": {
+            "query": {
+                "type": "String"
+            }
+        }
+    },
+    "createNote": "Criar nota",
+    "@createNote": {},
+    "tryAgain": "Tentar novamente",
+    "@tryAgain": {},
+    "errorDeletingNote": "Erro ao deletar nota: {error}",
+    "@errorDeletingNote": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "agoDays": "há {count}d",
+    "@agoDays": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "agoHours": "há {count}h",
+    "@agoHours": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "agoMinutes": "há {count}min",
+    "@agoMinutes": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "justNow": "agora mesmo",
+    "@justNow": {},
+    "saveNoteFailed": "Falha ao salvar a nota. Tente novamente.",
+    "@saveNoteFailed": {},
+    "agoDaysLong": "há {count, plural, =1{1 dia} other{{count} dias}}",
+    "@agoDaysLong": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "agoHoursLong": "há {count, plural, =1{1 hora} other{{count} horas}}",
+    "@agoHoursLong": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "agoMinutesLong": "há {count, plural, =1{1 minuto} other{{count} minutos}}",
+    "@agoMinutesLong": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "lastEdit": "Última edição: {when}",
+    "@lastEdit": {
+        "placeholders": {
+            "when": {
+                "type": "String"
+            }
+        }
+    },
+    "updateTaskFailed": "Falha ao atualizar.",
+    "@updateTaskFailed": {},
+    "supportEmailSubject": "[Tarefas App] Suporte & Feedback",
+    "@supportEmailSubject": {},
+    "emailOpenFailed": "Não foi possível abrir o app de e-mail. Contato: hendrilmendes2015@gmail.com",
+    "@emailOpenFailed": {},
+    "userFallback": "Usuário",
+    "@userFallback": {},
+    "alerts": "Alertas",
+    "@alerts": {},
+    "sendEmail": "Enviar e-mail",
+    "@sendEmail": {},
+    "contactDeveloper": "Fale com o desenvolvedor",
+    "@contactDeveloper": {},
+    "steps": "{count, plural, =1{1 passo} other{{count} passos}}",
+    "@steps": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "tabAgenda": "Agenda",
+    "@tabAgenda": {},
+    "assistantBadge": "ASSISTENTE LOCAL",
+    "@assistantBadge": {},
+    "focusNow": "FOCO AGORA",
+    "@focusNow": {},
+    "pomodoro": "Pomodoro",
+    "@pomodoro": {},
+    "quickAddEmpty": "Digite a tarefa — ex.: Amanhã 15h pagar conta #casa",
+    "@quickAddEmpty": {},
+    "quickAddTitle": "Nova tarefa inteligente",
+    "@quickAddTitle": {},
+    "quickAddHint": "Ex.: Segunda 9h reunião #trabalho !p1",
+    "@quickAddHint": {},
+    "quickAddTip": "Dica: use \"amanhã 15h\", \"#projeto\", \"!p1\" e a IA entende sozinha.",
+    "@quickAddTip": {},
+    "noDateSuggestToday": "Sem data — sugerir hoje",
+    "@noDateSuggestToday": {},
+    "suggestedSteps": "{count, plural, =1{1 passo sugerido} other{{count} passos sugeridos}}",
+    "@suggestedSteps": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "priorityColon": "Prioridade:",
+    "@priorityColon": {},
+    "releaseNotesEmpty": "Nenhuma nota de versão encontrada para esta versão.",
+    "@releaseNotesEmpty": {},
+    "releaseNotesError": "Erro ao carregar as notas da versão. Código: {code}",
+    "@releaseNotesError": {
+        "placeholders": {
+            "code": {
+                "type": "int"
+            }
+        }
+    },
+    "releaseNotesConnection": "Erro ao carregar. Verifique sua conexão com a internet.",
+    "@releaseNotesConnection": {},
+    "language": "Idioma",
+    "@language": {},
+    "languageSub": "Escolha o idioma do app",
+    "@languageSub": {},
+    "languageAuto": "Automático (sistema)",
+    "@languageAuto": {},
+    "stepsShopping": "Listar itens prioritários|Verificar despensa e geladeira|Definir orçamento máximo|Ir ao supermercado ou feira",
+    "@stepsShopping": {},
+    "stepsMeeting": "Definir pauta e objetivo|Reunir links e apresentações|Enviar convite/lembrete aos participantes|Registrar ata e próximos passos",
+    "@stepsMeeting": {},
+    "stepsCoding": "Entender requisito e edge cases|Criar branch e escrever código|Testar localmente cenários de erro|Abrir PR e solicitar review",
+    "@stepsCoding": {},
+    "stepsFinance": "Revisar extrato bancário|Categorizar receitas e despesas|Identificar gastos supérfluos|Atualizar planilha ou app financeiro",
+    "@stepsFinance": {},
+    "stepsHealth": "Marcar consulta ou exame|Separar exames anteriores|Anotar dúvidas para o médico|Confirmar horário e trajeto",
+    "@stepsHealth": {},
+    "noteTotalDetected": "Total detectado:",
+    "@noteTotalDetected": {},
+    "noteValuesCount": "{count, plural, =1{1 valor} other{{count} valores}}",
+    "@noteValuesCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "insertTotalInNote": "Inserir total na nota",
+    "@insertTotalInNote": {}
 }

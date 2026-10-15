@@ -13,7 +13,7 @@ class AuthService {
       _isGoogleSignInInitialized = true;
     } catch (e) {
       if (kDebugMode) {
-        print('Falha ao inicializar o Google Sign-In: $e');
+        print('Failed to initialize Google Sign-In: $e');
       }
     }
   }
@@ -24,7 +24,6 @@ class AuthService {
     }
   }
 
-  // Função para autenticação com Google
   Future<UserCredential?> signInWithGoogle() async {
     await _ensureGoogleSignInInitialized();
     try {
@@ -36,7 +35,7 @@ class AuthService {
       final idToken = googleAuth.idToken;
 
       if (idToken == null) {
-        throw Exception('Não foi possível obter o token de ID do Google.');
+        throw Exception('Could not obtain the Google ID token.');
       }
 
       final AuthCredential credential = GoogleAuthProvider.credential(
@@ -46,28 +45,25 @@ class AuthService {
 
       return await _auth.signInWithCredential(credential);
     } catch (e) {
-      if (kDebugMode) print('Erro na autenticação com Google: $e');
+      if (kDebugMode) print('Google authentication error: $e');
       await signOut();
       rethrow;
     }
   }
 
-  // Função para logout do usuário
   Future<void> signOut() async {
     try {
       await _auth.signOut();
       await _googleSignIn.signOut();
-      if (kDebugMode) print("Usuário desconectado com sucesso.");
+      if (kDebugMode) print("User signed out successfully.");
     } catch (e) {
-      if (kDebugMode) print("Erro ao desconectar usuário: $e");
+      if (kDebugMode) print("Error signing out user: $e");
     }
   }
 
-  // Função para obter o usuário atualmente autenticado
   Future<User?> currentUser() async {
     return _auth.currentUser;
   }
 
-  // Stream para monitorar alterações no estado de autenticação do usuário
   Stream<User?> authStateChanges() => _auth.authStateChanges();
 }

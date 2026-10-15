@@ -1,14 +1,8 @@
-// ignore_for_file: deprecated_member_use
-
-import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui';
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
+import 'package:tarefas/utils/app_strings.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -16,771 +10,418 @@ import 'package:tarefas/screens/about/about.dart';
 import 'package:tarefas/screens/login/login.dart';
 import 'package:tarefas/screens/settings/personalization/personalization.dart';
 import 'package:tarefas/theme/theme.dart';
-import 'package:wiredash/wiredash.dart';
+import 'package:tarefas/widgets/orb_glass.dart';
+import 'package:tarefas/widgets/settings_group.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  @override
-  // ignore: library_private_types_in_public_api
-  _SettingsScreenState createState() => _SettingsScreenState();
-}
+  static const _languages = <String, String>{
+    'pt': 'Português',
+    'en': 'English',
+    'es': 'Español',
+  };
 
-class _SettingsScreenState extends State<SettingsScreen>
-    with TickerProviderStateMixin {
-  final User? _user = FirebaseAuth.instance.currentUser;
-  final ScrollController _scrollController = ScrollController();
-  final AuthService _authService = AuthService();
-
-  Future<String> writeImageToStorage(Uint8List feedbackScreenshot) async {
-    final Directory output = await getTemporaryDirectory();
-    final String screenshotFilePath = '${output.path}/feedback.png';
-    final File screenshotFile = File(screenshotFilePath);
-    await screenshotFile.writeAsBytes(feedbackScreenshot);
-    return screenshotFilePath;
+  String _languageLabel(AppLocalizations l10n, Locale? locale) {
+    if (locale == null) return l10n.languageAuto;
+    return _languages[locale.languageCode] ?? l10n.languageAuto;
   }
 
-  Future<bool> checkReviewed() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('hasReviewed') ?? false;
+  Future<void> _showLanguagePicker(BuildContext context) async {
+    final themeModel = Provider.of<ThemeModel>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        final current = themeModel.locale?.languageCode;
+        Widget option(String? code, String label) {
+          final selected = current == code;
+          return ListTile(
+            title: Text(label),
+            trailing: selected ? const Icon(Icons.check) : null,
+            onTap: () {
+              themeModel.setLocale(code == null ? null : Locale(code));
+              Navigator.pop(sheetContext);
+            },
+          );
+        }
+
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+                child: Text(
+                  l10n.languageSub,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              option(null, l10n.languageAuto),
+              for (final e in _languages.entries) option(e.key, e.value),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
   }
 
-  Future<void> markReviewed() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('hasReviewed', true);
+  Future<void> _sendSupportEmail(BuildContext context) async {
+    final emailUri = Uri(
+      scheme: 'mailto',
+      path: 'hendrilmendes2015@gmail.com',
+      queryParameters: {'subject': S.current.supportEmailSubject},
+    );
+    try {
+      if (await canLaunchUrl(emailUri)) {
+        await launchUrl(emailUri);
+      } else {
+        await launchUrl(emailUri, mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.current.emailOpenFailed),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(l10n.logoutConfirm, textAlign: TextAlign.center),
+        content: Text(l10n.logoutConfirmSub, textAlign: TextAlign.center),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            child: Text(l10n.logout),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await AuthService().signOut();
+    if (context.mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => LoginScreen(authService: AuthService()),
+        ),
+        (route) => false,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final themeModel = Provider.of<ThemeModel>(context);
-    final colors = Theme.of(context).colorScheme;
-    final mediaQuery = MediaQuery.of(context);
-    final safeAreaBottom = mediaQuery.padding.bottom;
+    final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    final user = FirebaseAuth.instance.currentUser;
+    final displayName =
+        user?.displayName ?? user?.email?.split('@').first ?? l10n.userFallback;
+    final email = user?.email ?? '';
+    final photoUrl = user?.photoURL;
 
-    final bottomNavHeight = 70.0 + 32.0 + safeAreaBottom;
+    final String themeSubtitle;
+    switch (themeModel.themeMode) {
+      case ThemeModeType.light:
+        themeSubtitle = l10n.lightMode;
+        break;
+      case ThemeModeType.dark:
+        themeSubtitle = l10n.darkMode;
+        break;
+      case ThemeModeType.system:
+        themeSubtitle = l10n.systemMode;
+        break;
+    }
+
+    final topPadding = MediaQuery.of(context).padding.top + kToolbarHeight + 8;
 
     return Scaffold(
-      backgroundColor: colors.surface,
-      body: CustomScrollView(
-        controller: _scrollController,
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-            backgroundColor: colors.surface.withOpacity(0.8),
-            elevation: 0,
-            surfaceTintColor: Colors.transparent,
-            floating: true,
-            snap: true,
-            pinned: true,
-            title: Text(
-              AppLocalizations.of(context)!.settings,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.5,
-              ),
-            ),
-            centerTitle: true,
-            actions: [
-              IconButton(
-                icon: Icon(
-                  CupertinoIcons.square_arrow_right,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                tooltip: AppLocalizations.of(context)!.logout,
-                onPressed: () async {
-                  final confirmed = await _showLogoutConfirmationDialog(
-                    context,
-                  );
-                  if (confirmed == true) {
-                    await _authService.signOut();
-                    if (mounted) {
-                      // ignore: use_build_context_synchronously
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              LoginScreen(authService: _authService),
-                        ),
-                        (Route<dynamic> route) => false,
-                      );
-                    }
-                  }
-                },
-              ),
-              const SizedBox(width: 8),
-            ],
-            flexibleSpace: ClipRRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                child: Container(color: Colors.transparent),
-              ),
-            ),
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(
+        title: Text(
+          l10n.settings,
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            tooltip: l10n.logout,
+            icon: Icon(Icons.logout, color: scheme.error),
+            onPressed: () => _logout(context),
           ),
+          const SizedBox(width: 4),
+        ],
+      ),
+      body: ListView(
+        padding: EdgeInsets.fromLTRB(16, topPadding, 16, 110),
+        children: [
 
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                const SizedBox(height: 20),
-                _buildProfileCard(context),
-                const SizedBox(height: 24),
-                _buildQuickActionsGrid(context, themeModel),
-                const SizedBox(height: 32),
-                _buildSettingsCategories(context, themeModel),
-                const SizedBox(height: 20),
-              ]),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: scheme.brightness == Brightness.light
+                  ? scheme.surface.withOpacity(0.70)
+                  : scheme.surfaceContainerHighest.withOpacity(0.35),
+              border: Border.all(
+                color: scheme.brightness == Brightness.light
+                    ? Colors.white.withOpacity(0.8)
+                    : Colors.white.withOpacity(0.12),
+                width: 1.1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(
+                    scheme.brightness == Brightness.light ? 0.04 : 0.2,
+                  ),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  if (photoUrl != null && photoUrl.isNotEmpty)
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundImage: NetworkImage(photoUrl),
+                    )
+                  else
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [scheme.primary, scheme.secondary],
+                        ),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: const Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          email,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: scheme.onSurface.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          SliverToBoxAdapter(child: SizedBox(height: bottomNavHeight)),
+          const SizedBox(height: 12),
+
+          Row(
+            children: [
+              Expanded(
+                child: _QuickCard(
+                  icon: Icons.palette_outlined,
+                  title: l10n.theme,
+                  subtitle: themeSubtitle,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const PersonalizationScreen(),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _QuickCard(
+                  icon: Icons.notifications_outlined,
+                  title: l10n.notification,
+                  subtitle: l10n.alerts,
+                  onTap: () => AppSettings.openAppSettings(
+                    type: AppSettingsType.notification,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SettingsGroup(
+            title: l10n.language,
+            children: [
+              SettingsTile(
+                icon: Icons.language,
+                title: l10n.language,
+                subtitle: _languageLabel(l10n, themeModel.locale),
+                onTap: () => _showLanguagePicker(context),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SettingsGroup(
+            title: l10n.personalization,
+            children: [
+              SettingsTile(
+                icon: Icons.palette_outlined,
+                title: l10n.personalization,
+                subtitle: l10n.personalizationSub,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const PersonalizationScreen(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SettingsGroup(
+            title: l10n.support,
+            children: [
+              SettingsTile(
+                icon: Icons.mail_outline_rounded,
+                title: l10n.sendEmail,
+                subtitle: l10n.contactDeveloper,
+                onTap: () => _sendSupportEmail(context),
+              ),
+              SettingsTile(
+                icon: Icons.info_outline,
+                title: l10n.about,
+                subtitle: l10n.aboutSub,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AboutPage()),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildProfileCard(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final user = _user;
-    final photoUrl = user?.photoURL;
-    final displayName =
-        user?.displayName ?? (user?.email?.split('@')[0]) ?? 'Usuário';
-    final email = user?.email ?? 'email@exemplo.com';
+class _QuickCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+  const _QuickCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
 
-    return SizedBox(
-      width: double.infinity,
-      child: ClipRRect(
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isLight = scheme.brightness == Brightness.light;
+    return Container(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withOpacity(0.15),
-                  Colors.white.withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.2),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+        color: isLight
+            ? scheme.surface.withOpacity(0.70)
+            : scheme.surfaceContainerHighest.withOpacity(0.35),
+        border: Border.all(
+          color: isLight
+              ? Colors.white.withOpacity(0.8)
+              : Colors.white.withOpacity(0.12),
+          width: 1.1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isLight ? 0.04 : 0.20),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: scheme.primary.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: scheme.primary, size: 20),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: scheme.onSurface.withOpacity(0.6),
+                  ),
                 ),
               ],
             ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(20),
-                child: Row(
-                  children: [
-                    if (photoUrl != null && photoUrl.isNotEmpty)
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: colors.primary.withOpacity(0.2),
-                        backgroundImage: NetworkImage(photoUrl),
-                      )
-                    else
-                      Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [colors.primary, colors.secondary],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: colors.primary.withOpacity(0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          CupertinoIcons.person_fill,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            displayName,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: colors.onSurface,
-                              height: 1.2,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            email,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: colors.onSurface.withOpacity(0.7),
-                              fontWeight: FontWeight.w500,
-                              height: 1.2,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
         ),
       ),
     );
   }
-
-  Widget _buildQuickActionsGrid(BuildContext context, ThemeModel themeModel) {
-    final String themeSubtitle;
-    switch (themeModel.themeMode) {
-      case ThemeModeType.light:
-        themeSubtitle = AppLocalizations.of(context)!.lightMode;
-        break;
-      case ThemeModeType.dark:
-        themeSubtitle = AppLocalizations.of(context)!.darkMode;
-        break;
-      case ThemeModeType.system:
-        themeSubtitle = AppLocalizations.of(context)!.systemMode;
-        break;
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Row(
-          children: [
-            Expanded(
-              child: _buildQuickActionCard(
-                context,
-                icon: themeModel.isDarkMode
-                    ? CupertinoIcons.moon_fill
-                    : CupertinoIcons.sun_max_fill,
-                title: AppLocalizations.of(context)!.theme,
-                subtitle: themeSubtitle,
-                color: Theme.of(context).colorScheme.primary,
-                onTap: () {
-                  _showThemeChooserDialog(context, themeModel);
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildQuickActionCard(
-                context,
-                icon: CupertinoIcons.bell_fill,
-                title: AppLocalizations.of(context)!.notification,
-                color: Theme.of(context).colorScheme.secondary,
-                onTap: () {
-                  AppSettings.openAppSettings(
-                    type: AppSettingsType.notification,
-                  );
-                },
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildQuickActionCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    String? subtitle,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              height: 100,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: color.withOpacity(0.2), width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(icon, color: color, size: 18),
-                  ),
-                  const Spacer(),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      height: 1.2,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 1),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
-                        fontWeight: FontWeight.w500,
-                        height: 1.2,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSettingsCategories(BuildContext context, ThemeModel themeModel) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 16),
-          child: Text(
-            AppLocalizations.of(context)!.settings,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Theme.of(context).colorScheme.onSurface,
-              height: 1.2,
-            ),
-          ),
-        ),
-        _buildSettingsCategory(
-          context,
-          title: AppLocalizations.of(context)!.personalization,
-          items: [
-            SettingsItem(
-              icon: CupertinoIcons.paintbrush_fill,
-              title: AppLocalizations.of(context)!.personalization,
-              subtitle: AppLocalizations.of(context)!.personalizationSub,
-              onTap: () {
-                _showThemeSettings(context, themeModel);
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        _buildSettingsCategory(
-          context,
-          title: AppLocalizations.of(context)!.support,
-          items: [
-            SettingsItem(
-              icon: CupertinoIcons.chat_bubble_2_fill,
-              title: AppLocalizations.of(context)!.support,
-              subtitle: AppLocalizations.of(context)!.supportSub,
-              onTap: () {
-                Wiredash.of(context).show(inheritMaterialTheme: true);
-              },
-            ),
-            SettingsItem(
-              icon: CupertinoIcons.info_circle_fill,
-              title: AppLocalizations.of(context)!.about,
-              onTap: () {
-                _showAbout(context);
-              },
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSettingsCategory(
-    BuildContext context, {
-    required String title,
-    required List<SettingsItem> items,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-              width: 0.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withOpacity(0.8),
-                    height: 1.2,
-                  ),
-                ),
-              ),
-              ...items.asMap().entries.map((entry) {
-                final index = entry.key;
-                final item = entry.value;
-                final isLast = index == items.length - 1;
-
-                return Column(
-                  children: [
-                    _buildSettingsItem(context, item),
-                    if (!isLast)
-                      Container(
-                        height: 0.5,
-                        margin: const EdgeInsets.only(left: 56),
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withOpacity(0.08),
-                      ),
-                  ],
-                );
-              }),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSettingsItem(BuildContext context, SettingsItem item) {
-    final colors = Theme.of(context).colorScheme;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: item.onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: colors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(item.icon, size: 18, color: colors.primary),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.title,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: colors.onSurface,
-                        height: 1.2,
-                      ),
-                    ),
-                    if (item.subtitle != null) ...[
-                      const SizedBox(height: 1),
-                      Text(
-                        item.subtitle!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: colors.onSurface.withOpacity(0.6),
-                          height: 1.2,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              Icon(
-                CupertinoIcons.chevron_right,
-                size: 14,
-                color: colors.onSurface.withOpacity(0.4),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showThemeChooserDialog(BuildContext context, ThemeModel themeModel) {
-    final localizations = AppLocalizations.of(context)!;
-    final colors = Theme.of(context).colorScheme;
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: colors.surface.withOpacity(0.85),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-                      child: Text(
-                        localizations.displayMode,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: colors.onSurface,
-                        ),
-                      ),
-                    ),
-                    // Usamos um Consumer aqui para que o diálogo se reconstrua
-                    // ao selecionar uma opção, mostrando a seleção na hora.
-                    Consumer<ThemeModel>(
-                      builder: (context, model, child) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            RadioListTile<ThemeModeType>(
-                              title: Text(localizations.lightMode),
-                              value: ThemeModeType.light,
-                              groupValue: model.themeMode,
-                              onChanged: (value) {
-                                model.changeThemeMode(value!);
-                                Navigator.pop(context);
-                              },
-                            ),
-                            RadioListTile<ThemeModeType>(
-                              title: Text(localizations.darkMode),
-                              value: ThemeModeType.dark,
-                              groupValue: model.themeMode,
-                              onChanged: (value) {
-                                model.changeThemeMode(value!);
-                                Navigator.pop(context);
-                              },
-                            ),
-                            RadioListTile<ThemeModeType>(
-                              title: Text(localizations.systemMode),
-                              value: ThemeModeType.system,
-                              groupValue: model.themeMode,
-                              onChanged: (value) {
-                                model.changeThemeMode(value!);
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showThemeSettings(BuildContext context, ThemeModel themeModel) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PersonalizationScreen()),
-    );
-  }
-
-  void _showAbout(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AboutPage()),
-    );
-  }
-
-  Future<bool?> _showLogoutConfirmationDialog(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
-
-    return showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Dialog(
-            backgroundColor: Colors.transparent,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surface.withOpacity(0.95),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.error.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          CupertinoIcons.square_arrow_right,
-                          size: 32,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        localizations.logoutConfirm,
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        localizations.logoutConfirmSub,
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withOpacity(0.7),
-                          fontSize: 16,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 32),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () => Navigator.of(context).pop(false),
-                              child: Text(localizations.cancel),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () => Navigator.of(context).pop(true),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.error,
-                                foregroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.onError,
-                              ),
-                              child: Text(localizations.logout),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class SettingsItem {
-  final IconData icon;
-  final String title;
-  final String? subtitle;
-  final VoidCallback onTap;
-
-  SettingsItem({
-    required this.icon,
-    required this.title,
-    this.subtitle,
-    required this.onTap,
-  });
 }

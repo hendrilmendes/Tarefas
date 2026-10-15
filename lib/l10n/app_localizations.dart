@@ -5,6 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
 import 'app_localizations_pt.dart';
 
 // ignore_for_file: type=lint
@@ -92,7 +94,11 @@ abstract class AppLocalizations {
       ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('pt')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('es'),
+    Locale('pt'),
+  ];
 
   /// No description provided for @appName.
   ///
@@ -621,6 +627,792 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Você tem certeza que quer desconectar do app?'**
   String get logoutConfirmSub;
+
+  /// No description provided for @greetingNight.
+  ///
+  /// In pt, this message translates to:
+  /// **'Boa madrugada'**
+  String get greetingNight;
+
+  /// No description provided for @greetingMorning.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bom dia'**
+  String get greetingMorning;
+
+  /// No description provided for @greetingAfternoon.
+  ///
+  /// In pt, this message translates to:
+  /// **'Boa tarde'**
+  String get greetingAfternoon;
+
+  /// No description provided for @greetingEvening.
+  ///
+  /// In pt, this message translates to:
+  /// **'Boa noite'**
+  String get greetingEvening;
+
+  /// No description provided for @greetingWithName.
+  ///
+  /// In pt, this message translates to:
+  /// **'{greeting}, {name} 👋'**
+  String greetingWithName(String greeting, String name);
+
+  /// No description provided for @you.
+  ///
+  /// In pt, this message translates to:
+  /// **'você'**
+  String get you;
+
+  /// No description provided for @briefingEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você está com a agenda livre. Que tal planejar o dia em 3 metas?'**
+  String get briefingEmpty;
+
+  /// No description provided for @briefingOverdueToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você tem {overdue, plural, =1{1 atrasada} other{{overdue} atrasadas}} e {today} para hoje. Vamos limpar as atrasadas primeiro.'**
+  String briefingOverdueToday(int overdue, int today);
+
+  /// No description provided for @briefingOverdue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você tem {overdue, plural, =1{1 tarefa atrasada} other{{overdue} tarefas atrasadas}}. Recomendo reagendar ou concluir agora.'**
+  String briefingOverdue(int overdue);
+
+  /// No description provided for @briefingToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hoje você tem {today, plural, =1{1 tarefa} other{{today} tarefas}}. Bom ritmo — foque na primeira abaixo.'**
+  String briefingToday(int today);
+
+  /// No description provided for @briefingPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nada para hoje, mas há {count, plural, =1{1 pendente} other{{count} pendentes}} à frente. Que tal adiantar uma?'**
+  String briefingPending(int count);
+
+  /// No description provided for @briefingAllDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tudo concluído. Dia limpo — aproveite para revisar as notas.'**
+  String get briefingAllDone;
+
+  /// No description provided for @suggestionFocus.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sugestão: comece por \"{title}\" ({when}). Divida em passos de 10 min se travar.'**
+  String suggestionFocus(String title, String when);
+
+  /// No description provided for @suggestionCreate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sugestão: crie 3 tarefas com horário — ex.: \"Amanhã 9h academia #saude\".'**
+  String get suggestionCreate;
+
+  /// No description provided for @whenNoTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'sem horário'**
+  String get whenNoTime;
+
+  /// No description provided for @whenOverdue.
+  ///
+  /// In pt, this message translates to:
+  /// **'atrasada'**
+  String get whenOverdue;
+
+  /// No description provided for @whenToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'hoje às {time}'**
+  String whenToday(String time);
+
+  /// No description provided for @whenTomorrow.
+  ///
+  /// In pt, this message translates to:
+  /// **'amanhã'**
+  String get whenTomorrow;
+
+  /// No description provided for @whenInDays.
+  ///
+  /// In pt, this message translates to:
+  /// **'em {days} dias'**
+  String whenInDays(int days);
+
+  /// No description provided for @stepsTravel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Definir datas e orçamento|Reservar transporte e hospedagem|Fazer checklist de malas|Confirmar documentos'**
+  String get stepsTravel;
+
+  /// No description provided for @stepsStudy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Separar material em 3 blocos|Estudar bloco 1 (25 min foco)|Revisar com resumos|Fazer questões/exercícios'**
+  String get stepsStudy;
+
+  /// No description provided for @stepsClean.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolher 1 cômodo|Separar o que sai / fica|Limpar em 15 min|Guardar e fotografar o resultado'**
+  String get stepsClean;
+
+  /// No description provided for @stepsProject.
+  ///
+  /// In pt, this message translates to:
+  /// **'Definir objetivo em 1 frase|Rascunhar estrutura|Preencher conteúdo|Revisar e enviar'**
+  String get stepsProject;
+
+  /// No description provided for @stepsWorkout.
+  ///
+  /// In pt, this message translates to:
+  /// **'Separar roupa + água|Aquecer 5 min|Treino principal 20 min|Alongar e registrar'**
+  String get stepsWorkout;
+
+  /// No description provided for @stepsBill.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conferir valor e vencimento|Pagar no app/banco|Salvar comprovante'**
+  String get stepsBill;
+
+  /// No description provided for @stepsGeneric.
+  ///
+  /// In pt, this message translates to:
+  /// **'Definir o primeiro passo de 5 min|Executar sem interrupção|Revisar e marcar como feito'**
+  String get stepsGeneric;
+
+  /// No description provided for @slotToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hoje às {time} parece livre'**
+  String slotToday(String time);
+
+  /// No description provided for @slotTomorrow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amanhã às 09:00 parece ideal'**
+  String get slotTomorrow;
+
+  /// No description provided for @priorityUrgent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Urgente'**
+  String get priorityUrgent;
+
+  /// No description provided for @priorityHigh.
+  ///
+  /// In pt, this message translates to:
+  /// **'Alta'**
+  String get priorityHigh;
+
+  /// No description provided for @priorityMedium.
+  ///
+  /// In pt, this message translates to:
+  /// **'Média'**
+  String get priorityMedium;
+
+  /// No description provided for @priorityNormal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Normal'**
+  String get priorityNormal;
+
+  /// No description provided for @priority.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prioridade'**
+  String get priority;
+
+  /// No description provided for @overdue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atrasadas'**
+  String get overdue;
+
+  /// No description provided for @today.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hoje'**
+  String get today;
+
+  /// No description provided for @tomorrow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amanhã'**
+  String get tomorrow;
+
+  /// No description provided for @noDateGroup.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem data'**
+  String get noDateGroup;
+
+  /// No description provided for @agenda.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agenda'**
+  String get agenda;
+
+  /// No description provided for @agendaFreeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agenda livre por aqui'**
+  String get agendaFreeTitle;
+
+  /// No description provided for @agendaFreeBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nada nos próximos 14 dias.\n{tip}.'**
+  String agendaFreeBody(String tip);
+
+  /// No description provided for @agendaCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} na agenda'**
+  String agendaCount(int count);
+
+  /// No description provided for @focus.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foco'**
+  String get focus;
+
+  /// No description provided for @focusDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foco concluído! Hora da pausa ☕'**
+  String get focusDone;
+
+  /// No description provided for @breakDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pausa concluída. Bora pro próximo ciclo?'**
+  String get breakDone;
+
+  /// No description provided for @breakLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'PAUSA'**
+  String get breakLabel;
+
+  /// No description provided for @focusCycles.
+  ///
+  /// In pt, this message translates to:
+  /// **'FOCO • {cycles} ciclos'**
+  String focusCycles(int cycles);
+
+  /// No description provided for @breakTip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Respire, alongue, beba água.'**
+  String get breakTip;
+
+  /// No description provided for @focusTip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dica da IA: 1 tarefa, celular longe, 25 min direto.'**
+  String get focusTip;
+
+  /// No description provided for @pause.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pausar'**
+  String get pause;
+
+  /// No description provided for @start.
+  ///
+  /// In pt, this message translates to:
+  /// **'Começar'**
+  String get start;
+
+  /// No description provided for @reset.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resetar'**
+  String get reset;
+
+  /// No description provided for @taskCreatedByAi.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criada: \"{title}\" • {steps, plural, =1{1 passo sugerido} other{{steps} passos sugeridos}} pela IA'**
+  String taskCreatedByAi(String title, int steps);
+
+  /// No description provided for @errorSaving.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao salvar: {error}'**
+  String errorSaving(String error);
+
+  /// No description provided for @errorRemoving.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao remover: {error}'**
+  String errorRemoving(String error);
+
+  /// No description provided for @errorDeleting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao apagar: {error}'**
+  String errorDeleting(String error);
+
+  /// No description provided for @errorUpdatingTask.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao atualizar tarefa: {error}'**
+  String errorUpdatingTask(String error);
+
+  /// No description provided for @notificationChannelName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lembretes de Tarefas'**
+  String get notificationChannelName;
+
+  /// No description provided for @notificationChannelDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Alertas de tarefas agendadas'**
+  String get notificationChannelDesc;
+
+  /// No description provided for @updateFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Falha ao atualizar. Tente de novo.'**
+  String get updateFailed;
+
+  /// No description provided for @searchTasksHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar tarefa ou #projeto…'**
+  String get searchTasksHint;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todas'**
+  String get filterAll;
+
+  /// No description provided for @filterMyDay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meu Dia'**
+  String get filterMyDay;
+
+  /// No description provided for @filterUpcoming.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próximas'**
+  String get filterUpcoming;
+
+  /// No description provided for @filterDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Feitas'**
+  String get filterDone;
+
+  /// No description provided for @emptyDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nada concluído ainda — complete a primeira e volte aqui.'**
+  String get emptyDone;
+
+  /// No description provided for @emptyTasks.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma tarefa aqui.\nToque no botão abaixo para adicionar com linguagem natural.'**
+  String get emptyTasks;
+
+  /// No description provided for @completedLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Concluída'**
+  String get completedLabel;
+
+  /// No description provided for @markAsCompleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Marcar como concluída'**
+  String get markAsCompleted;
+
+  /// No description provided for @projectOptional.
+  ///
+  /// In pt, this message translates to:
+  /// **'Projeto (opcional)'**
+  String get projectOptional;
+
+  /// No description provided for @projectHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'#projeto — casa, trabalho…'**
+  String get projectHint;
+
+  /// No description provided for @aiSuggestedSteps.
+  ///
+  /// In pt, this message translates to:
+  /// **'Passos sugeridos pela IA local'**
+  String get aiSuggestedSteps;
+
+  /// No description provided for @signInFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível entrar. Tente novamente.'**
+  String get signInFailed;
+
+  /// No description provided for @loginToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hoje'**
+  String get loginToday;
+
+  /// No description provided for @loginSample1.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pagar conta de luz'**
+  String get loginSample1;
+
+  /// No description provided for @loginSample2.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reunião 9h'**
+  String get loginSample2;
+
+  /// No description provided for @loginSample3.
+  ///
+  /// In pt, this message translates to:
+  /// **'Academia 18h'**
+  String get loginSample3;
+
+  /// No description provided for @loginProgress.
+  ///
+  /// In pt, this message translates to:
+  /// **'2 de 3 concluídas'**
+  String get loginProgress;
+
+  /// No description provided for @loginBadgeTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seg 9:00'**
+  String get loginBadgeTime;
+
+  /// No description provided for @loginBadgeMeeting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reunião'**
+  String get loginBadgeMeeting;
+
+  /// No description provided for @loginBadgeReminder.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lembrete'**
+  String get loginBadgeReminder;
+
+  /// No description provided for @loginBadgeGym.
+  ///
+  /// In pt, this message translates to:
+  /// **'Academia 18h'**
+  String get loginBadgeGym;
+
+  /// No description provided for @welcomeBack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bem-vindo de volta 👋'**
+  String get welcomeBack;
+
+  /// No description provided for @signInToSee.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entre para ver suas tarefas de hoje.'**
+  String get signInToSee;
+
+  /// No description provided for @notesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anotações'**
+  String get notesTitle;
+
+  /// No description provided for @searchNotesHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar nas notas…'**
+  String get searchNotesHint;
+
+  /// No description provided for @noNotesFor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma nota para \"{query}\".'**
+  String noNotesFor(String query);
+
+  /// No description provided for @createNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criar nota'**
+  String get createNote;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tentar novamente'**
+  String get tryAgain;
+
+  /// No description provided for @errorDeletingNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao deletar nota: {error}'**
+  String errorDeletingNote(String error);
+
+  /// No description provided for @agoDays.
+  ///
+  /// In pt, this message translates to:
+  /// **'há {count}d'**
+  String agoDays(int count);
+
+  /// No description provided for @agoHours.
+  ///
+  /// In pt, this message translates to:
+  /// **'há {count}h'**
+  String agoHours(int count);
+
+  /// No description provided for @agoMinutes.
+  ///
+  /// In pt, this message translates to:
+  /// **'há {count}min'**
+  String agoMinutes(int count);
+
+  /// No description provided for @justNow.
+  ///
+  /// In pt, this message translates to:
+  /// **'agora mesmo'**
+  String get justNow;
+
+  /// No description provided for @saveNoteFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Falha ao salvar a nota. Tente novamente.'**
+  String get saveNoteFailed;
+
+  /// No description provided for @agoDaysLong.
+  ///
+  /// In pt, this message translates to:
+  /// **'há {count, plural, =1{1 dia} other{{count} dias}}'**
+  String agoDaysLong(int count);
+
+  /// No description provided for @agoHoursLong.
+  ///
+  /// In pt, this message translates to:
+  /// **'há {count, plural, =1{1 hora} other{{count} horas}}'**
+  String agoHoursLong(int count);
+
+  /// No description provided for @agoMinutesLong.
+  ///
+  /// In pt, this message translates to:
+  /// **'há {count, plural, =1{1 minuto} other{{count} minutos}}'**
+  String agoMinutesLong(int count);
+
+  /// No description provided for @lastEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Última edição: {when}'**
+  String lastEdit(String when);
+
+  /// No description provided for @updateTaskFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Falha ao atualizar.'**
+  String get updateTaskFailed;
+
+  /// No description provided for @supportEmailSubject.
+  ///
+  /// In pt, this message translates to:
+  /// **'[Tarefas App] Suporte & Feedback'**
+  String get supportEmailSubject;
+
+  /// No description provided for @emailOpenFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível abrir o app de e-mail. Contato: hendrilmendes2015@gmail.com'**
+  String get emailOpenFailed;
+
+  /// No description provided for @userFallback.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usuário'**
+  String get userFallback;
+
+  /// No description provided for @alerts.
+  ///
+  /// In pt, this message translates to:
+  /// **'Alertas'**
+  String get alerts;
+
+  /// No description provided for @sendEmail.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar e-mail'**
+  String get sendEmail;
+
+  /// No description provided for @contactDeveloper.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fale com o desenvolvedor'**
+  String get contactDeveloper;
+
+  /// No description provided for @steps.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 passo} other{{count} passos}}'**
+  String steps(int count);
+
+  /// No description provided for @tabAgenda.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agenda'**
+  String get tabAgenda;
+
+  /// No description provided for @assistantBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'ASSISTENTE LOCAL'**
+  String get assistantBadge;
+
+  /// No description provided for @focusNow.
+  ///
+  /// In pt, this message translates to:
+  /// **'FOCO AGORA'**
+  String get focusNow;
+
+  /// No description provided for @pomodoro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pomodoro'**
+  String get pomodoro;
+
+  /// No description provided for @quickAddEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite a tarefa — ex.: Amanhã 15h pagar conta #casa'**
+  String get quickAddEmpty;
+
+  /// No description provided for @quickAddTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova tarefa inteligente'**
+  String get quickAddTitle;
+
+  /// No description provided for @quickAddHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ex.: Segunda 9h reunião #trabalho !p1'**
+  String get quickAddHint;
+
+  /// No description provided for @quickAddTip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dica: use \"amanhã 15h\", \"#projeto\", \"!p1\" e a IA entende sozinha.'**
+  String get quickAddTip;
+
+  /// No description provided for @noDateSuggestToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem data — sugerir hoje'**
+  String get noDateSuggestToday;
+
+  /// No description provided for @suggestedSteps.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 passo sugerido} other{{count} passos sugeridos}}'**
+  String suggestedSteps(int count);
+
+  /// No description provided for @priorityColon.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prioridade:'**
+  String get priorityColon;
+
+  /// No description provided for @releaseNotesEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma nota de versão encontrada para esta versão.'**
+  String get releaseNotesEmpty;
+
+  /// No description provided for @releaseNotesError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao carregar as notas da versão. Código: {code}'**
+  String releaseNotesError(int code);
+
+  /// No description provided for @releaseNotesConnection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao carregar. Verifique sua conexão com a internet.'**
+  String get releaseNotesConnection;
+
+  /// No description provided for @language.
+  ///
+  /// In pt, this message translates to:
+  /// **'Idioma'**
+  String get language;
+
+  /// No description provided for @languageSub.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o idioma do app'**
+  String get languageSub;
+
+  /// No description provided for @languageAuto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Automático (sistema)'**
+  String get languageAuto;
+
+  /// No description provided for @stepsShopping.
+  ///
+  /// In pt, this message translates to:
+  /// **'Listar itens prioritários|Verificar despensa e geladeira|Definir orçamento máximo|Ir ao supermercado ou feira'**
+  String get stepsShopping;
+
+  /// No description provided for @stepsMeeting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Definir pauta e objetivo|Reunir links e apresentações|Enviar convite/lembrete aos participantes|Registrar ata e próximos passos'**
+  String get stepsMeeting;
+
+  /// No description provided for @stepsCoding.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entender requisito e edge cases|Criar branch e escrever código|Testar localmente cenários de erro|Abrir PR e solicitar review'**
+  String get stepsCoding;
+
+  /// No description provided for @stepsFinance.
+  ///
+  /// In pt, this message translates to:
+  /// **'Revisar extrato bancário|Categorizar receitas e despesas|Identificar gastos supérfluos|Atualizar planilha ou app financeiro'**
+  String get stepsFinance;
+
+  /// No description provided for @stepsHealth.
+  ///
+  /// In pt, this message translates to:
+  /// **'Marcar consulta ou exame|Separar exames anteriores|Anotar dúvidas para o médico|Confirmar horário e trajeto'**
+  String get stepsHealth;
+
+  /// No description provided for @noteTotalDetected.
+  ///
+  /// In pt, this message translates to:
+  /// **'Total detectado:'**
+  String get noteTotalDetected;
+
+  /// No description provided for @noteValuesCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 valor} other{{count} valores}}'**
+  String noteValuesCount(int count);
+
+  /// No description provided for @insertTotalInNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inserir total na nota'**
+  String get insertTotalInNote;
 }
 
 class _AppLocalizationsDelegate
@@ -634,7 +1426,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['pt'].contains(locale.languageCode);
+      <String>['en', 'es', 'pt'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -643,6 +1435,10 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
     case 'pt':
       return AppLocalizationsPt();
   }

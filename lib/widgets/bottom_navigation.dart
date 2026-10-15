@@ -1,29 +1,30 @@
 // ignore_for_file: deprecated_member_use
-
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:flutter/rendering.dart';
 import 'package:tarefas/l10n/app_localizations.dart';
+import 'package:tarefas/screens/calendar/calendar_screen.dart';
 import 'package:tarefas/screens/settings/settings.dart';
 import 'package:tarefas/screens/home/home.dart';
 import 'package:tarefas/screens/notes/notes.dart';
+import 'package:tarefas/widgets/orb_glass.dart';
 
 class BottomNavigationContainer extends StatefulWidget {
   const BottomNavigationContainer({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _BottomNavigationContainerState createState() =>
+  State<BottomNavigationContainer> createState() =>
       _BottomNavigationContainerState();
 }
 
 class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
   int _currentIndex = 0;
+  bool _compact = false;
   late final PageController _pageController;
 
   final List<Widget> _screens = const [
     HomeScreen(),
+    CalendarScreen(),
     NotesScreen(),
     SettingsScreen(),
   ];
@@ -42,263 +43,168 @@ class _BottomNavigationContainerState extends State<BottomNavigationContainer> {
 
   void _onTabTapped(int index) {
     if (_currentIndex == index) return;
-    setState(() {
-      _currentIndex = index;
-    });
+    setState(() => _currentIndex = index);
+    if (_pageController.hasClients) {
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+      );
+    }
   }
 
-  void _onPageChanged(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification is UserScrollNotification) {
+      final compact = notification.direction == ScrollDirection.reverse;
+      if (compact != _compact && mounted) setState(() => _compact = compact);
+    } else if (notification is ScrollEndNotification) {
+      if (_compact && mounted) setState(() => _compact = false);
+    }
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final destinations = [
+      _Dest(
+        CupertinoIcons.checkmark_circle,
+        CupertinoIcons.checkmark_circle_fill,
+        l10n!.home,
+      ),
+      _Dest(
+        CupertinoIcons.calendar,
+        CupertinoIcons.calendar_today,
+        l10n.tabAgenda,
+      ),
+      _Dest(CupertinoIcons.doc_text, CupertinoIcons.doc_text_fill, l10n.notes),
+      _Dest(CupertinoIcons.gear, CupertinoIcons.gear_solid, l10n.settings),
+    ];
+
     return Scaffold(
-      body: OrientationBuilder(
-        builder: (context, orientation) {
-          if (orientation == Orientation.portrait) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted &&
-                  _pageController.hasClients &&
-                  _pageController.page?.round() != _currentIndex) {
-                _pageController.jumpToPage(_currentIndex);
-              }
-            });
-          }
-
-          if (orientation == Orientation.portrait &&
-              _pageController.hasClients &&
-              _pageController.page?.round() != _currentIndex) {
-            _pageController.animateToPage(
-              _currentIndex,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOut,
-            );
-          }
-
-          if (orientation == Orientation.landscape) {
-            return Row(
-              children: [
-                ClipRRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor.withOpacity(0.2),
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.white.withOpacity(0.1),
-                            width: 1.0,
-                          ),
-                        ),
-                      ),
-                      child: NavigationRail(
-                        backgroundColor: Colors.transparent,
-                        groupAlignment: 0.0,
-                        selectedIndex: _currentIndex,
-                        onDestinationSelected: _onTabTapped,
-                        labelType: NavigationRailLabelType.all,
-                        indicatorColor: Theme.of(context)
-                            .bottomNavigationBarTheme
-                            .selectedItemColor
-                            ?.withOpacity(0.3),
-                        destinations: [
-                          NavigationRailDestination(
-                            icon: const Icon(CupertinoIcons.checkmark_alt),
-                            label: Text(AppLocalizations.of(context)!.home),
-                          ),
-                          NavigationRailDestination(
-                            icon: const Icon(CupertinoIcons.news),
-                            label: Text(AppLocalizations.of(context)!.notes),
-                          ),
-                          NavigationRailDestination(
-                            icon: const Icon(CupertinoIcons.settings),
-                            label: Text(AppLocalizations.of(context)!.settings),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 50),
-                    child: Container(
-                      key: ValueKey<int>(_currentIndex),
-                      child: _screens[_currentIndex],
-                    ),
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return Scaffold(
-              extendBody: true,
-              body: PageView(
-                controller: _pageController,
-                onPageChanged: _onPageChanged,
-                children: _screens,
-              ),
-              bottomNavigationBar: GlassNavBar(
-                selectedIndex: _currentIndex,
-                onItemSelected: _onTabTapped,
-                items: [
-                  GlassNavBarItem(
-                    icon: CupertinoIcons.checkmark_alt,
-                    label: AppLocalizations.of(context)!.home,
-                  ),
-                  GlassNavBarItem(
-                    icon: CupertinoIcons.news,
-                    label: AppLocalizations.of(context)!.notes,
-                  ),
-                  GlassNavBarItem(
-                    icon: CupertinoIcons.settings,
-                    label: AppLocalizations.of(context)!.settings,
-                  ),
-                ],
+      extendBody: true,
+      body: NotificationListener<ScrollNotification>(
+        onNotification: _onScrollNotification,
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (i) => setState(() => _currentIndex = i),
+          children: _screens,
+        ),
+      ),
+      bottomNavigationBar: FloatingGlassBar(
+        height: _compact ? 54 : 64,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: destinations.asMap().entries.map((entry) {
+            final i = entry.key;
+            final d = entry.value;
+            final selected = i == _currentIndex;
+            return Expanded(
+              child: _GlassNavItem(
+                icon: d.icon,
+                selectedIcon: d.selectedIcon,
+                label: d.label,
+                selected: selected,
+                showLabel: !_compact,
+                onTap: () => _onTabTapped(i),
               ),
             );
-          }
-        },
+          }).toList(),
+        ),
       ),
     );
   }
 }
 
-class GlassNavBarItem {
+class _Dest {
   final IconData icon;
+  final IconData selectedIcon;
   final String label;
-
-  GlassNavBarItem({required this.icon, required this.label});
+  const _Dest(this.icon, this.selectedIcon, this.label);
 }
 
-class GlassNavBar extends StatefulWidget {
-  final int selectedIndex;
-  final Function(int) onItemSelected;
-  final List<GlassNavBarItem> items;
+class _GlassNavItem extends StatefulWidget {
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+  final bool selected;
+  final bool showLabel;
+  final VoidCallback onTap;
 
-  const GlassNavBar({
-    super.key,
-    required this.selectedIndex,
-    required this.onItemSelected,
-    required this.items,
+  const _GlassNavItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+    required this.selected,
+    required this.showLabel,
+    required this.onTap,
   });
 
   @override
-  State<GlassNavBar> createState() => _GlassNavBarState();
+  State<_GlassNavItem> createState() => _GlassNavItemState();
 }
 
-class _GlassNavBarState extends State<GlassNavBar> {
-  final Duration _animationDuration = const Duration(milliseconds: 50);
-  final Curve _animationCurve = Curves.easeInOutQuart;
+class _GlassNavItemState extends State<_GlassNavItem> {
+  bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final selectedColor = theme.colorScheme.secondary;
-    final unselectedColor = theme.colorScheme.onSurface.withOpacity(0.7);
+    final color = widget.selected
+        ? theme.colorScheme.primary
+        : theme.textTheme.bodyLarge?.color?.withOpacity(0.7);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(100.0),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 4.0,
-            ),
-            decoration: BoxDecoration(
-              color: theme.cardColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(100.0),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.1),
-                width: 1.0,
+    final Widget icon = Icon(
+      widget.selected ? widget.selectedIcon : widget.icon,
+      color: color,
+      size: 24,
+    );
+
+    return GestureDetector(
+      onTap: widget.onTap,
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() => _pressed = false),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        child: Container(
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedScale(
+                scale: widget.selected ? 1.05 : 1.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutBack,
+                child: icon,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 15.0,
-                  spreadRadius: 2.0,
-                  offset: const Offset(0, 8),
-                ),
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.05),
-                  blurRadius: 5.0,
-                  spreadRadius: 1.0,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: widget.items.asMap().entries.map((entry) {
-                int index = entry.key;
-                GlassNavBarItem item = entry.value;
-                bool isSelected = index == widget.selectedIndex;
-
-                return GestureDetector(
-                  onTap: () => widget.onItemSelected(index),
-                  child: AnimatedContainer(
-                    duration: _animationDuration,
-                    curve: _animationCurve,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isSelected ? 20.0 : 12.0,
-                      vertical: 8.0,
-                    ),
-                    decoration: isSelected
-                        ? BoxDecoration(
-                            color: selectedColor.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(100.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: selectedColor.withOpacity(0.1),
-                                blurRadius: 10.0,
-                                spreadRadius: 1.0,
-                              ),
-                            ],
-                          )
-                        : null,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          item.icon,
-                          color: isSelected ? selectedColor : unselectedColor,
-                          size: isSelected ? 28.0 : 24.0,
-                        ),
-                        AnimatedOpacity(
-                          opacity: isSelected ? 1.0 : 0.0,
-                          duration: _animationDuration,
-                          curve: _animationCurve,
-                          child: AnimatedSize(
-                            duration: _animationDuration,
-                            curve: _animationCurve,
-                            alignment: Alignment.center,
-                            child: isSelected
-                                ? Padding(
-                                    padding: const EdgeInsets.only(top: 4.0),
-                                    child: Text(
-                                      item.label,
-                                      style: TextStyle(
-                                        color: selectedColor,
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  )
-                                : const SizedBox.shrink(),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                alignment: Alignment.topCenter,
+                child: widget.showLabel
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          widget.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: widget.selected
+                                ? FontWeight.w700
+                                : FontWeight.w600,
+                            color: color,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
           ),
         ),
       ),

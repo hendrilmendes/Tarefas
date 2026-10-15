@@ -1,717 +1,427 @@
 // ignore_for_file: deprecated_member_use
-
-import 'dart:ui';
+import 'package:tarefas/l10n/app_localizations.dart';
+import 'package:tarefas/utils/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/foundation.dart';
-import 'package:tarefas/l10n/app_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:intl/intl.dart';
+import 'package:tarefas/ai/assistant_service.dart';
 import 'package:tarefas/auth/auth.dart';
-import 'package:tarefas/tasks/tasks.dart';
+import 'package:tarefas/screens/focus/focus_screen.dart';
 import 'package:tarefas/screens/home/home_details.dart';
-import 'package:tarefas/widgets/home/task_dialog.dart';
+import 'package:tarefas/tasks/tasks.dart';
+import 'package:tarefas/widgets/dashboard_cards.dart';
+import 'package:tarefas/widgets/action_fab.dart';
+import 'package:tarefas/widgets/orb_glass.dart';
+import 'package:tarefas/widgets/quick_add_sheet.dart';
+import 'package:tarefas/widgets/task_tile.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> {
   final AuthService _authService = AuthService();
   User? _user;
+  int _filter = HomeFilter.all;
+  String _query = '';
 
-  late ScrollController _scrollController;
-  late AnimationController _fabAnimationController;
-  late Animation<double> _fabAnimation;
-  late Animation<Offset> _fabSlideAnimation;
+  final _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
-    _scrollController = ScrollController();
-
-    _fabAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-
-    _fabAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fabAnimationController, curve: Curves.easeInOut),
-    );
-
-    _fabSlideAnimation =
-        Tween<Offset>(begin: const Offset(0, 2), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _fabAnimationController,
-            curve: Curves.easeOutCubic,
-          ),
-        );
-
-    _fabAnimationController.forward();
-
     _checkUser();
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
-    _fabAnimationController.dispose();
+    _searchController.dispose();
     super.dispose();
-  }
-
-  bool _onScrollNotification(ScrollNotification notification) {
-    if (notification is UserScrollNotification) {
-      final ScrollDirection direction = notification.direction;
-      if (direction == ScrollDirection.reverse) {
-        if (_fabAnimationController.isCompleted) {
-          _fabAnimationController.reverse();
-        }
-      } else if (direction == ScrollDirection.forward) {
-        if (_fabAnimationController.isDismissed) {
-          _fabAnimationController.forward();
-        }
-      }
-    }
-    return false;
   }
 
   void _checkUser() async {
     final user = await _authService.currentUser();
-    if (mounted) {
-      setState(() {
-        _user = user;
-      });
-    }
+    if (mounted) setState(() => _user = user);
   }
 
-  Widget buildTaskItem(Task task, bool isPending) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
-      child: GestureDetector(
-        onLongPress: () => _removeTask(task),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.15),
-                  width: 0.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomeDetailsScreen(task: task),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () =>
-                              _updateTaskCompletion(task, !task.completed),
-                          child: Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: isPending
-                                    ? Theme.of(
-                                        context,
-                                      ).colorScheme.primary.withOpacity(0.6)
-                                    : Theme.of(context).colorScheme.primary,
-                                width: 2,
-                              ),
-                              color: task.completed
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.transparent,
-                            ),
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 200),
-                              transitionBuilder: (child, animation) {
-                                return ScaleTransition(
-                                  scale: animation,
-                                  child: child,
-                                );
-                              },
-                              child: task.completed
-                                  ? Icon(
-                                      Icons.check,
-                                      size: 16,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onPrimary,
-                                      key: const ValueKey('checked'),
-                                    )
-                                  : const SizedBox.shrink(
-                                      key: ValueKey('unchecked'),
-                                    ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                task.title,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: task.completed
-                                      ? TextDecoration.lineThrough
-                                      : null,
-                                  color: task.completed
-                                      ? Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface.withOpacity(0.6)
-                                      : Theme.of(context).colorScheme.onSurface,
-                                  height: 1.3,
-                                ),
-                              ),
-                              if (task.dateTime != null) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  DateFormat(
-                                    'dd/MM/yyyy • HH:mm',
-                                  ).format(task.dateTime!),
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withOpacity(0.5),
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+  List<Task> _visibleTasks(List<Task> all) {
+    var list = applyFilter(all, _filter);
+    if (_query.trim().isNotEmpty) {
+      final q = _query.toLowerCase();
+      list = list
+          .where(
+            (t) =>
+                t.title.toLowerCase().contains(q) ||
+                (t.project ?? '').toLowerCase().contains(q),
+          )
+          .toList();
+    }
+
+    list.sort((a, b) {
+      if (a.completed != b.completed) return a.completed ? 1 : -1;
+      final now = DateTime.now();
+      final sa = AssistantService.score(a, now);
+      final sb = AssistantService.score(b, now);
+      if (sa != sb) return sa.compareTo(sb);
+      final da = a.dateTime ?? DateTime(2100);
+      final db = b.dateTime ?? DateTime(2100);
+      return da.compareTo(db);
+    });
+    return list;
+  }
+
+  Future<void> _quickAdd() async {
+    if (_user == null) return;
+    final result = await QuickAddSheet.show(context);
+    if (result == null || !mounted) return;
+    try {
+      final docRef = await tasksCollection.add({
+        'title': result.title,
+        'completed': false,
+        'userId': _user!.uid,
+        'dateTime': result.dateTime,
+        'priority': result.priority,
+        if (result.project != null) 'project': result.project,
+        if (result.suggestedSteps.isNotEmpty) 'subtasks': result.suggestedSteps,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      await _scheduleNotification(docRef.id, result.title, result.dateTime);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              S.current.taskCreatedByAi(
+                result.title,
+                result.suggestedSteps.length,
               ),
             ),
+            behavior: SnackBarBehavior.floating,
           ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _addTask() async {
-    final appLocalizations = AppLocalizations.of(context);
-    if (appLocalizations == null || _user == null) return;
-
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.4),
-      builder: (context) => const TaskDialog(),
-    );
-
-    if (result != null) {
-      final String newTaskTitle = result['title'];
-      final DateTime taskDateTime = result['dateTime'];
-
-      try {
-        final newDocRef = await tasksCollection.add({
-          'title': newTaskTitle,
-          'completed': false,
-          'userId': _user!.uid,
-          'dateTime': taskDateTime,
-        });
-
-        final notificationId = newDocRef.id.hashCode;
-        const NotificationDetails notificationDetails = NotificationDetails(
-          android: AndroidNotificationDetails(
-            'task_channel',
-            'Lembretes de Tarefas',
-            icon: '@drawable/ic_notification',
-            channelDescription: 'Alertas de tarefas agendadas',
-            importance: Importance.high,
-            priority: Priority.high,
-            enableVibration: true,
-            fullScreenIntent: true,
-            category: AndroidNotificationCategory.reminder,
-          ),
-          iOS: DarwinNotificationDetails(),
-        );
-
-        FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-            FlutterLocalNotificationsPlugin();
-        await flutterLocalNotificationsPlugin.zonedSchedule(
-          notificationId,
-          newTaskTitle,
-          appLocalizations.notificationTask,
-          tz.TZDateTime.from(taskDateTime, tz.local),
-          notificationDetails,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        );
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Erro ao salvar a tarefa: $e")),
-          );
-        }
-      }
-    }
-  }
-
-  void _updateTaskCompletion(Task task, bool completed) async {
-    if (_user == null) {
-      return;
-    }
-
-    try {
-      await tasksCollection.doc(task.id).update({'completed': completed});
-
-      if (kDebugMode) {
-        print(
-          'Estado de conclusão da tarefa ${task.id} atualizado com sucesso.',
         );
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao atualizar estado de conclusão da tarefa: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(S.current.errorSaving('$e'))));
       }
+    }
+  }
 
+  Future<void> _scheduleNotification(
+    String docId,
+    String title,
+    DateTime? when,
+  ) async {
+    if (when == null || when.isBefore(DateTime.now())) return;
+    try {
+      final details = NotificationDetails(
+        android: AndroidNotificationDetails(
+          'task_channel',
+          S.current.notificationChannelName,
+          channelDescription: S.current.notificationChannelDesc,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: const DarwinNotificationDetails(),
+      );
+      await FlutterLocalNotificationsPlugin().zonedSchedule(
+        id: docId.hashCode,
+        title: title,
+        body: S.current.notificationTask,
+        scheduledDate: tz.TZDateTime.from(when, tz.local),
+        notificationDetails: details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+    } catch (_) {}
+  }
+
+  Future<void> _toggle(Task task) async {
+    try {
+      await tasksCollection.doc(task.id).update({'completed': !task.completed});
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Falha ao atualizar a tarefa. Tente novamente.'),
-          ),
+          SnackBar(content: Text(S.current.updateFailed)),
         );
       }
     }
   }
 
-  void _removeTask(Task task) async {
-    final appLocalizations = AppLocalizations.of(context);
-    if (appLocalizations == null || _user == null) {
-      return;
-    }
-    final confirmed =
-        await showDialog<bool>(
-          context: context,
-          barrierColor: Colors.black.withOpacity(0.4),
-          builder: (BuildContext context) {
-            return BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Dialog(
-                backgroundColor: Colors.transparent,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.surface.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                          width: 1,
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.error.withOpacity(0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              CupertinoIcons.delete,
-                              size: 32,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            appLocalizations.confirmDelete,
-                            style: Theme.of(context).textTheme.headlineSmall
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            appLocalizations.confirmDeleteTask,
-                            style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withOpacity(0.7),
-                              fontSize: 16,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 32),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(false),
-                                  child: Text(appLocalizations.cancel),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(true),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.error,
-                                    foregroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.onError,
-                                  ),
-                                  child: Text(appLocalizations.delete),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ) ??
-        false;
-
-    if (confirmed == true) {
-      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-          FlutterLocalNotificationsPlugin();
-      await flutterLocalNotificationsPlugin.cancel(task.id.hashCode);
-
-      try {
-        await tasksCollection.doc(task.id).delete();
-
-        if (kDebugMode) {
-          print('Tarefa removida do Firestore: ${task.id}');
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print('Erro ao apagar tarefa: $e');
-        }
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro ao remover a tarefa: $e')),
-          );
-        }
+  Future<void> _delete(Task task) async {
+    try {
+      await FlutterLocalNotificationsPlugin().cancel(id: task.id.hashCode);
+      await tasksCollection.doc(task.id).delete();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(S.current.errorRemoving('$e'))));
       }
     }
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 10, 20, 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Text(
-        title.toUpperCase(),
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.primary,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 1.2,
-        ),
-      ),
+  void _openDetails(Task task) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => HomeDetailsScreen(task: task)),
+    );
+  }
+
+  void _openFocus() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const FocusScreen()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final appLocalizations = AppLocalizations.of(context)!;
-    final colors = Theme.of(context).colorScheme;
-    const double bottomNavHeight = 80.0;
-    final double fabBottomMargin = bottomNavHeight + 40.0;
+    final scheme = Theme.of(context).colorScheme;
+    final userName = _user?.displayName ?? _user?.email?.split('@').first ?? '';
 
     return Scaffold(
-      backgroundColor: colors.surface,
-      extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-            child: AppBar(
-              backgroundColor: colors.surface.withOpacity(0.8),
-              elevation: 0,
-              surfaceTintColor: Colors.transparent,
-              title: Text(
-                appLocalizations.home,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              centerTitle: true,
-            ),
-          ),
-        ),
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [colors.surface, colors.surface.withOpacity(0.95)],
-          ),
-        ),
-        child: Stack(
-          children: [
-            StreamBuilder<QuerySnapshot>(
-              stream: _user != null
-                  ? tasksCollection
-                        .where('userId', isEqualTo: _user!.uid)
-                        .snapshots()
-                  : null,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  );
-                }
-
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Erro ao carregar tarefas: ${snapshot.error}'),
-                  );
-                }
-
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return CustomScrollView(
-                    slivers: [
-                      SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32.0,
+      backgroundColor: scheme.surface,
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _user != null
+            ? tasksCollection.where('userId', isEqualTo: _user!.uid).snapshots()
+            : null,
+        builder: (context, snapshot) {
+          final all = (snapshot.data?.docs ?? []).map(Task.fromDoc).toList();
+          final visible = _visibleTasks(all);
+          final briefing = AssistantService.briefing(
+            all,
+            userName.split(' ').first,
+          );
+          final stats = AssistantService.stats(all);
+          return CustomScrollView(
+            slivers: [
+                SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  scrolledUnderElevation: 0,
+                  automaticallyImplyLeading: false,
+                  toolbarHeight: 68,
+                  titleSpacing: 16,
+                  title: Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(
+                            scheme.brightness == Brightness.light ? 0.10 : 0.35,
+                          ),
+                          blurRadius: 20,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: OrbGlass(
+                        filter: OrbGlass.navBlur,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: (scheme.brightness == Brightness.light
+                                    ? Colors.white
+                                    : scheme.surface)
+                                .withOpacity(
+                              scheme.brightness == Brightness.light ? 0.70 : 0.45,
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(32),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        colors.primary.withOpacity(0.1),
-                                        colors.primary.withOpacity(0.05),
-                                      ],
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(
+                              color: scheme.brightness == Brightness.light
+                                  ? Colors.white.withOpacity(0.8)
+                                  : Colors.white.withOpacity(0.14),
+                              width: 1.1,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: (v) => setState(() => _query = v),
+                            decoration: InputDecoration(
+                              hintText: AppLocalizations.of(context)!.searchTasksHint,
+                              prefixIcon: const Icon(Icons.search, size: 20),
+                              suffixIcon: _query.isEmpty
+                                  ? null
+                                  : IconButton(
+                                      icon: const Icon(Icons.clear, size: 18),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        setState(() => _query = '');
+                                      },
                                     ),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: colors.primary.withOpacity(0.2),
-                                      width: 2,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: colors.primary.withOpacity(0.1),
-                                        blurRadius: 20,
-                                        offset: const Offset(0, 8),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Icon(
-                                    Icons.task_alt_outlined,
-                                    size: 64,
-                                    color: colors.primary.withOpacity(0.7),
-                                  ),
-                                ),
-                                const SizedBox(height: 32),
-                                Text(
-                                  AppLocalizations.of(context)!.noTask,
-                                  style: TextStyle(
-                                    color: colors.onSurface.withOpacity(0.8),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  AppLocalizations.of(context)!.addTasks,
-                                  style: TextStyle(
-                                    color: colors.onSurface.withOpacity(0.5),
-                                    fontSize: 16,
-                                    height: 1.4,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
+                              filled: false,
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              contentPadding:
+                                  const EdgeInsets.symmetric(vertical: 12),
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  );
-                }
-
-                final docs = snapshot.data!.docs;
-                final pendingTasks = <Task>[];
-                final completedTasks = <Task>[];
-
-                for (var doc in docs) {
-                  final data = doc.data() as Map<String, dynamic>;
-                  final task = Task(
-                    id: doc.id,
-                    title: data['title'] ?? 'Tarefa sem título',
-                    completed: data['completed'] ?? false,
-                    dateTime: (data['dateTime'] as Timestamp).toDate(),
-                  );
-                  if (task.completed) {
-                    completedTasks.add(task);
-                  } else {
-                    pendingTasks.add(task);
-                  }
-                }
-                pendingTasks.sort((a, b) => a.dateTime!.compareTo(b.dateTime!));
-                completedTasks.sort(
-                  (a, b) => b.dateTime!.compareTo(a.dateTime!),
-                );
-
-                return NotificationListener<ScrollNotification>(
-                  onNotification: _onScrollNotification,
-                  child: CustomScrollView(
-                    controller: _scrollController,
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: SizedBox(height: kToolbarHeight + 40),
-                      ),
-                      if (pendingTasks.isNotEmpty)
-                        SliverToBoxAdapter(
-                          child: _buildSectionHeader(appLocalizations.pendants),
-                        ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (_, index) =>
-                              buildTaskItem(pendingTasks[index], true),
-                          childCount: pendingTasks.length,
-                        ),
-                      ),
-                      if (completedTasks.isNotEmpty)
-                        SliverToBoxAdapter(
-                          child: _buildSectionHeader(
-                            appLocalizations.completed,
-                          ),
-                        ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (_, index) =>
-                              buildTaskItem(completedTasks[index], false),
-                          childCount: completedTasks.length,
-                        ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 140)),
-                    ],
+                    ),
                   ),
-                );
-              },
-            ),
-            Positioned(
-              right: 20,
-              bottom: fabBottomMargin,
-              child: SlideTransition(
-                position: _fabSlideAnimation,
-                child: AnimatedBuilder(
-                  animation: _fabAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _fabAnimation.value,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: [
-                            BoxShadow(
-                              color: colors.primary.withOpacity(0.4),
-                              blurRadius: 16,
-                              offset: const Offset(0, 6),
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                            child: Container(
-                              width: 56,
-                              height: 56,
-                              decoration: BoxDecoration(
-                                color: colors.primary.withOpacity(0.9),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.2),
-                                  width: 0.5,
-                                ),
-                              ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(16),
-                                  onTap: _addTask,
-                                  child: Icon(
-                                    CupertinoIcons.add,
-                                    color: colors.onPrimary,
-                                    size: 28,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
                 ),
-              ),
+                SliverToBoxAdapter(
+                  child: GreetingHeader(
+                    userName: userName,
+                    now: DateTime.now(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: AiBriefingCard(
+                    briefing: briefing,
+                    onFocusTap: briefing.focusTask != null
+                        ? () => _openDetails(briefing.focusTask!)
+                        : null,
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: StatsRow(stats: stats, onFocusTap: _openFocus),
+                ),
+                SliverToBoxAdapter(
+                  child: _FilterBar(
+                    filter: _filter,
+                    onChange: (f) => setState(() => _filter = f),
+                  ),
+                ),
+                if (snapshot.connectionState == ConnectionState.waiting)
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(40),
+                      child: Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      ),
+                    ),
+                  )
+                else if (visible.isEmpty)
+                  SliverToBoxAdapter(
+                    child: _EmptyState(filter: _filter),
+                  )
+                else
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate((context, i) {
+                      final task = visible[i];
+                      return TaskTile(
+                        task: task,
+                        onToggle: () => _toggle(task),
+                        onTap: () => _openDetails(task),
+                        onDelete: () => _delete(task),
+
+                        featured: i == 0 && !task.completed,
+                      );
+                    }, childCount: visible.length),
+                  ),
+                const SliverToBoxAdapter(child: SizedBox(height: 160)),
+              ],
+            );
+        },
+      ),
+      floatingActionButtonLocation: InsetFabLocation.aboveNavBar(context),
+      floatingActionButton: GlassFab(
+        onPressed: _quickAdd,
+        icon: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class _FilterBar extends StatelessWidget {
+  final int filter;
+  final ValueChanged<int> onChange;
+  const _FilterBar({required this.filter, required this.onChange});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final items = [
+      (HomeFilter.all, l10n.filterAll, Icons.inbox_outlined),
+      (HomeFilter.today, l10n.filterMyDay, Icons.today_outlined),
+      (HomeFilter.upcoming, l10n.filterUpcoming, Icons.upcoming_outlined),
+      (HomeFilter.overdue, l10n.overdue, Icons.warning_amber_rounded),
+      (HomeFilter.done, l10n.filterDone, Icons.check_circle_outline),
+    ];
+    return SizedBox(
+      height: 40,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+        itemCount: items.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 6),
+        itemBuilder: (context, i) {
+          final (value, label, icon) = items[i];
+          final selected = filter == value;
+          return FilterChip(
+            selected: selected,
+            showCheckmark: false,
+            shape: const StadiumBorder(),
+            visualDensity: const VisualDensity(horizontal: -2, vertical: -3),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+            avatar: Icon(
+              icon,
+              size: 15,
+              color: selected
+                  ? Theme.of(context).colorScheme.onSecondaryContainer
+                  : null,
             ),
-          ],
-        ),
+            label: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+            ),
+            onSelected: (_) => onChange(value),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final int filter;
+  const _EmptyState({required this.filter});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final msg = filter == HomeFilter.done
+        ? AppLocalizations.of(context)!.emptyDone
+        : AppLocalizations.of(context)!.emptyTasks;
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
+              color: scheme.primaryContainer.withOpacity(0.5),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.task_alt_outlined,
+              size: 52,
+              color: scheme.primary,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            msg,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: scheme.onSurface.withOpacity(0.65),
+              height: 1.5,
+            ),
+          ),
+        ],
       ),
     );
   }

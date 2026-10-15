@@ -1,381 +1,410 @@
 // ignore_for_file: deprecated_member_use
-
-import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:tarefas/theme/theme.dart';
+import 'package:tarefas/widgets/orb_glass.dart';
+import 'package:tarefas/widgets/settings_group.dart';
 
-class PersonalizationScreen extends StatefulWidget {
+class PersonalizationScreen extends StatelessWidget {
   const PersonalizationScreen({super.key});
-
-  @override
-  State<PersonalizationScreen> createState() => _PersonalizationScreenState();
-}
-
-class _PersonalizationScreenState extends State<PersonalizationScreen> {
 
   @override
   Widget build(BuildContext context) {
     final themeModel = Provider.of<ThemeModel>(context);
-    final colors = Theme.of(context).colorScheme;
-    final localizations = AppLocalizations.of(context)!;
-
-    final List<MaterialColor> accentColors = [
-      Colors.amber,
-      Colors.blue,
-      Colors.brown,
-      Colors.green,
-      Colors.grey,
-      Colors.indigo,
-      Colors.orange,
-      Colors.pink,
-      Colors.purple,
-      Colors.red,
-      Colors.teal,
-      Colors.yellow,
-    ];
+    final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    final topPadding = MediaQuery.of(context).padding.top + kToolbarHeight + 8;
 
     return Scaffold(
-      backgroundColor: colors.surface,
       extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-            child: AppBar(
-              backgroundColor: colors.surface.withOpacity(0.8),
-              elevation: 0,
-              surfaceTintColor: Colors.transparent,
-              title: Text(
-                localizations.personalization,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              centerTitle: true,
-              leading: Container(
-                margin: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: colors.surface.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.1),
-                    width: 0.5,
-                  ),
-                ),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios_new,
-                    size: 18,
-                    color: colors.onSurface,
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ),
-            ),
-          ),
+      appBar: GlassAppBar(
+        title: Text(
+          l10n.personalization,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
+        centerTitle: true,
       ),
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: kToolbarHeight + MediaQuery.of(context).padding.top,
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionTitle(context, localizations.theme),
-
-                  _buildGlassmorphismCard(
-                    context,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                          child: Row(
-                            children: [
-                              Icon(
-                                CupertinoIcons.paintbrush_fill,
-                                color: colors.primary,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                localizations.displayMode,
-                                style: TextStyle(
-                                  color: colors.onSurface,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                          child:
-                              CupertinoSlidingSegmentedControl<ThemeModeType>(
-                                backgroundColor: colors.surface.withOpacity(
-                                  0.4,
-                                ),
-                                thumbColor: colors.primary,
-                                groupValue: themeModel.themeMode,
-                                onValueChanged: (ThemeModeType? newValue) {
-                                  if (newValue != null) {
-                                    themeModel.changeThemeMode(newValue);
-                                  }
-                                },
-                                children: {
-                                  ThemeModeType.light: _buildSegment(
-                                    context,
-                                    localizations.lightMode,
-                                    CupertinoIcons.sun_max_fill,
-                                    themeModel.themeMode == ThemeModeType.light,
-                                  ),
-                                  ThemeModeType.dark: _buildSegment(
-                                    context,
-                                    localizations.darkMode,
-                                    CupertinoIcons.moon_fill,
-                                    themeModel.themeMode == ThemeModeType.dark,
-                                  ),
-                                  ThemeModeType.system: _buildSegment(
-                                    context,
-                                    localizations.systemMode,
-                                    CupertinoIcons.device_phone_portrait,
-                                    themeModel.themeMode ==
-                                        ThemeModeType.system,
-                                  ),
-                                },
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-                  _buildSectionTitle(context, localizations.color),
-                  _buildGlassmorphismCard(
-                    context,
-                    child: Column(
-                      children: [
-                       if (themeModel.supportsDynamicColor)
-                          SwitchListTile(
-                            title: Text(
-                              localizations.dynamicColors,
-                              style: TextStyle(
-                                color: colors.onSurface,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            subtitle: Text(
-                              localizations.dynamicColorsSub,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: colors.onSurface.withOpacity(0.7),
-                              ),
-                            ),
-                            value: themeModel.isDynamicColorsEnabled,
-                            onChanged: (value) {
-                              themeModel.toggleDynamicColors();
-                            },
-                            secondary: Icon(
-                              CupertinoIcons.color_filter_fill,
-                              color: colors.primary,
-                            ),
-                            activeColor: colors.primary,
-                            contentPadding: const EdgeInsets.fromLTRB(
-                              16,
-                              8,
-                              12,
-                              8,
-                            ),
-                          ),
-                       if (themeModel.supportsDynamicColor)
-                          const Divider(height: 1, indent: 16, endIndent: 16),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                          child: Row(
-                            children: [
-                              Icon(
-                                CupertinoIcons.eyedropper_full,
-                                color: colors.primary,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                localizations.accentColor,
-                                style: TextStyle(
-                                  color: colors.onSurface,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                          child: Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 16,
-                            runSpacing: 16,
-                            children: accentColors.map((color) {
-                              final bool isSelected =
-                                  (!themeModel.isDynamicColorsEnabled &&
-                                  themeModel.primaryColor == color);
-
-                              return GestureDetector(
-                                onTap: themeModel.isDynamicColorsEnabled
-                                    ? null
-                                    : () => themeModel.setPrimaryColor(color),
-                                child: AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 200),
-                                  opacity: themeModel.isDynamicColorsEnabled
-                                      ? 0.6
-                                      : 1.0,
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: color,
-                                      shape: BoxShape.circle,
-                                      border: isSelected
-                                          ? Border.all(
-                                              color: colors.onSurface,
-                                              width: 3,
-                                            )
-                                          : Border.all(
-                                              color: Colors.white.withOpacity(
-                                                0.3,
-                                              ),
-                                              width: 1,
-                                            ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: color.withOpacity(0.5),
-                                          blurRadius: 10,
-                                          spreadRadius: -2,
-                                        ),
-                                      ],
-                                    ),
-                                    child: isSelected
-                                        ? const Icon(
-                                            CupertinoIcons.checkmark_alt,
-                                            color: Colors.white,
-                                          )
-                                        : null,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        if (themeModel.isDynamicColorsEnabled)
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                            child: Text(
-                              localizations.dynamicColorsEnabledWarning,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: colors.onSurface.withOpacity(0.6),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSegment(
-    BuildContext context,
-    String title,
-    IconData icon,
-    bool isSelected,
-  ) {
-    final colors = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: ListView(
+        padding: EdgeInsets.fromLTRB(16, topPadding, 16, 40),
         children: [
-          Icon(
-            icon,
-            size: 18,
-            color: isSelected ? colors.onPrimary : colors.onSurface,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            title,
-            style: TextStyle(
-              color: isSelected ? colors.onPrimary : colors.onSurface,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, bottom: 12),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGlassmorphismCard(
-    BuildContext context, {
-    required Widget child,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-              width: 0.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+          // Theme Mode Selection
+          SettingsGroup(
+            title: l10n.theme,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.palette_outlined,
+                      size: 18,
+                      color: scheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.displayMode,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 8, 14, 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _ThemeModeCard(
+                        mode: ThemeModeType.light,
+                        label: l10n.lightMode,
+                        icon: Icons.light_mode_rounded,
+                        isSelected: themeModel.themeMode == ThemeModeType.light,
+                        accentColor: themeModel.primaryColor,
+                        onTap: () =>
+                            themeModel.changeThemeMode(ThemeModeType.light),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _ThemeModeCard(
+                        mode: ThemeModeType.dark,
+                        label: l10n.darkMode,
+                        icon: Icons.dark_mode_rounded,
+                        isSelected: themeModel.themeMode == ThemeModeType.dark,
+                        accentColor: themeModel.primaryColor,
+                        onTap: () =>
+                            themeModel.changeThemeMode(ThemeModeType.dark),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _ThemeModeCard(
+                        mode: ThemeModeType.system,
+                        label: l10n.systemMode,
+                        icon: Icons.brightness_auto_rounded,
+                        isSelected:
+                            themeModel.themeMode == ThemeModeType.system,
+                        accentColor: themeModel.primaryColor,
+                        onTap: () =>
+                            themeModel.changeThemeMode(ThemeModeType.system),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          child: child,
+          const SizedBox(height: 20),
+
+          // Accent Color Selection
+          SettingsGroup(
+            title: l10n.color,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.color_lens_outlined,
+                      size: 18,
+                      color: scheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.accentColor,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final itemWidth = (constraints.maxWidth - (12 * 3)) / 4;
+                    return Wrap(
+                      spacing: 12,
+                      runSpacing: 14,
+                      alignment: WrapAlignment.start,
+                      children: themeModel.availableAccentColors.map((color) {
+                        final selected = themeModel.primaryColor == color;
+                        return SizedBox(
+                          width: itemWidth,
+                          child: _ColorSwatchButton(
+                            color: color,
+                            isSelected: selected,
+                            onTap: () => themeModel.setPrimaryColor(color),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Visual Illustrated Theme Mode Card
+class _ThemeModeCard extends StatelessWidget {
+  final ThemeModeType mode;
+  final String label;
+  final IconData icon;
+  final bool isSelected;
+  final MaterialColor accentColor;
+  final VoidCallback onTap;
+
+  const _ThemeModeCard({
+    required this.mode,
+    required this.label,
+    required this.icon,
+    required this.isSelected,
+    required this.accentColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final cardBg = isSelected
+        ? accentColor.withOpacity(isDark ? 0.20 : 0.12)
+        : (isDark
+              ? theme.colorScheme.surfaceContainerHighest.withOpacity(0.35)
+              : theme.colorScheme.surface.withOpacity(0.60));
+
+    final borderColor = isSelected
+        ? accentColor
+        : (isDark
+              ? Colors.white.withOpacity(0.08)
+              : Colors.black.withOpacity(0.06));
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: borderColor, width: isSelected ? 2.0 : 1.0),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: accentColor.withOpacity(0.25),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          children: [
+            // Mini mockup illustration preview usando as cores reais do app
+            _buildMiniMockup(context, mode),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 15,
+                  color: isSelected
+                      ? accentColor
+                      : theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: isSelected
+                          ? FontWeight.w800
+                          : FontWeight.w600,
+                      color: isSelected
+                          ? accentColor
+                          : theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMiniMockup(BuildContext context, ThemeModeType mode) {
+    const mockupHeight = 44.0;
+    const mockupWidth = double.infinity;
+
+    Widget buildSide({required bool dark}) {
+      final scheme = ColorScheme.fromSeed(
+        seedColor: accentColor,
+        brightness: dark ? Brightness.dark : Brightness.light,
+      );
+      final bg = scheme.surface;
+      final border = dark
+          ? Colors.white.withOpacity(0.10)
+          : Colors.black.withOpacity(0.08);
+      final barColor = scheme.onSurface.withOpacity(dark ? 0.25 : 0.15);
+      final accent = scheme.primary;
+
+      return Container(
+        height: mockupHeight,
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: border, width: 0.8),
+        ),
+        padding: const EdgeInsets.all(5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: accent,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Container(
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: barColor,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            Container(
+              height: 4,
+              width: 24,
+              decoration: BoxDecoration(
+                color: barColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 3),
+            Container(
+              height: 4,
+              width: 16,
+              decoration: BoxDecoration(
+                color: accent.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (mode == ThemeModeType.light) {
+      return buildSide(dark: false);
+    } else if (mode == ThemeModeType.dark) {
+      return buildSide(dark: true);
+    } else {
+      // Split / System mode
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: SizedBox(
+          height: mockupHeight,
+          width: mockupWidth,
+          child: Row(
+            children: [
+              Expanded(child: buildSide(dark: false)),
+              Container(width: 1, color: Colors.grey.withOpacity(0.3)),
+              Expanded(child: buildSide(dark: true)),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+}
+
+/// Refined Color Swatch Button with scale feedback and check ring
+class _ColorSwatchButton extends StatelessWidget {
+  final MaterialColor color;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ColorSwatchButton({
+    required this.color,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedScale(
+        scale: isSelected ? 1.08 : 1.0,
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutBack,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [color.shade400, color.shade700],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? Colors.white : Colors.transparent,
+                  width: isSelected ? 2.5 : 0,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(isSelected ? 0.55 : 0.25),
+                    blurRadius: isSelected ? 12 : 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: isSelected
+                  ? const Center(
+                      child: Icon(
+                        Icons.check_rounded,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    )
+                  : null,
+            ),
+          ],
         ),
       ),
     );

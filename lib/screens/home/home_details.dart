@@ -1,14 +1,16 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
-
-import 'dart:ui';
+import 'package:tarefas/utils/app_strings.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tarefas/ai/assistant_service.dart';
 import 'package:tarefas/tasks/tasks.dart';
+import 'package:tarefas/widgets/action_fab.dart';
+import 'package:tarefas/widgets/orb_glass.dart';
+import 'package:tarefas/widgets/settings_group.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class HomeDetailsScreen extends StatefulWidget {
@@ -17,664 +19,347 @@ class HomeDetailsScreen extends StatefulWidget {
   const HomeDetailsScreen({super.key, required this.task});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _HomeDetailsScreenState createState() => _HomeDetailsScreenState();
+  State<HomeDetailsScreen> createState() => _HomeDetailsScreenState();
 }
 
 class _HomeDetailsScreenState extends State<HomeDetailsScreen> {
-  late TextEditingController _controller;
+  late TextEditingController _titleController;
+  late TextEditingController _projectController;
   late DateTime? _selectedDateTime;
-  int _selectedAction = 1;
+  late int _priority;
+  bool _saving = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.task.title);
+    _titleController = TextEditingController(text: widget.task.title);
+    _projectController = TextEditingController(text: widget.task.project ?? '');
     _selectedDateTime = widget.task.dateTime;
+    _priority = widget.task.priority;
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _titleController.dispose();
+    _projectController.dispose();
     super.dispose();
   }
 
-  void _onActionSelected(int index) {
+  Future<void> _pickDateTime() async {
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDateTime ?? DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 1)),
+      lastDate: DateTime(2100),
+    );
+    if (selectedDate == null || !mounted) return;
+    final selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_selectedDateTime ?? DateTime.now()),
+    );
+    if (!mounted) return;
     setState(() {
-      _selectedAction = index;
+      if (selectedTime != null) {
+        _selectedDateTime = DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          selectedTime.hour,
+          selectedTime.minute,
+        );
+      } else {
+        _selectedDateTime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, 9, 0);
+      }
     });
-
-    switch (index) {
-      case 0:
-        _delete();
-        break;
-      case 1:
-        _saveTask();
-        break;
-      case 2:
-        _shareTask();
-        break;
-    }
   }
 
-  void _saveTask() {
-    final newTitle = _controller.text.trim();
-    if (newTitle.isNotEmpty) {
-      final updatedTask = Task(
-        title: newTitle,
-        completed: widget.task.completed,
-        id: widget.task.id,
-        dateTime: _selectedDateTime,
-      );
-      _updateTask(updatedTask);
+  Future<void> _save() async {
+    final l10n = AppLocalizations.of(context)!;
+    final title = _titleController.text.trim();
+    if (title.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.inputTaskError)));
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      final projectText = _projectController.text.trim().replaceAll('#', '');
+      await tasksCollection.doc(widget.task.id).update({
+        'title': title,
+        'completed': widget.task.completed,
+        'dateTime': _selectedDateTime,
+        'priority': _priority,
+        if (projectText.isNotEmpty) 'project': projectText,
+      });
+
+      if (_selectedDateTime != null && _selectedDateTime!.isAfter(DateTime.now())) {
+        final details = NotificationDetails(
+          android: AndroidNotificationDetails(
+            'task_channel',
+            S.current.notificationChannelName,
+            channelDescription: S.current.notificationChannelDesc,
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: const DarwinNotificationDetails(),
+        );
+        await FlutterLocalNotificationsPlugin().zonedSchedule(
+          id: widget.task.id.hashCode,
+          title: title,
+          body: l10n.notificationTask,
+          scheduledDate: tz.TZDateTime.from(_selectedDateTime!, tz.local),
+          notificationDetails: details,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        );
+      }
+      if (mounted) Navigator.pop(context, true);
+    } catch (e) {
+      if (kDebugMode) print('Error updating task: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.current.errorSaving('$e'))));
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 
   Future<void> _delete() async {
-    final appLocalizations = AppLocalizations.of(context);
-    if (appLocalizations == null) return;
-
-    final confirm = await showDialog<bool>(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.4),
-      builder: (BuildContext context) {
-        return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Dialog(
-            backgroundColor: Colors.transparent,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surface.withOpacity(0.95),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.error.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.delete_outline,
-                          size: 32,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        appLocalizations.confirmDelete,
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        appLocalizations.confirmDeleteTask,
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withOpacity(0.7),
-                          fontSize: 16,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 32),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () => Navigator.of(context).pop(false),
-                              child: Text(appLocalizations.cancel),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () => Navigator.of(context).pop(true),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.error,
-                                foregroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.onError,
-                              ),
-                              child: Text(appLocalizations.delete),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await confirmDeleteDialog(
+      context,
+      title: l10n.confirmDelete,
+      message: l10n.confirmDeleteTask,
     );
-
-    if (confirm != true) {
-      return;
-    }
-
+    if (!confirmed) return;
     try {
+      await FlutterLocalNotificationsPlugin().cancel(id: widget.task.id.hashCode);
       await tasksCollection.doc(widget.task.id).delete();
-
-      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-          FlutterLocalNotificationsPlugin();
-      await flutterLocalNotificationsPlugin.cancel(widget.task.id.hashCode);
-
-      if (kDebugMode) {
-        print('Tarefa removida do Firestore: ${widget.task.id}');
-      }
-
-      if (mounted) {
-        Navigator.of(context).pop(true);
-      }
+      if (mounted) Navigator.pop(context, true);
     } catch (e) {
-      if (kDebugMode) {
-        print('Erro ao apagar tarefa: $e');
-      }
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Erro ao apagar tarefa: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.current.errorDeleting('$e'))));
       }
     }
   }
 
-  void _shareTask() {
-    final formattedDate = _selectedDateTime != null
-        ? DateFormat('dd/MM/yyyy • HH:mm').format(_selectedDateTime!)
-        : AppLocalizations.of(context)!.noDate;
-
-    SharePlus.instance.share(
-      ShareParams(
-        text:
-            '${AppLocalizations.of(context)!.taskTitle}: ${widget.task.title}\n'
-            '${AppLocalizations.of(context)!.dateTitle}: $formattedDate',
-      ),
-    );
+  void _share() {
+    final l10n = AppLocalizations.of(context)!;
+    final date = _selectedDateTime != null
+        ? DateFormat.yMd(l10n.localeName).add_Hm().format(_selectedDateTime!)
+        : l10n.noDate;
+    SharePlus.instance.share(ShareParams(text: '${l10n.taskTitle}: ${_titleController.text}\n${l10n.dateTitle}: $date'));
   }
 
-  void _updateTask(Task updatedTask) async {
-    if (kDebugMode) {
-      print('Atualizando tarefa: $updatedTask');
-    }
-
-    if (updatedTask.title != widget.task.title ||
-        updatedTask.completed != widget.task.completed ||
-        updatedTask.dateTime != widget.task.dateTime) {
-      if (kDebugMode) {
-        print('Detalhes da tarefa atualizados: $updatedTask');
+  void _toggleDone() async {
+    try {
+      await tasksCollection.doc(widget.task.id).update({'completed': !widget.task.completed});
+      if (mounted) Navigator.pop(context, true);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.current.updateTaskFailed)));
       }
-
-      try {
-        await tasksCollection.doc(widget.task.id).update({
-          'title': updatedTask.title,
-          'completed': updatedTask.completed,
-          'dateTime': updatedTask.dateTime,
-        });
-
-        if (kDebugMode) {
-          print('Notificação agendada para: ${updatedTask.dateTime}');
-        }
-
-        const NotificationDetails notificationDetails = NotificationDetails(
-          android: AndroidNotificationDetails(
-            'task_channel',
-            'Lembretes de Tarefas',
-            icon: '@drawable/ic_notification',
-            channelDescription: 'Alertas de tarefas agendadas',
-            importance: Importance.high,
-            priority: Priority.high,
-            enableVibration: true,
-            fullScreenIntent: true,
-          ),
-          iOS: DarwinNotificationDetails(),
-        );
-
-        FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-            FlutterLocalNotificationsPlugin();
-
-        await flutterLocalNotificationsPlugin.zonedSchedule(
-          updatedTask.id.hashCode,
-          updatedTask.title,
-          AppLocalizations.of(context)!.notificationTask,
-          tz.TZDateTime.from(updatedTask.dateTime!, tz.local),
-          notificationDetails,
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        );
-
-        if (mounted) {
-          Navigator.of(context).pop(true);
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error updating task: $e');
-        }
-      }
-    } else {
-      Navigator.of(context).pop(false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
+    final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    final steps = widget.task.subtasks.isNotEmpty
+        ? widget.task.subtasks
+        : AssistantService.breakdown(_titleController.text);
 
     return Scaffold(
-      backgroundColor: colors.surface,
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-            child: AppBar(
-              backgroundColor: colors.surface.withOpacity(0.8),
-              elevation: 0,
-              surfaceTintColor: Colors.transparent,
+      appBar: AppBar(
+        title: Text(l10n.taskDetails, style: const TextStyle(fontWeight: FontWeight.w800)),
+        centerTitle: true,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+        children: [
+
+          Card(
+            elevation: 0,
+            margin: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: scheme.outlineVariant.withOpacity(0.5)),
+            ),
+            color: widget.task.completed
+                ? scheme.primaryContainer.withOpacity(0.5)
+                : scheme.surfaceContainerHighest.withOpacity(0.45),
+            child: SwitchListTile(
               title: Text(
-                AppLocalizations.of(context)!.taskDetails,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.5,
-                ),
+                widget.task.completed ? l10n.completedLabel : l10n.markAsCompleted,
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
               ),
-              centerTitle: true,
+              secondary: Icon(
+                widget.task.completed ? Icons.check_circle : Icons.radio_button_unchecked,
+                color: scheme.primary,
+              ),
+              value: widget.task.completed,
+              onChanged: (_) => _toggleDone(),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _Label(l10n.inputTask),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _titleController,
+            minLines: 1,
+            maxLines: 3,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: InputDecoration(
+              hintText: l10n.inputTask,
+              filled: true,
+              fillColor: scheme.surfaceContainerHighest.withOpacity(0.5),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+              contentPadding: const EdgeInsets.all(18),
+            ),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 16),
+          _Label(l10n.dateTime),
+          const SizedBox(height: 8),
+          Card(
+            elevation: 0,
+            margin: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: scheme.outlineVariant.withOpacity(0.5)),
+            ),
+            color: scheme.surfaceContainerHighest.withOpacity(0.45),
+            child: ListTile(
+              onTap: _pickDateTime,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               leading: Container(
-                margin: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: colors.surface.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.1),
-                    width: 0.5,
-                  ),
+                  color: scheme.primary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios_new,
-                    size: 18,
-                    color: colors.onSurface,
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
+                child: Icon(Icons.schedule_outlined, color: scheme.primary, size: 20),
+              ),
+              title: Text(
+                _selectedDateTime != null
+                    ? DateFormat.yMd(l10n.localeName).add_Hm().format(_selectedDateTime!)
+                    : l10n.dateTime,
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              ),
+              trailing: _selectedDateTime != null
+                  ? IconButton(
+                      icon: const Icon(Icons.clear, size: 18),
+                      onPressed: () => setState(() => _selectedDateTime = null),
+                    )
+                  : const Icon(Icons.chevron_right, size: 18),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _Label(l10n.priority),
+          const SizedBox(height: 8),
+          SegmentedButton<int>(
+            segments: const [
+              ButtonSegment(value: 1, label: Text('P1')),
+              ButtonSegment(value: 2, label: Text('P2')),
+              ButtonSegment(value: 3, label: Text('P3')),
+              ButtonSegment(value: 4, label: Text('P4')),
+            ],
+            selected: {_priority},
+            onSelectionChanged: (s) => setState(() => _priority = s.first),
+            showSelectedIcon: false,
+          ),
+          const SizedBox(height: 16),
+          _Label(l10n.projectOptional),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _projectController,
+            decoration: InputDecoration(
+              hintText: l10n.projectHint,
+              prefixIcon: const Icon(Icons.tag, size: 20),
+              filled: true,
+              fillColor: scheme.surfaceContainerHighest.withOpacity(0.5),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+              contentPadding: const EdgeInsets.all(18),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _Label(l10n.aiSuggestedSteps),
+          const SizedBox(height: 8),
+
+          ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: OrbGlass(
+              filter: OrbGlass.highBlur,
+              borderRadius: BorderRadius.circular(24),
+              child: Container(
+                decoration: orbGlassDecoration(Theme.of(context),
+                    borderRadius: BorderRadius.circular(24), hero: true),
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  children: [
+                    for (var i = 0; i < steps.length; i++)
+                      ListTile(
+                        dense: true,
+                        leading: Container(
+                          width: 28,
+                          height: 28,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: scheme.primary.withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text('${i + 1}',
+                              style: TextStyle(fontWeight: FontWeight.w800, color: scheme.primary, fontSize: 13)),
+                        ),
+                        title: Text(steps[i], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                      ),
+                  ],
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [colors.surface, colors.surface.withOpacity(0.95)],
-          ),
+      floatingActionButtonLocation: InsetFabLocation.aboveSystemBar(context),
+      floatingActionButton: ActionFab(
+        busy: _saving,
+        primary: FabAction(
+          icon: Icons.check,
+          label: l10n.save,
+          onPressed: _save,
         ),
-        child: SafeArea(
-          child: Stack(
-            children: [
-              SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 120.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        AppLocalizations.of(context)!.inputTask,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: colors.onSurface.withOpacity(0.7),
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.15),
-                              width: 0.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: TextField(
-                            controller: _controller,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: colors.onSurface,
-                              height: 1.4,
-                            ),
-                            maxLines: null,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.all(20),
-                              hintText: AppLocalizations.of(context)!.inputTask,
-                              hintStyle: TextStyle(
-                                color: colors.onSurface.withOpacity(0.5),
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        AppLocalizations.of(context)!.dateTime,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: colors.onSurface.withOpacity(0.7),
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.15),
-                              width: 0.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(16),
-                              onTap: () async {
-                                final selectedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate:
-                                      _selectedDateTime ?? DateTime.now(),
-                                  firstDate: DateTime.now(),
-                                  lastDate: DateTime(2100),
-                                );
-                                if (selectedDate != null) {
-                                  if (!mounted) return;
-                                  final selectedTime = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.fromDateTime(
-                                      _selectedDateTime ?? DateTime.now(),
-                                    ),
-                                  );
-                                  if (selectedTime != null) {
-                                    setState(() {
-                                      _selectedDateTime = DateTime(
-                                        selectedDate.year,
-                                        selectedDate.month,
-                                        selectedDate.day,
-                                        selectedTime.hour,
-                                        selectedTime.minute,
-                                      );
-                                    });
-                                  }
-                                }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: colors.primary.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Icon(
-                                        Icons.schedule_outlined,
-                                        size: 20,
-                                        color: colors.primary,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Text(
-                                        _selectedDateTime != null
-                                            ? DateFormat(
-                                                'dd/MM/yyyy • HH:mm',
-                                              ).format(_selectedDateTime!)
-                                            : AppLocalizations.of(
-                                                context,
-                                              )!.dateTime,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: _selectedDateTime != null
-                                              ? colors.onSurface
-                                              : colors.onSurface.withOpacity(
-                                                  0.6,
-                                                ),
-                                        ),
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.chevron_right,
-                                      color: colors.onSurface.withOpacity(0.4),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: GlassNavBar(
-                  selectedIndex: _selectedAction,
-                  onItemSelected: _onActionSelected,
-                  items: [
-                    GlassNavBarItem(
-                      icon: CupertinoIcons.delete,
-                      label: AppLocalizations.of(context)!.delete,
-                    ),
-                    GlassNavBarItem(
-                      icon: CupertinoIcons.checkmark_alt_circle,
-                      label: AppLocalizations.of(context)!.save,
-                    ),
-                    GlassNavBarItem(
-                      icon: CupertinoIcons.share,
-                      label: AppLocalizations.of(context)!.share,
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        secondary: [
+          FabAction(
+            icon: Icons.share_outlined,
+            label: l10n.share,
+            onPressed: _share,
           ),
-        ),
+          FabAction(
+            icon: Icons.delete_outline,
+            label: l10n.delete,
+            onPressed: _delete,
+          ),
+        ],
       ),
     );
   }
 }
 
-class GlassNavBarItem {
-  final IconData icon;
-  final String label;
-
-  GlassNavBarItem({required this.icon, required this.label});
-}
-
-class GlassNavBar extends StatefulWidget {
-  final int selectedIndex;
-  final Function(int) onItemSelected;
-  final List<GlassNavBarItem> items;
-
-  const GlassNavBar({
-    super.key,
-    required this.selectedIndex,
-    required this.onItemSelected,
-    required this.items,
-  });
-
-  @override
-  State<GlassNavBar> createState() => _GlassNavBarState();
-}
-
-class _GlassNavBarState extends State<GlassNavBar> {
-  final Duration _animationDuration = const Duration(milliseconds: 200);
-  final Curve _animationCurve = Curves.easeInOutQuart;
+class _Label extends StatelessWidget {
+  final String text;
+  const _Label(this.text);
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final selectedColor = theme.colorScheme.secondary;
-    final unselectedColor = theme.colorScheme.onSurface.withOpacity(0.7);
-
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(100.0),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 10.0,
-            ),
-            decoration: BoxDecoration(
-              color: theme.cardColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(100.0),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.1),
-                width: 1.0,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 15.0,
-                  spreadRadius: 2.0,
-                  offset: const Offset(0, 8),
-                ),
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.05),
-                  blurRadius: 5.0,
-                  spreadRadius: 1.0,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: widget.items.asMap().entries.map((entry) {
-                int index = entry.key;
-                GlassNavBarItem item = entry.value;
-                bool isSelected = index == widget.selectedIndex;
-
-                return GestureDetector(
-                  onTap: () => widget.onItemSelected(index),
-                  child: AnimatedContainer(
-                    duration: _animationDuration,
-                    curve: _animationCurve,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isSelected ? 20.0 : 12.0,
-                      vertical: 8.0,
-                    ),
-                    decoration: isSelected
-                        ? BoxDecoration(
-                            color: selectedColor.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(100.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: selectedColor.withOpacity(0.1),
-                                blurRadius: 10.0,
-                                spreadRadius: 1.0,
-                              ),
-                            ],
-                          )
-                        : null,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          item.icon,
-                          color: isSelected ? selectedColor : unselectedColor,
-                          size: isSelected ? 28.0 : 24.0,
-                        ),
-                        AnimatedOpacity(
-                          opacity: isSelected ? 1.0 : 0.0,
-                          duration: _animationDuration,
-                          curve: _animationCurve,
-                          child: AnimatedSize(
-                            duration: _animationDuration,
-                            curve: _animationCurve,
-                            alignment: Alignment.center,
-                            child: isSelected
-                                ? Padding(
-                                    padding: const EdgeInsets.only(top: 4.0),
-                                    child: Text(
-                                      item.label,
-                                      style: TextStyle(
-                                        color: selectedColor,
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  )
-                                : const SizedBox.shrink(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
+      padding: const EdgeInsets.only(left: 4),
+      child: Text(
+        text.toUpperCase(),
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.1,
+          color: Theme.of(context).colorScheme.primary,
         ),
       ),
     );

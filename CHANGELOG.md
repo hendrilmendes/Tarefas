@@ -1,5 +1,32 @@
 Changelog Tarefas
 
+## [4.0.0]
+
+### Features & Novidades
+- **Nova Identidade Visual & Logo**:
+  - Nova logo moderna em fita fluída minimalista (*Modern Minimal Ribbon*), unindo a letra "T" ao símbolo de tarefa concluída com gradiente vibrante.
+  - Novos ícones de aplicativo para Android (incluindo drawables adaptativos e *Themed Icons* do Android 13+) e pacote completo para iOS.
+  - Novo ícone monocromático exclusivo para a barra de notificações.
+- **IA Local Avançada (100% On-Device)**:
+  - Detecção automática inteligente de prioridade (P1 a P4) e projetos (#trabalho, #casa, #estudos, #saude, #financas) conforme você digita.
+  - Reconhecimento avançado de datas relativas ("em 2 horas", "em 30 minutos", "fim de semana").
+  - Novos modelos de quebra automática de tarefas em subtarefas (Compras, Reuniões, Programação/Dev, Finanças e Saúde).
+- **Calculadora Automática nas Notas**:
+  - Detecção e soma automática em tempo real de valores monetários e numéricos nas anotações.
+  - Badge com valor total calculado diretamente no card da nota.
+  - Card interativo dentro do editor com botão para inserir o total na nota com 1 toque.
+- **Tipografia & Animações**:
+  - Nova tipografia e transição suave compartilhada entre as telas do app.
+  - Ajuste de visibilidade e contraste dos textos no tema escuro.
+
+### Correções & Melhorias
+- Correção de overflow e corte no botão de salvar no modal de criação rápida.
+- Correção de exceção de agendamento de frame durante scroll/layout.
+- Ajuste de Safe Area e preenchimento nos botões flutuantes.
+- Limpeza e otimização geral do código fonte.
+
+======================================================
+
 ## [3.0.20]
 
 ### Alterações

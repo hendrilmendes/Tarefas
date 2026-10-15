@@ -2,10 +2,8 @@
 
 import 'dart:convert';
 import 'dart:io' show Platform;
-import 'dart:ui'; // Importe para usar ImageFilter
-import 'package:flutter/cupertino.dart'; // Importe para usar CupertinoIcons
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -33,11 +31,11 @@ class Updater {
           _showNoUpdateDialog(context);
         }
       } else if (kDebugMode) {
-        print("Erro ao buscar versão: Nenhuma resposta válida do servidor.");
+        print("Error fetching version: no valid response from the server.");
       }
     } catch (e) {
       if (kDebugMode) {
-        print("Ocorreu um erro: $e");
+        print("An error occurred: $e");
       }
       // ignore: use_build_context_synchronously
       _showErrorDialog(context);
@@ -98,107 +96,66 @@ class Updater {
     String releaseNotes,
   ) {
     final AppLocalizations localizations = AppLocalizations.of(context)!;
-    final colors = Theme.of(context).colorScheme;
+    final scheme = Theme.of(context).colorScheme;
 
     showDialog(
       context: context,
       builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: colors.surface.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          icon: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: scheme.primary.withOpacity(0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.system_update, color: scheme.primary, size: 28),
+          ),
+          title: Text('${localizations.newUpdate}\n${localizations.version} $newVersion',
+              textAlign: TextAlign.center),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations.news,
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Text(releaseNotes,
+                        style: TextStyle(
+                          color: scheme.onSurface.withOpacity(0.8),
+                          height: 1.5,
+                        )),
+                  ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          CupertinoIcons.arrow_down_circle_fill,
-                          color: colors.primary,
-                          size: 36,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                localizations.newUpdate,
-                                style: Theme.of(context).textTheme.headlineSmall
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                "${localizations.version} $newVersion",
-                                style: Theme.of(context).textTheme.bodyLarge
-                                    ?.copyWith(
-                                      color: colors.onSurface.withOpacity(0.7),
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      localizations.news,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Flexible(
-                      child: SingleChildScrollView(
-                        child: Text(
-                          releaseNotes,
-                          style: TextStyle(
-                            color: colors.onSurface.withOpacity(0.8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(localizations.after),
-                        ),
-                        const SizedBox(width: 8),
-                        FilledButton.icon(
-                          icon: const Icon(CupertinoIcons.download_circle),
-                          onPressed: () {
-                            final Uri uri = Platform.isAndroid
-                                ? Uri.parse(
-                                    'https://play.google.com/store/apps/details?id=com.github.hendrilmendes.tarefas',
-                                  )
-                                : Uri.parse(
-                                    'https://github.com/hendrilmendes/Tarefas/releases/latest',
-                                  );
-                            launchUrl(uri);
-                            Navigator.pop(context);
-                          },
-                          label: Text(localizations.download),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              ],
             ),
           ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(localizations.after),
+            ),
+            FilledButton.icon(
+              icon: const Icon(Icons.download, size: 18),
+              onPressed: () {
+                final Uri uri = Platform.isAndroid
+                    ? Uri.parse(
+                        'https://play.google.com/store/apps/details?id=com.github.hendrilmendes.tarefas',
+                      )
+                    : Uri.parse(
+                        'https://github.com/hendrilmendes/Tarefas/releases/latest',
+                      );
+                launchUrl(uri);
+                Navigator.pop(context);
+              },
+              label: Text(localizations.download),
+            ),
+          ],
         );
       },
     );
@@ -206,61 +163,32 @@ class Updater {
 
   static void _showNoUpdateDialog(BuildContext context) {
     final AppLocalizations localizations = AppLocalizations.of(context)!;
-    final colors = Theme.of(context).colorScheme;
 
     showDialog(
       context: context,
       builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: colors.surface.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      CupertinoIcons.checkmark_seal_fill,
-                      color: Colors.green,
-                      size: 48,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      localizations.noUpdate,
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      localizations.noUpdateSub,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: colors.onSurface.withOpacity(0.7),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    FilledButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(localizations.ok),
-                    ),
-                  ],
-                ),
-              ),
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          icon: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(0.12),
+              shape: BoxShape.circle,
             ),
+            child: const Icon(Icons.verified_outlined, color: Colors.green, size: 28),
           ),
+          title: Text(localizations.noUpdate, textAlign: TextAlign.center),
+          content: Text(
+            localizations.noUpdateSub,
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(localizations.ok),
+            ),
+          ],
         );
       },
     );
@@ -284,11 +212,11 @@ class Updater {
           );
         }
       } else if (kDebugMode) {
-        print("Erro ao buscar versão: Nenhuma resposta válida do servidor.");
+        print("Error fetching version: no valid response from the server.");
       }
     } catch (e) {
       if (kDebugMode) {
-        print("Ocorreu um erro: $e");
+        print("An error occurred: $e");
       }
       // ignore: use_build_context_synchronously
       _showErrorDialog(context);
@@ -297,63 +225,33 @@ class Updater {
 
   static void _showErrorDialog(BuildContext context) {
     final AppLocalizations localizations = AppLocalizations.of(context)!;
-    final colors = Theme.of(context).colorScheme;
+    final scheme = Theme.of(context).colorScheme;
 
     showDialog(
       context: context,
       builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: colors.surface.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      CupertinoIcons.xmark_octagon_fill,
-                      color: colors.error,
-                      size: 48,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      localizations.error,
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            color: colors.error,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      localizations.errorUpdate,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: colors.onSurface.withOpacity(0.8),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Align(
-                      alignment: Alignment.center,
-                      child: FilledButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(localizations.ok),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          icon: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: scheme.error.withOpacity(0.12),
+              shape: BoxShape.circle,
             ),
+            child: Icon(Icons.error_outline, color: scheme.error, size: 28),
           ),
+          title: Text(localizations.error, textAlign: TextAlign.center),
+          content: Text(
+            localizations.errorUpdate,
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(localizations.ok),
+            ),
+          ],
         );
       },
     );

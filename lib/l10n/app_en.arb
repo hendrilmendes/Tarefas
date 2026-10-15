@@ -1,0 +1,633 @@
+{
+    "@@locale": "en",
+    "appName": "Tá na Lista",
+    "@appName": {},
+    "home": "Tasks",
+    "@home": {},
+    "notes": "Notes",
+    "@notes": {},
+    "settings": "Settings",
+    "@settings": {},
+    "googleLogin": "Sign in with Google",
+    "@googleLogin": {},
+    "ok": "OK",
+    "@ok": {},
+    "newTask": "New Task",
+    "@newTask": {},
+    "newNote": "New Note",
+    "@newNote": {},
+    "saveNote": "Note saved successfully!",
+    "@saveNote": {},
+    "errosaveNote": "Error saving note.",
+    "@errosaveNote": {},
+    "cancel": "Cancel",
+    "@cancel": {},
+    "delete": "Delete",
+    "@delete": {},
+    "save": "Save",
+    "@save": {},
+    "notesDetails": "Note Details",
+    "@notesDetails": {},
+    "inputTask": "Enter your task",
+    "@inputTask": {},
+    "inputNote": "Enter your note",
+    "@inputNote": {},
+    "errorLoadNotes": "Error loading notes",
+    "@errorLoadNotes": {},
+    "noTask": "No tasks found",
+    "@noTask": {},
+    "noNotes": "No notes found",
+    "@noNotes": {},
+    "confirmDelete": "Confirm deletion",
+    "@confirmDelete": {},
+    "confirmDeleteNote": "Are you sure you want to delete this note?",
+    "@confirmDeleteNote": {},
+    "about": "About",
+    "@about": {},
+    "copyright": "All rights reserved",
+    "@copyright": {},
+    "appDesc": "Organize your daily tasks and notes.",
+    "@appDesc": {},
+    "version": "Version",
+    "@version": {},
+    "privacy": "Privacy Policy",
+    "@privacy": {},
+    "privacySub": "Terms that protect your privacy",
+    "@privacySub": {},
+    "sourceCode": "Source Code",
+    "@sourceCode": {},
+    "sourceCodeSub": "Project available on GitHub",
+    "@sourceCodeSub": {},
+    "openSource": "Open Source Licenses",
+    "@openSource": {},
+    "openSourceSub": "Third-party software used in the app",
+    "@openSourceSub": {},
+    "interface": "Interface",
+    "@interface": {},
+    "others": "Others",
+    "@others": {},
+    "theme": "Theme",
+    "@theme": {},
+    "themeSelect": "Choose Theme",
+    "@themeSelect": {},
+    "darkMode": "Dark",
+    "@darkMode": {},
+    "lightMode": "Light",
+    "@lightMode": {},
+    "systemMode": "System",
+    "@systemMode": {},
+    "dynamicColors": "Dynamic Colors",
+    "@dynamicColors": {},
+    "dynamicColorsSub": "Provides a pleasant interface that matches your wallpaper",
+    "@dynamicColorsSub": {},
+    "update": "Updates",
+    "@update": {},
+    "updateSub": "Check for new app versions",
+    "@updateSub": {},
+    "support": "Support",
+    "@support": {},
+    "supportSub": "Found a bug or want to suggest something?",
+    "@supportSub": {},
+    "review": "Rate the App",
+    "@review": {},
+    "reviewSub": "Leave a review on the app store",
+    "@reviewSub": {},
+    "aboutSub": "A little more about the app",
+    "@aboutSub": {},
+    "newUpdate": "New version available",
+    "@newUpdate": {},
+    "news": "What's new:",
+    "@news": {},
+    "after": "LATER",
+    "@after": {},
+    "download": "DOWNLOAD",
+    "@download": {},
+    "noUpdate": "No updates available",
+    "@noUpdate": {},
+    "noUpdateSub": "You already have the latest version of the app",
+    "@noUpdateSub": {},
+    "pendants": "Pending",
+    "@pendants": {},
+    "completed": "Completed",
+    "@completed": {},
+    "dateTime": "Select date and time",
+    "@dateTime": {},
+    "taskDetails": "Task Details",
+    "@taskDetails": {},
+    "notificationTask": "Don't forget",
+    "@notificationTask": {},
+    "error": "Error",
+    "@error": {},
+    "inputDateError": "Date and time are required",
+    "@inputDateError": {},
+    "inputTaskError": "Cannot add a blank task",
+    "@inputTaskError": {},
+    "inputNoteError": "Cannot save a blank note",
+    "@inputNoteError": {},
+    "notification": "Notifications",
+    "@notification": {},
+    "notificationSub": "Notifications about your tasks",
+    "@notificationSub": {},
+    "confirmDeleteTask": "Do you really want to delete the task?",
+    "@confirmDeleteTask": {},
+    "share": "Share",
+    "@share": {},
+    "alreadyReviewed": "You have already rated the app",
+    "@alreadyReviewed": {},
+    "dateTitle": "Task Date",
+    "@dateTitle": {},
+    "noDate": "No Schedule",
+    "@noDate": {},
+    "taskTitle": "Task Title",
+    "@taskTitle": {},
+    "errorUpdate": "Could not check for updates.",
+    "@errorUpdate": {},
+    "loading": "Loading...",
+    "@loading": {},
+    "loginError": "Login error",
+    "@loginError": {},
+    "personalization": "Personalization",
+    "@personalization": {},
+    "personalizationSub": "Customize the app the way you want",
+    "@personalizationSub": {},
+    "color": "Color",
+    "@color": {},
+    "accentColor": "Accent Color",
+    "@accentColor": {},
+    "dynamicColorsEnabledWarning": "Dynamic Colors is enabled",
+    "@dynamicColorsEnabledWarning": {},
+    "information": "Information",
+    "@information": {},
+    "displayMode": "Display Mode",
+    "@displayMode": {},
+    "addTasks": "Tap the + button to create your first task",
+    "@addTasks": {},
+    "addNotes": "Tap the + button to create your first note",
+    "@addNotes": {},
+    "acceptTerms": "By continuing, you agree to our ",
+    "@acceptTerms": {},
+    "welcomeMessageTitle": "Organize your day,",
+    "@welcomeMessageTitle": {},
+    "welcomeMessageSub": "reach your goals.",
+    "@welcomeMessageSub": {},
+    "logout": "Sign out",
+    "@logout": {},
+    "logoutConfirm": "Disconnect",
+    "@logoutConfirm": {},
+    "logoutConfirmSub": "Are you sure you want to disconnect from the app?",
+    "@logoutConfirmSub": {},
+    "greetingNight": "Good night",
+    "@greetingNight": {},
+    "greetingMorning": "Good morning",
+    "@greetingMorning": {},
+    "greetingAfternoon": "Good afternoon",
+    "@greetingAfternoon": {},
+    "greetingEvening": "Good evening",
+    "@greetingEvening": {},
+    "greetingWithName": "{greeting}, {name} 👋",
+    "@greetingWithName": {
+        "placeholders": {
+            "greeting": {
+                "type": "String"
+            },
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "you": "you",
+    "@you": {},
+    "briefingEmpty": "Your schedule is clear. How about planning the day in 3 goals?",
+    "@briefingEmpty": {},
+    "briefingOverdueToday": "You have {overdue, plural, =1{1 overdue task} other{{overdue} overdue tasks}} and {today} for today. Let's clear the overdue ones first.",
+    "@briefingOverdueToday": {
+        "placeholders": {
+            "overdue": {
+                "type": "int"
+            },
+            "today": {
+                "type": "int"
+            }
+        }
+    },
+    "briefingOverdue": "You have {overdue, plural, =1{1 overdue task} other{{overdue} overdue tasks}}. I recommend rescheduling or finishing now.",
+    "@briefingOverdue": {
+        "placeholders": {
+            "overdue": {
+                "type": "int"
+            }
+        }
+    },
+    "briefingToday": "Today you have {today, plural, =1{1 task} other{{today} tasks}}. Good pace — focus on the first one below.",
+    "@briefingToday": {
+        "placeholders": {
+            "today": {
+                "type": "int"
+            }
+        }
+    },
+    "briefingPending": "Nothing for today, but {count, plural, =1{1 task is} other{{count} tasks are}} pending ahead. How about getting a head start?",
+    "@briefingPending": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "briefingAllDone": "All done. Clean slate — take the chance to review your notes.",
+    "@briefingAllDone": {},
+    "suggestionFocus": "Suggestion: start with \"{title}\" ({when}). Break it into 10-minute steps if you get stuck.",
+    "@suggestionFocus": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            },
+            "when": {
+                "type": "String"
+            }
+        }
+    },
+    "suggestionCreate": "Suggestion: create 3 tasks with a time — e.g. \"Tomorrow 9am gym #health\".",
+    "@suggestionCreate": {},
+    "whenNoTime": "no time set",
+    "@whenNoTime": {},
+    "whenOverdue": "overdue",
+    "@whenOverdue": {},
+    "whenToday": "today at {time}",
+    "@whenToday": {
+        "placeholders": {
+            "time": {
+                "type": "String"
+            }
+        }
+    },
+    "whenTomorrow": "tomorrow",
+    "@whenTomorrow": {},
+    "whenInDays": "in {days} days",
+    "@whenInDays": {
+        "placeholders": {
+            "days": {
+                "type": "int"
+            }
+        }
+    },
+    "stepsTravel": "Set dates and budget|Book transport and lodging|Make a packing checklist|Confirm documents",
+    "@stepsTravel": {},
+    "stepsStudy": "Split material into 3 blocks|Study block 1 (25 min focus)|Review with summaries|Do practice questions/exercises",
+    "@stepsStudy": {},
+    "stepsClean": "Pick 1 room|Sort what goes / stays|Clean for 15 min|Put away and photograph the result",
+    "@stepsClean": {},
+    "stepsProject": "Define the goal in 1 sentence|Draft the structure|Fill in the content|Review and send",
+    "@stepsProject": {},
+    "stepsWorkout": "Get clothes + water ready|Warm up 5 min|Main workout 20 min|Stretch and log it",
+    "@stepsWorkout": {},
+    "stepsBill": "Check amount and due date|Pay in the app/bank|Save the receipt",
+    "@stepsBill": {},
+    "stepsGeneric": "Define the first 5-minute step|Do it without interruption|Review and mark as done",
+    "@stepsGeneric": {},
+    "slotToday": "Today at {time} looks free",
+    "@slotToday": {
+        "placeholders": {
+            "time": {
+                "type": "String"
+            }
+        }
+    },
+    "slotTomorrow": "Tomorrow at 09:00 looks ideal",
+    "@slotTomorrow": {},
+    "priorityUrgent": "Urgent",
+    "@priorityUrgent": {},
+    "priorityHigh": "High",
+    "@priorityHigh": {},
+    "priorityMedium": "Medium",
+    "@priorityMedium": {},
+    "priorityNormal": "Normal",
+    "@priorityNormal": {},
+    "priority": "Priority",
+    "@priority": {},
+    "overdue": "Overdue",
+    "@overdue": {},
+    "today": "Today",
+    "@today": {},
+    "tomorrow": "Tomorrow",
+    "@tomorrow": {},
+    "noDateGroup": "No date",
+    "@noDateGroup": {},
+    "agenda": "Schedule",
+    "@agenda": {},
+    "agendaFreeTitle": "Nothing scheduled here",
+    "@agendaFreeTitle": {},
+    "agendaFreeBody": "Nothing in the next 14 days.\n{tip}.",
+    "@agendaFreeBody": {
+        "placeholders": {
+            "tip": {
+                "type": "String"
+            }
+        }
+    },
+    "agendaCount": "{count} on the schedule",
+    "@agendaCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "focus": "Focus",
+    "@focus": {},
+    "focusDone": "Focus complete! Time for a break ☕",
+    "@focusDone": {},
+    "breakDone": "Break over. Ready for the next cycle?",
+    "@breakDone": {},
+    "breakLabel": "BREAK",
+    "@breakLabel": {},
+    "focusCycles": "FOCUS • {cycles, plural, =1{1 cycle} other{{cycles} cycles}}",
+    "@focusCycles": {
+        "placeholders": {
+            "cycles": {
+                "type": "int"
+            }
+        }
+    },
+    "breakTip": "Breathe, stretch, drink water.",
+    "@breakTip": {},
+    "focusTip": "AI tip: 1 task, phone away, 25 straight minutes.",
+    "@focusTip": {},
+    "pause": "Pause",
+    "@pause": {},
+    "start": "Start",
+    "@start": {},
+    "reset": "Reset",
+    "@reset": {},
+    "taskCreatedByAi": "Created: \"{title}\" • {steps, plural, =1{1 step} other{{steps} steps}} suggested by AI",
+    "@taskCreatedByAi": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            },
+            "steps": {
+                "type": "int"
+            }
+        }
+    },
+    "errorSaving": "Error saving: {error}",
+    "@errorSaving": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "errorRemoving": "Error removing: {error}",
+    "@errorRemoving": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "errorDeleting": "Error deleting: {error}",
+    "@errorDeleting": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "errorUpdatingTask": "Error updating task: {error}",
+    "@errorUpdatingTask": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "notificationChannelName": "Task Reminders",
+    "@notificationChannelName": {},
+    "notificationChannelDesc": "Alerts for scheduled tasks",
+    "@notificationChannelDesc": {},
+    "updateFailed": "Update failed. Please try again.",
+    "@updateFailed": {},
+    "searchTasksHint": "Search tasks or #project…",
+    "@searchTasksHint": {},
+    "filterAll": "All",
+    "@filterAll": {},
+    "filterMyDay": "My Day",
+    "@filterMyDay": {},
+    "filterUpcoming": "Upcoming",
+    "@filterUpcoming": {},
+    "filterDone": "Done",
+    "@filterDone": {},
+    "emptyDone": "Nothing completed yet — finish the first one and come back.",
+    "@emptyDone": {},
+    "emptyTasks": "No tasks here.\nTap the button below to add one using natural language.",
+    "@emptyTasks": {},
+    "completedLabel": "Completed",
+    "@completedLabel": {},
+    "markAsCompleted": "Mark as completed",
+    "@markAsCompleted": {},
+    "projectOptional": "Project (optional)",
+    "@projectOptional": {},
+    "projectHint": "#project — home, work…",
+    "@projectHint": {},
+    "aiSuggestedSteps": "Steps suggested by the local AI",
+    "@aiSuggestedSteps": {},
+    "signInFailed": "Could not sign in. Please try again.",
+    "@signInFailed": {},
+    "loginToday": "Today",
+    "@loginToday": {},
+    "loginSample1": "Pay electricity bill",
+    "@loginSample1": {},
+    "loginSample2": "Meeting 9am",
+    "@loginSample2": {},
+    "loginSample3": "Gym 6pm",
+    "@loginSample3": {},
+    "loginProgress": "2 of 3 completed",
+    "@loginProgress": {},
+    "loginBadgeTime": "Mon 9:00",
+    "@loginBadgeTime": {},
+    "loginBadgeMeeting": "Meeting",
+    "@loginBadgeMeeting": {},
+    "loginBadgeReminder": "Reminder",
+    "@loginBadgeReminder": {},
+    "loginBadgeGym": "Gym 6pm",
+    "@loginBadgeGym": {},
+    "welcomeBack": "Welcome back 👋",
+    "@welcomeBack": {},
+    "signInToSee": "Sign in to see your tasks for today.",
+    "@signInToSee": {},
+    "notesTitle": "Notes",
+    "@notesTitle": {},
+    "searchNotesHint": "Search notes…",
+    "@searchNotesHint": {},
+    "noNotesFor": "No notes for \"{query}\".",
+    "@noNotesFor": {
+        "placeholders": {
+            "query": {
+                "type": "String"
+            }
+        }
+    },
+    "createNote": "Create note",
+    "@createNote": {},
+    "tryAgain": "Try again",
+    "@tryAgain": {},
+    "errorDeletingNote": "Error deleting note: {error}",
+    "@errorDeletingNote": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "agoDays": "{count}d ago",
+    "@agoDays": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "agoHours": "{count}h ago",
+    "@agoHours": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "agoMinutes": "{count}min ago",
+    "@agoMinutes": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "justNow": "just now",
+    "@justNow": {},
+    "saveNoteFailed": "Failed to save the note. Please try again.",
+    "@saveNoteFailed": {},
+    "agoDaysLong": "{count, plural, =1{1 day} other{{count} days}} ago",
+    "@agoDaysLong": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "agoHoursLong": "{count, plural, =1{1 hour} other{{count} hours}} ago",
+    "@agoHoursLong": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "agoMinutesLong": "{count, plural, =1{1 minute} other{{count} minutes}} ago",
+    "@agoMinutesLong": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "lastEdit": "Last edited: {when}",
+    "@lastEdit": {
+        "placeholders": {
+            "when": {
+                "type": "String"
+            }
+        }
+    },
+    "updateTaskFailed": "Failed to update.",
+    "@updateTaskFailed": {},
+    "supportEmailSubject": "[Tarefas App] Support & Feedback",
+    "@supportEmailSubject": {},
+    "emailOpenFailed": "Could not open the email app. Contact: hendrilmendes2015@gmail.com",
+    "@emailOpenFailed": {},
+    "userFallback": "User",
+    "@userFallback": {},
+    "alerts": "Alerts",
+    "@alerts": {},
+    "sendEmail": "Send email",
+    "@sendEmail": {},
+    "contactDeveloper": "Talk to the developer",
+    "@contactDeveloper": {},
+    "steps": "{count, plural, =1{1 step} other{{count} steps}}",
+    "@steps": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "tabAgenda": "Schedule",
+    "@tabAgenda": {},
+    "assistantBadge": "LOCAL ASSISTANT",
+    "@assistantBadge": {},
+    "focusNow": "FOCUS NOW",
+    "@focusNow": {},
+    "pomodoro": "Pomodoro",
+    "@pomodoro": {},
+    "quickAddEmpty": "Type the task — e.g. Tomorrow 3pm pay bill #home",
+    "@quickAddEmpty": {},
+    "quickAddTitle": "New smart task",
+    "@quickAddTitle": {},
+    "quickAddHint": "E.g. Monday 9am meeting #work !p1",
+    "@quickAddHint": {},
+    "quickAddTip": "Tip: use \"tomorrow 3pm\", \"#project\", \"!p1\" and the AI figures it out.",
+    "@quickAddTip": {},
+    "noDateSuggestToday": "No date — suggest today",
+    "@noDateSuggestToday": {},
+    "suggestedSteps": "{count, plural, =1{1 suggested step} other{{count} suggested steps}}",
+    "@suggestedSteps": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "priorityColon": "Priority:",
+    "@priorityColon": {},
+    "releaseNotesEmpty": "No release notes found for this version.",
+    "@releaseNotesEmpty": {},
+    "releaseNotesError": "Error loading release notes. Code: {code}",
+    "@releaseNotesError": {
+        "placeholders": {
+            "code": {
+                "type": "int"
+            }
+        }
+    },
+    "releaseNotesConnection": "Error loading. Check your internet connection.",
+    "@releaseNotesConnection": {},
+    "language": "Language",
+    "@language": {},
+    "languageSub": "Choose the app language",
+    "@languageSub": {},
+    "languageAuto": "Automatic (system)",
+    "@languageAuto": {},
+    "stepsShopping": "List priority items|Check pantry and fridge|Set maximum budget|Go to the supermarket or market",
+    "@stepsShopping": {},
+    "stepsMeeting": "Define agenda and goal|Gather links and presentations|Send invite/reminder to attendees|Log minutes and action items",
+    "@stepsMeeting": {},
+    "stepsCoding": "Understand requirement and edge cases|Create branch and write code|Test locally for error scenarios|Open PR and request review",
+    "@stepsCoding": {},
+    "stepsFinance": "Review bank statement|Categorize income and expenses|Spot unnecessary expenses|Update spreadsheet or finance app",
+    "@stepsFinance": {},
+    "stepsHealth": "Schedule appointment or exam|Gather past test results|Write down questions for doctor|Confirm time and route",
+    "@stepsHealth": {},
+    "noteTotalDetected": "Detected total:",
+    "@noteTotalDetected": {},
+    "noteValuesCount": "{count, plural, =1{1 value} other{{count} values}}",
+    "@noteValuesCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "insertTotalInNote": "Insert total into note",
+    "@insertTotalInNote": {}
+}

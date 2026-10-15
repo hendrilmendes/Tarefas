@@ -1,18 +1,20 @@
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:tarefas/utils/app_strings.dart';
+
 import 'dart:io';
 
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'
+    as flutter_localizations;
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:tarefas/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:shorebird_code_push/shorebird_code_push.dart';
 import 'package:tarefas/auth/auth.dart';
 import 'package:tarefas/firebase_options.dart';
 import 'package:tarefas/screens/login/login.dart';
@@ -20,7 +22,6 @@ import 'package:tarefas/theme/theme.dart';
 import 'package:tarefas/updater/updater.dart';
 import 'package:tarefas/widgets/bottom_navigation.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:wiredash/wiredash.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,20 +31,13 @@ void main() async {
   final themeModel = ThemeModel();
   await themeModel.initialize();
 
-  // Inicialização do Firebase e Crashlytics
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-  // Shorebird
-  await ShorebirdUpdater().checkForUpdate();
-
-  // Permissões para notificações
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   if (Platform.isIOS) {
     try {
-      // Solicitar permissão para notificações no iOS
       flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
             IOSFlutterLocalNotificationsPlugin
@@ -51,30 +45,27 @@ void main() async {
           .requestPermissions(alert: true, badge: true, sound: true);
     } catch (e) {
       if (kDebugMode) {
-        print("Erro ao solicitar permissão de notificação: $e");
+        print("Error requesting notification permission: $e");
       }
     }
   }
 
-  // Solicitar permissão para notificações no Android
   flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin
       >()!
       .requestNotificationsPermission();
 
-  // Desabilitar otimização de bateria
   if (Platform.isAndroid) {
     try {
       await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
     } catch (e) {
       if (kDebugMode) {
-        print("Erro ao desabilitar otimização de bateria: $e");
+        print("Error disabling battery optimization: $e");
       }
     }
   }
 
-  // Inicialização do fuso horário
   tz.initializeTimeZones();
 
   runApp(MyApp(themeModel: themeModel));
@@ -104,59 +95,71 @@ class MyApp extends StatelessWidget {
       value: themeModel,
       child: Consumer<ThemeModel>(
         builder: (_, currentThemeModel, _) {
-          return DynamicColorBuilder(
-            builder: (lightDynamic, darkDynamic) {
-              ColorScheme lightColorScheme;
-              ColorScheme darkColorScheme;
+          final lightColorScheme = ColorScheme.fromSeed(
+            seedColor: currentThemeModel.primaryColor,
+            brightness: Brightness.light,
+          );
+          final darkColorScheme = ColorScheme.fromSeed(
+            seedColor: currentThemeModel.primaryColor,
+            brightness: Brightness.dark,
+          );
 
-              if (currentThemeModel.isDynamicColorsEnabled &&
-                  lightDynamic != null &&
-                  darkDynamic != null) {
-                lightColorScheme = lightDynamic;
-                darkColorScheme = darkDynamic;
-              } else {
-                lightColorScheme = ColorScheme.fromSeed(
-                  seedColor: currentThemeModel.primaryColor,
-                  brightness: Brightness.light,
-                );
-                darkColorScheme = ColorScheme.fromSeed(
-                  seedColor: currentThemeModel.primaryColor,
-                  brightness: Brightness.dark,
-                );
-              }
-              return Wiredash(
-                projectId: 't-na-lista-1ey23re',
-                secret: 'nOYpdMFquNhBifLf9oChh5whMDcSG8y9',
-                child: MaterialApp(
-                  theme: ThemeData(
-                    brightness: Brightness.light,
-                    colorScheme: lightColorScheme,
-                    useMaterial3: true,
-                    textTheme: Typography().black.apply(
-                      fontFamily: GoogleFonts.openSans().fontFamily,
-                    ),
-                  ),
-                  darkTheme: ThemeData(
-                    brightness: Brightness.dark,
-                    colorScheme: darkColorScheme,
-                    useMaterial3: true,
-                    textTheme: Typography().white.apply(
-                      fontFamily: GoogleFonts.openSans().fontFamily,
-                    ),
-                  ),
+          final actionIconTheme = ActionIconThemeData(
+            backButtonIconBuilder: (BuildContext context) =>
+                const Icon(Icons.arrow_back_ios_new, size: 20),
+          );
 
-                  themeMode: _getThemeMode(currentThemeModel.themeMode),
-                  debugShowCheckedModeBanner: false,
-                  localizationsDelegates:
-                      AppLocalizations.localizationsDelegates,
-                  supportedLocales: AppLocalizations.supportedLocales,
-                  home: _buildHome(context),
-                  routes: {
-                    '/login': (context) =>
-                        LoginScreen(authService: authService),
-                  },
-                ),
-              );
+          const chipTheme = ChipThemeData(shape: StadiumBorder());
+
+          const pageTransitionsTheme = PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            },
+          );
+
+          return MaterialApp(
+            theme: ThemeData(
+              brightness: Brightness.light,
+              colorScheme: lightColorScheme,
+              useMaterial3: true,
+              actionIconTheme: actionIconTheme,
+              chipTheme: chipTheme,
+              pageTransitionsTheme: pageTransitionsTheme,
+              textTheme: Typography().black.apply(
+                fontFamily: GoogleFonts.inter().fontFamily,
+              ),
+            ),
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              colorScheme: darkColorScheme,
+              useMaterial3: true,
+              actionIconTheme: actionIconTheme,
+              chipTheme: chipTheme,
+              pageTransitionsTheme: pageTransitionsTheme,
+              textTheme: Typography().white.apply(
+                fontFamily: GoogleFonts.inter().fontFamily,
+              ),
+            ),
+            themeMode: _getThemeMode(currentThemeModel.themeMode),
+            debugShowCheckedModeBanner: false,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              ...GlobalMaterialLocalizations.delegates,
+              flutter_localizations.GlobalMaterialLocalizations.delegate,
+              flutter_localizations.GlobalWidgetsLocalizations.delegate,
+              flutter_localizations.GlobalCupertinoLocalizations.delegate,
+            ],
+            locale: currentThemeModel.locale,
+            supportedLocales: AppLocalizations.supportedLocales,
+            builder: (context, child) {
+              final l10n = AppLocalizations.of(context);
+              if (l10n != null) S.update(l10n);
+              return child ?? const SizedBox.shrink();
+            },
+            home: _buildHome(context),
+            routes: {
+              '/login': (context) => LoginScreen(authService: authService),
             },
           );
         },
